@@ -12,8 +12,8 @@
 // https://github.com/anthonymorast/DataTables/tree/master
 
 namespace Data {
-    template <typename Out>
-    void split(const std::string &s, char delim, Out result) {
+    template <typename T>
+    void split(const std::string &s, char delim, T result) {
         std::istringstream iss(s);
         std::string item;
         while (std::getline(iss, item, delim)) {
@@ -25,11 +25,6 @@ namespace Data {
         std::vector<std::string> elems;
         split(s, delim, std::back_inserter(elems));
         return elems;
-    };
-
-    struct DataShapeException : public std::runtime_error {
-        DataShapeException(const std::string msg) : runtime_error(msg){};
-        ~DataShapeException(){};
     };
 
     class DataTableShape {
@@ -50,7 +45,7 @@ namespace Data {
 
         int operator[](int index) const {
             if (index != 0 && index != 1) {
-                throw DataShapeException("Invalid data shape. Valid indices "
+                throw std::runtime_error("Invalid data shape. Valid indices "
                                          "are 0 for rows and 1 for columns.");
             }
             return index == 0 ? nrows : ncols;
@@ -68,6 +63,8 @@ namespace Data {
         DataTable(const std::string &filename, bool hasHeaders = true,
                   char delim = ',');
         DataTable(const std::string &dbfile, const std::string &tablename);
+        DataTable(std::vector<std::vector<std::string>> data,
+                  std::vector<std::string> headers, DataTableShape shape);
         ~DataTable(){};
         void toCSV(const std::string &filename) const;
         bool fromCSV(const std::string &filename, bool hasHeaders = true,
@@ -97,15 +94,15 @@ namespace Data {
         void shuffleRows(int passes = 100);
 
         // data analysis
-        std::vector<std::string> pctChange(std::string column) const;
-        std::vector<std::string> pctChange(int column) const;
-        std::vector<std::string> sma(std::string column, int periods) const;
-        std::vector<std::string> sma(int column, int periods) const;
-        std::vector<std::string> ema(std::string column, int periods) const;
-        std::vector<std::string> ema(int column, int periods) const;
-        std::vector<std::string> rsi(std::string column,
-                                     int periods = 14) const;
-        std::vector<std::string> rsi(int column, int periods = 14) const;
+        // std::vector<std::string> pctChange(std::string column) const;
+        // std::vector<std::string> pctChange(int column) const;
+        // std::vector<std::string> sma(std::string column, int periods) const;
+        // std::vector<std::string> sma(int column, int periods) const;
+        // std::vector<std::string> ema(std::string column, int periods) const;
+        // std::vector<std::string> ema(int column, int periods) const;
+        // std::vector<std::string> rsi(std::string column,
+        //                              int periods = 14) const;
+        // std::vector<std::string> rsi(int column, int periods = 14) const;
         std::string min(int col) const;
         std::string max(int col) const;
         std::string min() const;
@@ -116,9 +113,9 @@ namespace Data {
         double mean() const;
 
         // overridden operators
-        std::vector<std::string> operator[](int index) const; // select row
-        DataTable operator[](std::string column) const; // select column into DT
-        template <typename U>
+        std::vector<std::string> operator[](int idx) const; // select row
+        std::vector<std::string>
+        operator[](std::string columnName) const; // select column into DT
         friend std::ostream &operator<<(std::ostream &os,
                                         const DataTable &table);
 
