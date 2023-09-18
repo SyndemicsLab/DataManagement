@@ -113,4 +113,143 @@ namespace Data {
         return result;
     }
 
+    std::vector<std::string> DataTable::getColumn(int idx) const {
+        if (idx >= this->headers.size() && this->getData().size() > 0 &&
+            idx >= this->getData()[0].size()) {
+            return {}; // not found
+        }
+        std::vector<std::string> result;
+        result.push_back(this->headers[idx]);
+        for (std::vector<std::string> row : this->data) {
+            result.push_back(row[idx]);
+        }
+        return result;
+    }
+
+    DataTable DataTable::selectColumns(std::vector<int> columnIdxs) const {
+        std::vector<int> sortedIdxs(columnIdxs.size());
+        std::partial_sort_copy(std::begin(columnIdxs), std::end(columnIdxs),
+                               std::begin(sortedIdxs), std::end(sortedIdxs));
+
+        int lastIdx = sortedIdxs[sortedIdxs.size() - 1];
+        if (lastIdx >= this->headers.size() && this->getData().size() > 0 &&
+            lastIdx >= this->getData()[0].size()) {
+            return {}; // not found
+        }
+
+        std::vector<std::string> newDTHeaders;
+        for (int sIdx : sortedIdxs) {
+            newDTHeaders.push_back(this->headers[sIdx]);
+        }
+
+        std::vector<std::vector<std::string>> newDTData;
+        for (std::vector<std::string> row : this->data) {
+            std::vector<std::string> newRowData;
+            for (int sIdx : sortedIdxs) {
+                newRowData.push_back(row[sIdx]);
+            }
+            newDTData.push_back(newRowData);
+        }
+
+        DataTableShape newDTShape;
+        newDTShape.setNCols(newDTData[0].size());
+        newDTShape.setNRows(newDTData.size());
+
+        DataTable newDT(newDTData, newDTHeaders, newDTShape);
+        return newDT;
+    }
+
+    DataTable
+    DataTable::selectColumns(std::vector<std::string> columnNames) const {
+        std::vector<std::vector<std::string>> columnDataVectors;
+        std::vector<std::string> headers = columnNames;
+        int counter = 0;
+        for (std::string col : columnNames) {
+            std::vector<std::string> d = this->getColumn(col);
+            if (!d.empty()) {
+                columnDataVectors.push_back(d);
+            } else {
+                headers.erase(headers.begin() + counter);
+                counter--;
+            }
+            counter++;
+        }
+        std::vector<std::vector<std::string>> newDTData(
+            columnDataVectors[0].size());
+        int i = 0, j = 0;
+        for (std::vector<std::string> columnData : columnDataVectors) {
+            for (std::string data : columnData) {
+                newDTData[i][j] = data;
+                i++;
+            }
+            j++;
+        }
+        DataTableShape newDTShape;
+        newDTShape.setNCols(newDTData[0].size());
+        newDTShape.setNRows(newDTData.size());
+        DataTable newDT(newDTData, headers, newDTShape);
+        return newDT;
+    }
+
+    DataTable DataTable::selectRows(std::vector<int> idxs) const {
+        std::vector<int> sortedIdxs(idxs.size());
+        std::partial_sort_copy(std::begin(idxs), std::end(idxs),
+                               std::begin(sortedIdxs), std::end(sortedIdxs));
+        std::vector<std::vector<std::string>> newDTData;
+        for (int idx : idxs) {
+            newDTData.push_back(this->data[idx]);
+        }
+        DataTableShape newDTShape;
+        newDTShape.setNCols(newDTData[0].size());
+        newDTShape.setNRows(newDTData.size());
+        DataTable newDT(newDTData, this->headers, newDTShape);
+        return newDT;
+    }
+
+    DataTable DataTable::selectRowRange(int start, int end) const {
+        int total = end - start;
+        if (total < 0) {
+            return {};
+        }
+        std::vector<int> idxs(total);
+        std::iota(std::begin(idxs), std::end(idxs), start);
+        return this->selectRows(idxs);
+    }
+
+    void DataTable::dropColumns(std::vector<int> columns) {
+        std::vector<int> sortedIdxs(columns.size());
+        std::partial_sort_copy(std::begin(columns), std::end(columns),
+                               std::begin(sortedIdxs), std::end(sortedIdxs));
+
+        int offset = 0;
+        for (int idx : sortedIdxs) {
+            if (this->headers.size() > 0) {
+                this->headers.erase(this->headers.begin() + idx - offset);
+            }
+            this->data.erase(this->data.begin() + idx - offset);
+            offset++;
+        }
+    }
+
+    void DataTable::dropColumns(std::vector<std::string> columnNames) {
+        std::vector<int> colIdxs;
+        for (std::string col : columnNames) {
+            auto iter =
+                std::find(this->headers.begin(), this->headers.end(), col);
+            if (iter != this->headers.end()) {
+                colIdxs.push_back(iter - this->headers.begin());
+            }
+        }
+        this->dropColumns(colIdxs);
+    }
+
+    void DataTable::dropColumn(int column) {
+        this->headers.erase(this->headers.begin() + column);
+        this->data.erase(this->data.begin() + column);
+    }
+
+    void DataTable::dropColumn(std::string column) {}
+
+    void DataTable::shuffleRows(int passes = 100) {}
+
 } // namespace Data
