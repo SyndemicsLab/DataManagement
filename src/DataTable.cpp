@@ -27,7 +27,7 @@ namespace Data {
         if (hasHeaders) {
             std::string firstLine;
             std::getline(csvFile, firstLine);
-            this->headers = split(firstLine, delim);
+            this->headers = this->split(firstLine, delim);
             this->shape.setNCols(this->headers.size());
         } else {
             this->headers = {};
@@ -40,7 +40,7 @@ namespace Data {
         }
 
         for (std::string line : content) {
-            std::vector<std::string> rowData = split(line, delim);
+            std::vector<std::string> rowData = this->split(line, delim);
 
             // This should only ever execute the first time when hasHeaders is
             // false
