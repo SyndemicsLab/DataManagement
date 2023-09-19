@@ -1,8 +1,12 @@
 #ifndef DATATABLE_HPP_
 #define DATATABLE_HPP_
 
+#include <algorithm>
+#include <fstream>
 #include <iostream>
 #include <memory>
+#include <numeric>
+#include <random>
 #include <string>
 #include <vector>
 
@@ -10,14 +14,31 @@
 // https://github.com/anthonymorast/DataTables/tree/master
 
 namespace Data {
-    struct DataShapeException : public std::runtime_error {
-        DataShapeException(const std::string msg) : runtime_error(msg){};
-        ~DataShapeException(){};
+    template <typename T>
+    void split(const std::string &s, char delim, T result) {
+        std::istringstream iss(s);
+        std::string item;
+        while (std::getline(iss, item, delim)) {
+            *result++ = item;
+        }
     };
 
-    struct DataTableShape {
-        int nrows;
-        int ncols;
+    std::vector<std::string> split(const std::string &s, char delim) {
+        std::vector<std::string> elems;
+        split(s, delim, std::back_inserter(elems));
+        return elems;
+    };
+
+    class DataTableShape {
+    private:
+        int nrows = 0;
+        int ncols = 0;
+
+    public:
+        int getNRows() { return this->nrows; }
+        int getNCols() { return this->ncols; }
+        void setNRows(int nrows) { this->nrows = nrows; }
+        void setNCols(int ncols) { this->ncols = ncols; }
         friend std::ostream &operator<<(std::ostream &os,
                                         const DataTableShape shape) {
             os << "(" << shape.nrows << ", " << shape.ncols << ")";
@@ -26,7 +47,7 @@ namespace Data {
 
         int operator[](int index) const {
             if (index != 0 && index != 1) {
-                throw DataShapeException("Invalid data shape. Valid indices "
+                throw std::runtime_error("Invalid data shape. Valid indices "
                                          "are 0 for rows and 1 for columns.");
             }
             return index == 0 ? nrows : ncols;
@@ -35,53 +56,57 @@ namespace Data {
 
     class DataTable {
     private:
-        std::vector<std::string> _headers;
-        std::shared_ptr<std::shared_ptr<std::string>> _data;
-        DataTableShape _shape;
+        std::vector<std::string> headers;
+        std::vector<std::vector<std::string>> data;
+        DataTableShape shape;
+        std::vector<int>
+        convertStringVecToInt(std::vector<std::string> data) const;
 
     public:
         DataTable(){};
+        DataTable(const std::string &filename, bool hasHeaders = true,
+                  char delim = ',');
+        DataTable(const std::string &dbfile, const std::string &tablename);
+        DataTable(std::vector<std::vector<std::string>> data,
+                  std::vector<std::string> headers, DataTableShape shape);
         ~DataTable(){};
-        void to_csv(const std::string &filename) const;
-        bool from_csv(const std::string &filename, bool has_headers = true);
-        bool from_sql(const std::string &dbfile, const std::string &tablename);
-        std::shared_ptr<std::shared_ptr<std::string>> get_data() const {
-            return _data;
+        void toCSV(const std::string &filename) const;
+        bool fromCSV(const std::string &filename, bool hasHeaders = true,
+                     char delim = ',');
+        bool fromSQL(const std::string &dbfile, const std::string &tablename);
+        std::vector<std::vector<std::string>> getData() const { return data; }
+        std::vector<std::string> getRow(int idx) const;
+        std::vector<std::string> getColumn(int idx) const;
+        std::vector<std::string> getColumn(std::string columnName) const;
+        DataTable selectColumns(std::vector<int> columnIdxs) const;
+        DataTable selectColumns(std::vector<std::string> columnNames) const;
+        DataTable selectRows(std::vector<int> idxs) const;
+        DataTable selectRowRange(int start, int end) const;
+        DataTable topNRows(int n) const { return this->selectRowRange(0, n); }
+        DataTable bottomNRows(int n) const {
+            return selectRowRange(shape[0] - n, shape[0]);
         }
-        std::shared_ptr<std::string> get_row(int idx) const;
-        std::shared_ptr<std::string> get_column(int idx) const;
-        std::shared_ptr<std::string> get_column(std::string column_name) const;
-        DataTable select_columns(std::vector<int> column_idxs) const;
-        DataTable select_columns(std::vector<std::string> column_names) const;
-        DataTable select_rows(std::vector<int> idxs) const;
-        DataTable select_row_range(int start, int end) const;
-        DataTable top_n_rows(int n) const {
-            return this->select_row_range(0, n);
-        }
-        DataTable bottom_n_rows(int n) const {
-            return select_row_range(_shape[0] - n, _shape[0]);
-        }
-        DataTable head() const { return top_n_rows(10); }
-        DataTable tail() const { return bottom_n_rows(10); }
-        std::vector<std::string> get_headers() const { return _headers; }
+        DataTable head() const { return topNRows(10); }
+        DataTable tail() const { return bottomNRows(10); }
+        std::vector<std::string> getHeaders() const { return headers; }
 
         // table operations
-        void drop_columns(std::vector<int> columns);
-        void drop_columns(std::vector<std::string> column_names);
-        void drop_column(int column);
-        void drop_column(std::string column);
-        void shuffle_rows(int passes = 100);
+        void dropColumns(std::vector<int> columns);
+        void dropColumns(std::vector<std::string> column_names);
+        void dropColumn(int column);
+        void dropColumn(std::string column);
+        void shuffleRows(int seed = 0);
 
         // data analysis
-        std::shared_ptr<std::string> pct_change(std::string column) const;
-        std::shared_ptr<std::string> pct_change(int column) const;
-        std::shared_ptr<std::string> sma(std::string column, int periods) const;
-        std::shared_ptr<std::string> sma(int column, int periods) const;
-        std::shared_ptr<std::string> ema(std::string column, int periods) const;
-        std::shared_ptr<std::string> ema(int column, int periods) const;
-        std::shared_ptr<std::string> rsi(std::string column,
-                                         int periods = 14) const;
-        std::shared_ptr<std::string> rsi(int column, int periods = 14) const;
+        // std::vector<std::string> pctChange(std::string column) const;
+        // std::vector<std::string> pctChange(int column) const;
+        // std::vector<std::string> sma(std::string column, int periods) const;
+        // std::vector<std::string> sma(int column, int periods) const;
+        // std::vector<std::string> ema(std::string column, int periods) const;
+        // std::vector<std::string> ema(int column, int periods) const;
+        // std::vector<std::string> rsi(std::string column,
+        //                              int periods = 14) const;
+        // std::vector<std::string> rsi(int column, int periods = 14) const;
         std::string min(int col) const;
         std::string max(int col) const;
         std::string min() const;
@@ -92,16 +117,16 @@ namespace Data {
         double mean() const;
 
         // overridden operators
-        std::shared_ptr<std::string> operator[](int index) const; // select row
-        DataTable operator[](std::string column) const; // select column into DT
-        template <typename U>
+        std::vector<std::string> operator[](int idx) const; // select row
+        std::vector<std::string>
+        operator[](std::string columnName) const; // select column into DT
         friend std::ostream &operator<<(std::ostream &os,
                                         const DataTable &table);
 
         // for other classes
-        int nrows() const { return _shape[0]; }
-        int ncols() const { return _shape[1]; }
-        DataTableShape shape() const { return _shape; }
+        int nrows() const { return shape[0]; }
+        int ncols() const { return shape[1]; }
+        DataTableShape getShape() const { return shape; }
     };
 } // namespace Data
 
