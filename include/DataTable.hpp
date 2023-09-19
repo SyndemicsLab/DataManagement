@@ -7,6 +7,7 @@
 #include <memory>
 #include <numeric>
 #include <random>
+#include <sstream>
 #include <string>
 #include <vector>
 

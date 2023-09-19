@@ -1,8 +1,8 @@
 #include "DataTable.hpp"
 
 namespace Data {
-    DataTable::DataTable(const std::string &filename, bool hasHeaders = true,
-                         char delim = ',') {
+    DataTable::DataTable(const std::string &filename, bool hasHeaders,
+                         char delim) {
         this->fromCSV(filename, hasHeaders, delim);
     }
 
@@ -17,8 +17,8 @@ namespace Data {
         this->shape = shape;
     }
 
-    bool DataTable::fromCSV(const std::string &filename, bool hasHeaders = true,
-                            char delim = ',') {
+    bool DataTable::fromCSV(const std::string &filename, bool hasHeaders,
+                            char delim) {
         std::ifstream csvFile(filename);
         if (!csvFile) {
             return false;
@@ -264,7 +264,7 @@ namespace Data {
         this->dropColumn(idx);
     }
 
-    void DataTable::shuffleRows(int seed = 0) {
+    void DataTable::shuffleRows(int seed) {
         auto rng = std::default_random_engine{};
         rng.seed(seed);
         std::shuffle(std::begin(this->data), std::end(this->data), rng);
