@@ -58,6 +58,11 @@ namespace Data {
         return true;
     }
 
+    bool DataTable::fromSQL(const std::string &dbfile,
+                            const std::string &tablename) {
+        return false;
+    }
+
     void DataTable::toCSV(const std::string &filename) const {
         std::ofstream csvFile(filename);
         if (!csvFile) {
@@ -248,8 +253,141 @@ namespace Data {
         this->data.erase(this->data.begin() + column);
     }
 
-    void DataTable::dropColumn(std::string column) {}
+    void DataTable::dropColumn(std::string column) {
+        int idx = 0;
+        for (std::string colName : this->headers) {
+            if (column == colName) {
+                break;
+            }
+            idx++;
+        }
+        this->dropColumn(idx);
+    }
 
-    void DataTable::shuffleRows(int passes = 100) {}
+    void DataTable::shuffleRows(int seed = 0) {
+        auto rng = std::default_random_engine{};
+        rng.seed(seed);
+        std::shuffle(std::begin(this->data), std::end(this->data), rng);
+    }
+
+    std::string DataTable::min(int col) const {
+        std::vector<int> colData =
+            this->convertStringVecToInt(this->getColumn(col));
+
+        std::vector<int>::iterator minElement =
+            std::min_element(std::begin(colData), std::end(colData));
+
+        return std::to_string(*minElement);
+    }
+
+    std::string DataTable::max(int col) const {
+        std::vector<int> colData =
+            this->convertStringVecToInt(this->getColumn(col));
+
+        std::vector<int>::iterator maxElement =
+            std::max_element(std::begin(colData), std::end(colData));
+
+        return std::to_string(*maxElement);
+    }
+
+    std::string DataTable::min() const {
+        std::vector<int> intData;
+        for (std::vector<std::string> col : this->data) {
+            std::vector<int> tempData = this->convertStringVecToInt(col);
+            std::vector<int>::iterator minElement =
+                std::min_element(std::begin(tempData), std::end(tempData));
+            intData.push_back(*minElement);
+        }
+
+        std::vector<int>::iterator minElement =
+            std::min_element(std::begin(intData), std::end(intData));
+        return std::to_string(*minElement);
+    }
+
+    std::string DataTable::max() const {
+        std::vector<int> intData;
+        for (std::vector<std::string> col : this->data) {
+            std::vector<int> tempData = this->convertStringVecToInt(col);
+            std::vector<int>::iterator maxElement =
+                std::max_element(std::begin(tempData), std::end(tempData));
+            intData.push_back(*maxElement);
+        }
+
+        std::vector<int>::iterator maxElement =
+            std::max_element(std::begin(intData), std::end(intData));
+        return std::to_string(*maxElement);
+    }
+
+    double DataTable::sum(int col) const {
+        std::vector<int> colData =
+            this->convertStringVecToInt(this->getColumn(col));
+        double result = std::reduce(colData.begin(), colData.end());
+        return result;
+    }
+
+    double DataTable::sum() const {
+        std::vector<int> intData;
+        double runningSum = 0;
+        for (std::vector<std::string> col : this->data) {
+            std::vector<int> tempData = this->convertStringVecToInt(col);
+            runningSum += std::reduce(tempData.begin(), tempData.end());
+        }
+        return runningSum;
+    }
+
+    double DataTable::mean(int col) const {
+        std::vector<int> colData =
+            this->convertStringVecToInt(this->getColumn(col));
+        double result = std::reduce(colData.begin(), colData.end()) /
+                        ((double)(colData.size()));
+        return result;
+    }
+
+    double DataTable::mean() const {
+        std::vector<int> intData;
+        double runningSum = 0;
+        double count = 0;
+        for (std::vector<std::string> col : this->data) {
+            std::vector<int> tempData = this->convertStringVecToInt(col);
+            runningSum += std::reduce(tempData.begin(), tempData.end());
+            count += tempData.size();
+        }
+        return runningSum / count;
+    }
+
+    std::vector<int>
+    DataTable::convertStringVecToInt(std::vector<std::string> data) const {
+        std::vector<int> intData;
+        std::transform(data.begin(), data.end(), std::back_inserter(intData),
+                       [](const std::string &str) { return std::stoi(str); });
+        return intData;
+    }
+
+    std::ostream &operator<<(std::ostream &os, const DataTable &table) {
+        if (!table.getData().empty() || (table.getShape()[1] == 0))
+            return os;
+
+        std::string rowBuffer;
+        if (!table.getHeaders().empty()) {
+            std::vector<std::string> headers = table.getHeaders();
+            for (std::string header : headers) {
+                rowBuffer += header + ",";
+            }
+
+            rowBuffer.pop_back();
+            os << rowBuffer << "\n";
+        }
+
+        std::vector<std::vector<std::string>> tempData = table.getData();
+        for (std::vector<std::string> iData : tempData) {
+            rowBuffer = "";
+            for (std::string jData : iData) {
+                rowBuffer += jData + ",";
+            }
+            rowBuffer.pop_back();
+            os << rowBuffer << "\n";
+        }
+        return os;
+    }
 
 } // namespace Data

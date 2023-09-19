@@ -6,6 +6,7 @@
 #include <iostream>
 #include <memory>
 #include <numeric>
+#include <random>
 #include <string>
 #include <vector>
 
@@ -58,6 +59,8 @@ namespace Data {
         std::vector<std::string> headers;
         std::vector<std::vector<std::string>> data;
         DataTableShape shape;
+        std::vector<int>
+        convertStringVecToInt(std::vector<std::string> data) const;
 
     public:
         DataTable(){};
@@ -92,7 +95,7 @@ namespace Data {
         void dropColumns(std::vector<std::string> column_names);
         void dropColumn(int column);
         void dropColumn(std::string column);
-        void shuffleRows(int passes = 100);
+        void shuffleRows(int seed = 0);
 
         // data analysis
         // std::vector<std::string> pctChange(std::string column) const;
