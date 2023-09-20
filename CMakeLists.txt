@@ -12,6 +12,8 @@ find_package(Boost REQUIRED COMPONENTS filesystem PATHS libs/)
 
 add_library(data
     src/DataTable.cpp
+    src/Configuration.cpp
+    src/SQLite3.cpp
     libs/sqlite3/sqlite3.c
 )
 
