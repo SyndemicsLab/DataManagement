@@ -48,6 +48,7 @@ namespace Data {
         DataTableShape shape;
         std::vector<int>
         convertStringVecToInt(std::vector<std::string> data) const;
+        int getIdxOfColumnName(std::string columnName) const;
 
         template <typename T>
         void split(const std::string &s, char delim, T result) {
