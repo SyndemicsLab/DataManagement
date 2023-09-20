@@ -7,6 +7,7 @@
 #include <memory>
 #include <numeric>
 #include <random>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -14,20 +15,6 @@
 // https://github.com/anthonymorast/DataTables/tree/master
 
 namespace Data {
-    template <typename T>
-    void split(const std::string &s, char delim, T result) {
-        std::istringstream iss(s);
-        std::string item;
-        while (std::getline(iss, item, delim)) {
-            *result++ = item;
-        }
-    };
-
-    std::vector<std::string> split(const std::string &s, char delim) {
-        std::vector<std::string> elems;
-        split(s, delim, std::back_inserter(elems));
-        return elems;
-    };
 
     class DataTableShape {
     private:
@@ -61,6 +48,21 @@ namespace Data {
         DataTableShape shape;
         std::vector<int>
         convertStringVecToInt(std::vector<std::string> data) const;
+
+        template <typename T>
+        void split(const std::string &s, char delim, T result) {
+            std::istringstream iss(s);
+            std::string item;
+            while (std::getline(iss, item, delim)) {
+                *result++ = item;
+            }
+        };
+
+        std::vector<std::string> split(const std::string &s, char delim) {
+            std::vector<std::string> elems;
+            split(s, delim, std::back_inserter(elems));
+            return elems;
+        };
 
     public:
         DataTable(){};

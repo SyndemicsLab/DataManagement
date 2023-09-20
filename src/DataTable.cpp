@@ -1,8 +1,8 @@
 #include "DataTable.hpp"
 
 namespace Data {
-    DataTable::DataTable(const std::string &filename, bool hasHeaders = true,
-                         char delim = ',') {
+    DataTable::DataTable(const std::string &filename, bool hasHeaders,
+                         char delim) {
         this->fromCSV(filename, hasHeaders, delim);
     }
 
@@ -17,8 +17,8 @@ namespace Data {
         this->shape = shape;
     }
 
-    bool DataTable::fromCSV(const std::string &filename, bool hasHeaders = true,
-                            char delim = ',') {
+    bool DataTable::fromCSV(const std::string &filename, bool hasHeaders,
+                            char delim) {
         std::ifstream csvFile(filename);
         if (!csvFile) {
             return false;
@@ -27,7 +27,7 @@ namespace Data {
         if (hasHeaders) {
             std::string firstLine;
             std::getline(csvFile, firstLine);
-            this->headers = split(firstLine, delim);
+            this->headers = this->split(firstLine, delim);
             this->shape.setNCols(this->headers.size());
         } else {
             this->headers = {};
@@ -40,7 +40,7 @@ namespace Data {
         }
 
         for (std::string line : content) {
-            std::vector<std::string> rowData = split(line, delim);
+            std::vector<std::string> rowData = this->split(line, delim);
 
             // This should only ever execute the first time when hasHeaders is
             // false
@@ -264,7 +264,7 @@ namespace Data {
         this->dropColumn(idx);
     }
 
-    void DataTable::shuffleRows(int seed = 0) {
+    void DataTable::shuffleRows(int seed) {
         auto rng = std::default_random_engine{};
         rng.seed(seed);
         std::shuffle(std::begin(this->data), std::end(this->data), rng);
