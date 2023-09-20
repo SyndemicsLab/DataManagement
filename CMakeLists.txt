@@ -12,11 +12,13 @@ find_package(Boost REQUIRED COMPONENTS filesystem PATHS libs/)
 
 add_library(data
     src/DataTable.cpp
+    libs/sqlite3/sqlite3.c
 )
 
 set(DM_INCLUDES "${CMAKE_CURRENT_LIST_DIR}/include")
+set(SQL_INCLUDES "${CMAKE_CURRENT_LIST_DIR}/libs/sqlite3")
 
-target_include_directories(data PUBLIC ${DM_INCLUDES})
+target_include_directories(data PUBLIC ${DM_INCLUDES} ${SQL_INCLUDES})
 
 target_link_libraries(data
     Boost::filesystem
