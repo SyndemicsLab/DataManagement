@@ -111,7 +111,7 @@ namespace Data {
         }
         int idx = iter - this->headers.begin();
         std::vector<std::string> result;
-        result.push_back(columnName);
+        // result.push_back(columnName);
         for (std::vector<std::string> row : this->data) {
             result.push_back(row[idx]);
         }
@@ -124,7 +124,7 @@ namespace Data {
             return {}; // not found
         }
         std::vector<std::string> result;
-        result.push_back(this->headers[idx]);
+        // result.push_back(this->headers[idx]);
         for (std::vector<std::string> row : this->data) {
             result.push_back(row[idx]);
         }
@@ -166,34 +166,14 @@ namespace Data {
 
     DataTable
     DataTable::selectColumns(std::vector<std::string> columnNames) const {
-        std::vector<std::vector<std::string>> columnDataVectors;
-        std::vector<std::string> headers = columnNames;
-        int counter = 0;
-        for (std::string col : columnNames) {
-            std::vector<std::string> d = this->getColumn(col);
-            if (!d.empty()) {
-                columnDataVectors.push_back(d);
-            } else {
-                headers.erase(headers.begin() + counter);
-                counter--;
+        std::vector<int> colIdxs;
+        for (std::string colname : columnNames) {
+            int idx = this->getIdxOfColumnName(colname);
+            if (idx != -1) {
+                colIdxs.push_back(idx);
             }
-            counter++;
         }
-        std::vector<std::vector<std::string>> newDTData(
-            columnDataVectors[0].size());
-        int i = 0, j = 0;
-        for (std::vector<std::string> columnData : columnDataVectors) {
-            for (std::string data : columnData) {
-                newDTData[i][j] = data;
-                i++;
-            }
-            j++;
-        }
-        DataTableShape newDTShape;
-        newDTShape.setNCols(newDTData[0].size());
-        newDTShape.setNRows(newDTData.size());
-        DataTable newDT(newDTData, headers, newDTShape);
-        return newDT;
+        return this->selectColumns(colIdxs);
     }
 
     DataTable DataTable::selectRows(std::vector<int> idxs) const {
@@ -202,7 +182,9 @@ namespace Data {
                                std::begin(sortedIdxs), std::end(sortedIdxs));
         std::vector<std::vector<std::string>> newDTData;
         for (int idx : idxs) {
-            newDTData.push_back(this->data[idx]);
+            if (idx < this->data.size()) {
+                newDTData.push_back(this->data[idx]);
+            }
         }
         DataTableShape newDTShape;
         newDTShape.setNCols(newDTData[0].size());
@@ -231,7 +213,9 @@ namespace Data {
             if (this->headers.size() > 0) {
                 this->headers.erase(this->headers.begin() + idx - offset);
             }
-            this->data.erase(this->data.begin() + idx - offset);
+            for (std::vector<std::string> &row : this->data) {
+                row.erase(row.begin() + idx - offset);
+            }
             offset++;
         }
     }
@@ -250,7 +234,9 @@ namespace Data {
 
     void DataTable::dropColumn(int column) {
         this->headers.erase(this->headers.begin() + column);
-        this->data.erase(this->data.begin() + column);
+        for (std::vector<std::string> &row : this->data) {
+            row.erase(row.begin() + column);
+        }
     }
 
     void DataTable::dropColumn(std::string column) {
@@ -388,6 +374,18 @@ namespace Data {
             os << rowBuffer << "\n";
         }
         return os;
+    }
+
+    int DataTable::getIdxOfColumnName(std::string columnName) const {
+        int idx = 0;
+        for (std::string colname : this->headers) {
+            if (columnName == colname) {
+                return idx;
+            }
+            idx++;
+        }
+
+        return -1;
     }
 
 } // namespace Data
