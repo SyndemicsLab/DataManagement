@@ -26,9 +26,9 @@ target_link_libraries(data
     Boost::filesystem
 )
 
-option(BUILD_TESTS "enable Data tests" ON)
+option(BUILD_DATA_TESTS "enable Data tests" OFF)
 
-if(BUILD_TESTS)
+if(BUILD_DATA_TESTS)
 
     include(FetchContent)
     FetchContent_Declare(
