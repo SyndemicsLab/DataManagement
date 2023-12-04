@@ -3,16 +3,34 @@
 namespace Data {
     std::vector<std::string>
     Configuration::parseString2VectorOfStrings(std::string st) {
-        return {};
+        std::stringstream ss(st);
+        std::vector<std::string> result;
+
+        while (ss.good()) {
+            std::string substr;
+            getline(ss, substr, ',');
+            // remove leading whitespace
+            int first = substr.find_first_not_of(' ');
+            // break and return if the string is empty
+            // TODO log warning when this happens
+            if (std::string::npos == first) {
+                break;
+            }
+            int last = substr.find_last_not_of(' ');
+            result.push_back(substr.substr(first, (last - first + 1)));
+        }
+        return result;
     }
 
     std::vector<int> Configuration::parseString2VectorOfInts(std::string st) {
-        return {};
-    }
+        std::vector<int> result;
 
-    std::vector<int> Configuration::updateIndices(std::vector<int> indices,
-                                                  std::vector<int> maxIndices) {
-        return {};
+        std::istringstream iss(st);
+        std::string token;
+        while (std::getline(iss, token, ',')) {
+            result.push_back(std::stoi(token));
+        }
+        return result;
     }
 
     Configuration::Configuration(std::string configFile) {}

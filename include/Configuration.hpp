@@ -13,8 +13,6 @@ namespace Data {
 
         std::vector<std::string> parseString2VectorOfStrings(std::string st);
         std::vector<int> parseString2VectorOfInts(std::string st);
-        std::vector<int> updateIndices(std::vector<int> indices,
-                                       std::vector<int> maxIndices);
 
     public:
         // CONSTRUCTORS
