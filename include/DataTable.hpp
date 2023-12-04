@@ -22,8 +22,8 @@ namespace Data {
         int ncols = 0;
 
     public:
-        int getNRows() { return this->nrows; }
-        int getNCols() { return this->ncols; }
+        int getNRows() const { return this->nrows; }
+        int getNCols() const { return this->ncols; }
         void setNRows(int nrows) { this->nrows = nrows; }
         void setNCols(int ncols) { this->ncols = ncols; }
         friend std::ostream &operator<<(std::ostream &os,
@@ -65,6 +65,18 @@ namespace Data {
             return elems;
         };
 
+        void checkJoin(int &t1ColIdx, std::string tableOneColumnName,
+                       DataTable const &tableTwo, int &t2ColIdx,
+                       std::string tableTwoColumnName,
+                       std::vector<std::string> &headerVec) const;
+
+        void checkJoin(std::vector<int> &t1ColIndices,
+                       std::vector<std::string> tableOneColumnNames,
+                       DataTable const &tableTwo,
+                       std::vector<int> &t2ColIndices,
+                       std::vector<std::string> tableTwoColumnNames,
+                       std::vector<std::string> &headerVec) const;
+
     public:
         DataTable(){};
         DataTable(const std::string &filename, bool hasHeaders = true,
@@ -85,6 +97,27 @@ namespace Data {
         DataTable selectColumns(std::vector<std::string> columnNames) const;
         DataTable selectRows(std::vector<int> idxs) const;
         DataTable selectRowRange(int start, int end) const;
+
+        DataTable innerJoin(DataTable const &tableTwo,
+                            std::string tableOneColumnName,
+                            std::string tableTwoColumnName) const;
+
+        DataTable innerJoin(DataTable const &tableTwo,
+                            std::vector<std::string> tableOneColumnNames,
+                            std::vector<std::string> tableTwoColumnNames) const;
+
+        DataTable leftJoin(DataTable const &tableTwo,
+                           std::string tableOneColumnName,
+                           std::string tableTwoColumnName) const;
+
+        DataTable rightJoin(DataTable const &tableTwo,
+                            std::string tableOneColumnName,
+                            std::string tableTwoColumnName) const;
+
+        DataTable outerJoin(DataTable const &tableTwo,
+                            std::string tableOneColumnName,
+                            std::string tableTwoColumnName) const;
+
         DataTable topNRows(int n) const { return this->selectRowRange(0, n); }
         DataTable bottomNRows(int n) const {
             return selectRowRange(shape[0] - n, shape[0]);
@@ -100,16 +133,6 @@ namespace Data {
         void dropColumn(std::string column);
         void shuffleRows(int seed = 0);
 
-        // data analysis
-        // std::vector<std::string> pctChange(std::string column) const;
-        // std::vector<std::string> pctChange(int column) const;
-        // std::vector<std::string> sma(std::string column, int periods) const;
-        // std::vector<std::string> sma(int column, int periods) const;
-        // std::vector<std::string> ema(std::string column, int periods) const;
-        // std::vector<std::string> ema(int column, int periods) const;
-        // std::vector<std::string> rsi(std::string column,
-        //                              int periods = 14) const;
-        // std::vector<std::string> rsi(int column, int periods = 14) const;
         std::string min(int col) const;
         std::string max(int col) const;
         std::string min() const;

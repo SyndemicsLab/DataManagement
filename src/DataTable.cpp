@@ -203,6 +203,112 @@ namespace Data {
         return this->selectRows(idxs);
     }
 
+    DataTable DataTable::innerJoin(DataTable const &tableTwo,
+                                   std::string tableOneColumnName,
+                                   std::string tableTwoColumnName) const {
+        int t1ColIdx = -1, t2ColIdx = -1;
+        std::vector<std::string> headerVec;
+        this->checkJoin(t1ColIdx, tableOneColumnName, tableTwo, t2ColIdx,
+                        tableTwoColumnName, headerVec);
+        if (t1ColIdx < 0 || t2ColIdx < 0) {
+            return {};
+        }
+
+        std::vector<std::vector<std::string>> newDTData;
+        for (int i = 0; i < shape.getNRows(); ++i) {
+            for (int j = 0; j < tableTwo.shape.getNRows(); ++j) {
+                std::vector<std::string> t1row = getRow(i);
+                std::vector<std::string> t2row = tableTwo.getRow(j);
+                if (t1row[t1ColIdx] == t2row[t2ColIdx]) {
+                    t2row.erase(t2row.begin() + t2ColIdx);
+                    t1row.insert(t1row.end(), t2row.begin(), t2row.end());
+                    newDTData.push_back(t1row);
+                }
+            }
+        }
+
+        DataTableShape newDTShape;
+        newDTShape.setNCols(headerVec.size());
+        newDTShape.setNRows(newDTData.size());
+
+        DataTable newDT(newDTData, headerVec, newDTShape);
+
+        return newDT;
+    }
+
+    DataTable
+    DataTable::innerJoin(DataTable const &tableTwo,
+                         std::vector<std::string> tableOneColumnNames,
+                         std::vector<std::string> tableTwoColumnNames) const {
+        std::vector<int> t1ColIndices;
+        std::vector<int> t2ColIndices;
+        std::vector<std::string> headerVec;
+        this->checkJoin(t1ColIndices, tableOneColumnNames, tableTwo,
+                        t2ColIndices, tableTwoColumnNames, headerVec);
+
+        if (t1ColIndices.size() != t2ColIndices.size()) {
+            return {};
+        }
+        for (int i = 0; i < t1ColIndices.size(); ++i) {
+            if (t1ColIndices[i] < 0 || t1ColIndices[i] < 0) {
+                return {};
+            }
+        }
+
+        std::vector<std::vector<std::string>> newDTData;
+        for (int i = 0; i < shape.getNRows(); ++i) {
+            for (int j = 0; j < tableTwo.shape.getNRows(); ++j) {
+                std::vector<std::string> t1row = getRow(i);
+                std::vector<std::string> t2row = tableTwo.getRow(j);
+                bool match = true;
+                for (int k = 0; k < t1ColIndices.size(); ++k) {
+                    if (t1row[k] != t2row[k]) {
+                        match = false;
+                    }
+                }
+                if (match) {
+                    // reverse iterator so we don't have to worry about erasing
+                    // idxs
+                    for (std::vector<int>::reverse_iterator rIt =
+                             t2ColIndices.rbegin();
+                         rIt != t2ColIndices.rend(); ++rIt) {
+                        int idx =
+                            std::distance(begin(t2ColIndices), rIt.base()) - 1;
+                        t2row.erase(t2row.begin() + idx);
+                    }
+                    t1row.insert(t1row.end(), t2row.begin(), t2row.end());
+                    newDTData.push_back(t1row);
+                }
+            }
+        }
+
+        DataTableShape newDTShape;
+        newDTShape.setNCols(headerVec.size());
+        newDTShape.setNRows(newDTData.size());
+
+        DataTable newDT(newDTData, headerVec, newDTShape);
+
+        return newDT;
+    }
+
+    DataTable DataTable::leftJoin(DataTable const &tableTwo,
+                                  std::string tableOneColumnName,
+                                  std::string tableTwoColumnName) const {
+        throw new std::logic_error("Not Implemented Yet");
+    }
+
+    DataTable DataTable::rightJoin(DataTable const &tableTwo,
+                                   std::string tableOneColumnName,
+                                   std::string tableTwoColumnName) const {
+        throw new std::logic_error("Not Implemented Yet");
+    }
+
+    DataTable DataTable::outerJoin(DataTable const &tableTwo,
+                                   std::string tableOneColumnName,
+                                   std::string tableTwoColumnName) const {
+        throw new std::logic_error("Not Implemented Yet");
+    }
+
     void DataTable::dropColumns(std::vector<int> columns) {
         std::vector<int> sortedIdxs(columns.size());
         std::partial_sort_copy(std::begin(columns), std::end(columns),
@@ -386,6 +492,59 @@ namespace Data {
         }
 
         return -1;
+    }
+
+    void DataTable::checkJoin(int &t1ColIdx, std::string tableOneColumnName,
+                              DataTable const &tableTwo, int &t2ColIdx,
+                              std::string tableTwoColumnName,
+                              std::vector<std::string> &headerVec) const {
+
+        t1ColIdx = getIdxOfColumnName(tableOneColumnName);
+        t2ColIdx = tableTwo.getIdxOfColumnName(tableTwoColumnName);
+        if (t1ColIdx < 0 || t2ColIdx < 0) {
+            return;
+        }
+
+        std::vector<std::string> temp = tableTwo.getHeaders();
+        temp.erase(temp.begin() + t2ColIdx);
+
+        std::vector<std::string> combinedHeaders = headers;
+        combinedHeaders.insert(combinedHeaders.end(), temp.begin(), temp.end());
+
+        headerVec = combinedHeaders;
+    }
+
+    void DataTable::checkJoin(std::vector<int> &t1ColIndices,
+                              std::vector<std::string> tableOneColumnNames,
+                              DataTable const &tableTwo,
+                              std::vector<int> &t2ColIndices,
+                              std::vector<std::string> tableTwoColumnNames,
+                              std::vector<std::string> &headerVec) const {
+        if (tableOneColumnNames.size() != tableTwoColumnNames.size()) {
+            return;
+        }
+        for (int i = 0; i < tableTwoColumnNames.size(); ++i) {
+            int t1ColIdx = getIdxOfColumnName(tableOneColumnNames[i]);
+            int t2ColIdx = tableTwo.getIdxOfColumnName(tableTwoColumnNames[i]);
+            if (t1ColIdx < 0 || t2ColIdx < 0) {
+                return;
+            }
+            t1ColIndices.push_back(t1ColIdx);
+            t2ColIndices.push_back(t2ColIdx);
+        }
+
+        std::vector<std::string> temp = tableTwo.getHeaders();
+
+        for (std::vector<int>::reverse_iterator rIt = t2ColIndices.rbegin();
+             rIt != t2ColIndices.rend(); ++rIt) {
+            int idx = std::distance(begin(t2ColIndices), rIt.base()) - 1;
+            temp.erase(temp.begin() + idx);
+        }
+
+        std::vector<std::string> combinedHeaders = headers;
+        combinedHeaders.insert(combinedHeaders.end(), temp.begin(), temp.end());
+
+        headerVec = combinedHeaders;
     }
 
 } // namespace Data
