@@ -236,6 +236,60 @@ namespace Data {
         return newDT;
     }
 
+    DataTable
+    DataTable::innerJoin(DataTable const &tableTwo,
+                         std::vector<std::string> tableOneColumnNames,
+                         std::vector<std::string> tableTwoColumnNames) const {
+        std::vector<int> t1ColIndices;
+        std::vector<int> t2ColIndices;
+        std::vector<std::string> headerVec;
+        this->checkJoin(t1ColIndices, tableOneColumnNames, tableTwo,
+                        t2ColIndices, tableTwoColumnNames, headerVec);
+
+        if (t1ColIndices.size() != t2ColIndices.size()) {
+            return {};
+        }
+        for (int i = 0; i < t1ColIndices.size(); ++i) {
+            if (t1ColIndices[i] < 0 || t1ColIndices[i] < 0) {
+                return {};
+            }
+        }
+
+        std::vector<std::vector<std::string>> newDTData;
+        for (int i = 0; i < shape.getNRows(); ++i) {
+            for (int j = 0; j < tableTwo.shape.getNRows(); ++j) {
+                std::vector<std::string> t1row = getRow(i);
+                std::vector<std::string> t2row = tableTwo.getRow(j);
+                bool match = true;
+                for (int k = 0; k < t1ColIndices.size(); ++k) {
+                    if (t1row[k] != t2row[k]) {
+                        match = false;
+                    }
+                }
+                if (match) {
+                    // reverse iterator so we don't have
+                    for (std::vector<int>::reverse_iterator rIt =
+                             t2ColIndices.rbegin();
+                         rIt != t2ColIndices.rend(); ++rIt) {
+                        int idx =
+                            std::distance(begin(t2ColIndices), rIt.base()) - 1;
+                        t2row.erase(t2row.begin() + idx);
+                    }
+                    t1row.insert(t1row.end(), t2row.begin(), t2row.end());
+                    newDTData.push_back(t1row);
+                }
+            }
+        }
+
+        DataTableShape newDTShape;
+        newDTShape.setNCols(headerVec.size());
+        newDTShape.setNRows(newDTData.size());
+
+        DataTable newDT(newDTData, headerVec, newDTShape);
+
+        return newDT;
+    }
+
     DataTable DataTable::leftJoin(DataTable const &tableTwo,
                                   std::string tableOneColumnName,
                                   std::string tableTwoColumnName) const {
@@ -452,6 +506,39 @@ namespace Data {
 
         std::vector<std::string> temp = tableTwo.getHeaders();
         temp.erase(temp.begin() + t2ColIdx);
+
+        std::vector<std::string> combinedHeaders = headers;
+        combinedHeaders.insert(combinedHeaders.end(), temp.begin(), temp.end());
+
+        headerVec = combinedHeaders;
+    }
+
+    void DataTable::checkJoin(std::vector<int> &t1ColIndices,
+                              std::vector<std::string> tableOneColumnNames,
+                              DataTable const &tableTwo,
+                              std::vector<int> &t2ColIndices,
+                              std::vector<std::string> tableTwoColumnNames,
+                              std::vector<std::string> &headerVec) const {
+        if (tableOneColumnNames.size() != tableTwoColumnNames.size()) {
+            return;
+        }
+        for (int i = 0; i < tableTwoColumnNames.size(); ++i) {
+            int t1ColIdx = getIdxOfColumnName(tableOneColumnNames[i]);
+            int t2ColIdx = tableTwo.getIdxOfColumnName(tableTwoColumnNames[i]);
+            if (t1ColIdx < 0 || t2ColIdx < 0) {
+                return;
+            }
+            t1ColIndices.push_back(t1ColIdx);
+            t2ColIndices.push_back(t2ColIdx);
+        }
+
+        std::vector<std::string> temp = tableTwo.getHeaders();
+
+        for (std::vector<int>::reverse_iterator rIt = t2ColIndices.rbegin();
+             rIt != t2ColIndices.rend(); ++rIt) {
+            int idx = std::distance(begin(t2ColIndices), rIt.base()) - 1;
+            temp.erase(temp.begin() + idx);
+        }
 
         std::vector<std::string> combinedHeaders = headers;
         combinedHeaders.insert(combinedHeaders.end(), temp.begin(), temp.end());

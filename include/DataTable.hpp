@@ -70,6 +70,13 @@ namespace Data {
                        std::string tableTwoColumnName,
                        std::vector<std::string> &headerVec) const;
 
+        void checkJoin(std::vector<int> &t1ColIndices,
+                       std::vector<std::string> tableOneColumnNames,
+                       DataTable const &tableTwo,
+                       std::vector<int> &t2ColIndices,
+                       std::vector<std::string> tableTwoColumnNames,
+                       std::vector<std::string> &headerVec) const;
+
     public:
         DataTable(){};
         DataTable(const std::string &filename, bool hasHeaders = true,
@@ -94,6 +101,10 @@ namespace Data {
         DataTable innerJoin(DataTable const &tableTwo,
                             std::string tableOneColumnName,
                             std::string tableTwoColumnName) const;
+
+        DataTable innerJoin(DataTable const &tableTwo,
+                            std::vector<std::string> tableOneColumnNames,
+                            std::vector<std::string> tableTwoColumnNames) const;
 
         DataTable leftJoin(DataTable const &tableTwo,
                            std::string tableOneColumnName,
@@ -122,16 +133,6 @@ namespace Data {
         void dropColumn(std::string column);
         void shuffleRows(int seed = 0);
 
-        // data analysis
-        // std::vector<std::string> pctChange(std::string column) const;
-        // std::vector<std::string> pctChange(int column) const;
-        // std::vector<std::string> sma(std::string column, int periods) const;
-        // std::vector<std::string> sma(int column, int periods) const;
-        // std::vector<std::string> ema(std::string column, int periods) const;
-        // std::vector<std::string> ema(int column, int periods) const;
-        // std::vector<std::string> rsi(std::string column,
-        //                              int periods = 14) const;
-        // std::vector<std::string> rsi(int column, int periods = 14) const;
         std::string min(int col) const;
         std::string max(int col) const;
         std::string min() const;

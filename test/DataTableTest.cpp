@@ -746,3 +746,55 @@ TEST_F(DataTableTest, innerJoin) {
         }
     }
 }
+
+TEST_F(DataTableTest, multiInnerJoin) {
+    std::vector<std::string> h1 = {"id", "id2", "test1", "test2", "test3"};
+    std::vector<std::string> h2 = {"id", "id2", "test4", "test5", "test6"};
+
+    std::vector<std::vector<std::string>> d1 = {
+        {"1", "a", "hi1.1", "hi1.2", "hi1.3"},
+        {"2", "b", "hi2.1", "hi2.2", "hi2.3"},
+        {"2", "c", "hi3.1", "hi3.2", "hi3.3"}};
+
+    Data::DataTableShape shape1;
+    shape1.setNCols(4);
+    shape1.setNRows(3);
+
+    std::vector<std::vector<std::string>> d2 = {
+        {"1", "a", "hi4.1", "hi4.2", "hi4.3"},
+        {"2", "b", "hi5.1", "hi5.2", "hi5.3"},
+        {"3", "b", "hi6.1", "hi6.2", "hi6.3"}};
+
+    Data::DataTableShape shape2;
+    shape2.setNCols(4);
+    shape2.setNRows(3);
+
+    Data::DataTable dt1(d1, h1, shape1);
+    Data::DataTable dt2(d2, h2, shape2);
+
+    std::vector<std::string> columnNames = {"id", "id2"};
+    Data::DataTable resultTable = dt1.innerJoin(dt2, columnNames, columnNames);
+    std::vector<std::string> resultHeaders = resultTable.getHeaders();
+    std::vector<std::vector<std::string>> resultData = resultTable.getData();
+
+    std::vector<std::string> expectedHeaders = {
+        "id", "id2", "test1", "test2", "test3", "test4", "test5", "test6"};
+
+    std::vector<std::vector<std::string>> expectedData = {
+        {"1", "a", "hi1.1", "hi1.2", "hi1.3", "hi4.1", "hi4.2", "hi4.3"},
+        {"2", "b", "hi2.1", "hi2.2", "hi2.3", "hi5.1", "hi5.2", "hi5.3"}};
+
+    std::cout << resultData.size() << std::endl;
+    ASSERT_TRUE(resultData.size() == expectedData.size());
+    ASSERT_TRUE(resultData[0].size() == expectedData[0].size());
+
+    for (int i = 0; i < resultHeaders.size(); ++i) {
+        EXPECT_EQ(resultHeaders[i], expectedHeaders[i]);
+    }
+
+    for (int i = 0; i < resultData.size(); ++i) {
+        for (int j = 0; j < resultData[0].size(); ++j) {
+            EXPECT_EQ(resultData[i][j], expectedData[i][j]);
+        }
+    }
+}
