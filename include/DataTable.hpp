@@ -22,8 +22,8 @@ namespace Data {
         int ncols = 0;
 
     public:
-        int getNRows() { return this->nrows; }
-        int getNCols() { return this->ncols; }
+        int getNRows() const { return this->nrows; }
+        int getNCols() const { return this->ncols; }
         void setNRows(int nrows) { this->nrows = nrows; }
         void setNCols(int ncols) { this->ncols = ncols; }
         friend std::ostream &operator<<(std::ostream &os,
@@ -65,6 +65,11 @@ namespace Data {
             return elems;
         };
 
+        void checkJoin(int &t1ColIdx, std::string tableOneColumnName,
+                       DataTable const &tableTwo, int &t2ColIdx,
+                       std::string tableTwoColumnName,
+                       std::vector<std::string> &headerVec) const;
+
     public:
         DataTable(){};
         DataTable(const std::string &filename, bool hasHeaders = true,
@@ -85,6 +90,23 @@ namespace Data {
         DataTable selectColumns(std::vector<std::string> columnNames) const;
         DataTable selectRows(std::vector<int> idxs) const;
         DataTable selectRowRange(int start, int end) const;
+
+        DataTable innerJoin(DataTable const &tableTwo,
+                            std::string tableOneColumnName,
+                            std::string tableTwoColumnName) const;
+
+        DataTable leftJoin(DataTable const &tableTwo,
+                           std::string tableOneColumnName,
+                           std::string tableTwoColumnName) const;
+
+        DataTable rightJoin(DataTable const &tableTwo,
+                            std::string tableOneColumnName,
+                            std::string tableTwoColumnName) const;
+
+        DataTable outerJoin(DataTable const &tableTwo,
+                            std::string tableOneColumnName,
+                            std::string tableTwoColumnName) const;
+
         DataTable topNRows(int n) const { return this->selectRowRange(0, n); }
         DataTable bottomNRows(int n) const {
             return selectRowRange(shape[0] - n, shape[0]);
