@@ -267,7 +267,8 @@ namespace Data {
                     }
                 }
                 if (match) {
-                    // reverse iterator so we don't have
+                    // reverse iterator so we don't have to worry about erasing
+                    // idxs
                     for (std::vector<int>::reverse_iterator rIt =
                              t2ColIndices.rbegin();
                          rIt != t2ColIndices.rend(); ++rIt) {
