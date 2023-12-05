@@ -40,7 +40,7 @@ namespace Data {
         return result;
     }
 
-    template <T> Configuration::get<T>(std::string str) {
+    template <T> T Configuration::get<T>(std::string str) {
         return this->ptree.get<T>(str);
     }
 
