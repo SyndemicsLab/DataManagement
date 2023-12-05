@@ -3,7 +3,7 @@
 namespace Data {
     Configuration::Configuration(std::string configFile) {
         std::ifstream f(configFile.c_str());
-        assert(f.good(), "Valid Config File Provided");
+        assert((f.good(), "Valid Config File Provided"));
 
         read_ini(configFile, this->ptree);
     }
