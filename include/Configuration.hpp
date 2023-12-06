@@ -22,10 +22,12 @@ namespace Data {
         virtual ~Configuration() = default;
 
         /// @brief
-        /// @tparam T
+        /// @param T
         /// @param str
         /// @return
-        template <typename T> T get(std::string str);
+        template <typename T> T get(std::string str) {
+            return this->ptree.get<T>(str);
+        }
     };
 } // namespace Data
 

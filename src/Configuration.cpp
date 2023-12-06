@@ -41,23 +41,6 @@ namespace Data {
     }
 
     template <>
-    unsigned long Configuration::get<unsigned long>(std::string str) {
-        return this->ptree.get<unsigned long>(str);
-    }
-
-    template <> double Configuration::get<double>(std::string str) {
-        return this->ptree.get<double>(str);
-    }
-
-    template <> bool Configuration::get<bool>(std::string str) {
-        return this->ptree.get<bool>(str);
-    }
-
-    template <> int Configuration::get<int>(std::string str) {
-        return this->ptree.get<int>(str);
-    }
-
-    template <>
     std::vector<int> Configuration::get<std::vector<int>>(std::string str) {
         std::string res = this->ptree.get<std::string>(str);
         std::vector<int> resVec = this->parseString2VectorOfInts(res);
