@@ -1,6 +1,13 @@
 #include "Configuration.hpp"
 
 namespace Data {
+    Configuration::Configuration(std::string configFile) {
+        std::ifstream f(configFile.c_str());
+        assert((f.good(), "Valid Config File Provided"));
+
+        read_ini(configFile, this->ptree);
+    }
+
     std::vector<std::string>
     Configuration::parseString2VectorOfStrings(std::string st) {
         std::stringstream ss(st);
@@ -33,5 +40,24 @@ namespace Data {
         return result;
     }
 
-    Configuration::Configuration(std::string configFile) {}
+    template <>
+    std::vector<int> Configuration::get<std::vector<int>>(std::string str) {
+        std::string res = this->ptree.get<std::string>(str);
+        std::vector<int> resVec = this->parseString2VectorOfInts(res);
+        std::vector<int> result;
+        for (int r : resVec) {
+            result.push_back(r);
+        }
+        return result;
+    }
+
+    template <>
+    std::vector<std::string>
+    Configuration::get<std::vector<std::string>>(std::string str) {
+        std::string res = this->ptree.get<std::string>(str);
+        if (res.empty()) {
+            return {};
+        }
+        return this->parseString2VectorOfStrings(res);
+    }
 } // namespace Data

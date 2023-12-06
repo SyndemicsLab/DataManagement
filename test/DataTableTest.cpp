@@ -1,9 +1,8 @@
+#include "DataTable.hpp"
 #include <boost/filesystem.hpp>
 #include <gtest/gtest.h>
 #include <string>
 #include <vector>
-
-#include "DataTable.hpp"
 
 class DataTableTest : public ::testing::Test {
 protected:

@@ -5,6 +5,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/property_tree/ini_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
+#include <cassert>
 
 namespace Data {
     class Configuration {
@@ -21,10 +22,12 @@ namespace Data {
         virtual ~Configuration() = default;
 
         /// @brief
-        /// @tparam T
+        /// @param T
         /// @param str
         /// @return
-        template <typename T> T get(std::string str);
+        template <typename T> T get(std::string str) {
+            return this->ptree.get<T>(str);
+        }
     };
 } // namespace Data
 
