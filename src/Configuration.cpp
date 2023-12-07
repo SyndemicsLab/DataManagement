@@ -39,25 +39,4 @@ namespace Data {
         }
         return result;
     }
-
-    template <>
-    std::vector<int> Configuration::get<std::vector<int>>(std::string str) {
-        std::string res = this->ptree.get<std::string>(str);
-        std::vector<int> resVec = this->parseString2VectorOfInts(res);
-        std::vector<int> result;
-        for (int r : resVec) {
-            result.push_back(r);
-        }
-        return result;
-    }
-
-    template <>
-    std::vector<std::string>
-    Configuration::get<std::vector<std::string>>(std::string str) {
-        std::string res = this->ptree.get<std::string>(str);
-        if (res.empty()) {
-            return {};
-        }
-        return this->parseString2VectorOfStrings(res);
-    }
 } // namespace Data
