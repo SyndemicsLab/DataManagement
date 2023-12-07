@@ -12,9 +12,6 @@ namespace Data {
     private:
         boost::property_tree::ptree ptree;
 
-        std::vector<std::string> parseString2VectorOfStrings(std::string st);
-        std::vector<int> parseString2VectorOfInts(std::string st);
-
     public:
         // CONSTRUCTORS
         Configuration(){};
@@ -28,6 +25,15 @@ namespace Data {
         template <typename T> T get(std::string str) {
             return this->ptree.get<T>(str);
         }
+
+        /// @brief
+        /// @param
+        /// @return
+        std::vector<std::string> parseString2VectorOfStrings(std::string st);
+        /// @brief
+        /// @param
+        /// @return
+        std::vector<int> parseString2VectorOfInts(std::string st);
     };
 } // namespace Data
 

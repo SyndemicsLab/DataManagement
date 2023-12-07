@@ -20,8 +20,24 @@ protected:
     }
 };
 
-TEST_F(ConfigurationTest, ParseConfig) {
-    outStream << "[simulation]\nduration = 120" << std::endl;
+TEST_F(ConfigurationTest, ParseSingleValue) {
+    outStream << "[section]\nvalue = 120" << std::endl;
     Data::Configuration config(tempFilePath.string());
-    EXPECT_EQ(120, config.get<int>("simulation.duration"));
+    EXPECT_EQ(120, config.get<int>("section.value"));
+}
+
+TEST_F(ConfigurationTest, ParseVectorOfInts) {
+    outStream << "[section]\nnumbers = 10, 20, 30, 40, 50" << std::endl;
+    Data::Configuration config(tempFilePath.string());
+    std::string numbers = config.get<std::string>("section.numbers");
+    std::vector<int> expected = {10, 20, 30, 40, 50};
+    EXPECT_EQ(expected, config.parseString2VectorOfInts(numbers));
+}
+
+TEST_F(ConfigurationTest, ParseVectorOfStrings) {
+    outStream << "[section]\nstrings = foo, bar, baz, bat" << std::endl;
+    Data::Configuration config(tempFilePath.string());
+    std::string strings = config.get<std::string>("section.strings");
+    std::vector<std::string> expected = {"foo", "bar", "baz", "bat"};
+    EXPECT_EQ(expected, config.parseString2VectorOfStrings(strings));
 }
