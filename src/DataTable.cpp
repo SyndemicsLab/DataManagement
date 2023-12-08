@@ -302,17 +302,30 @@ namespace Data {
         auto rng = std::default_random_engine{};
         rng.seed(seed);
 
-        std::vector<int> rows(this->data[0].size());
-        std::iota(std::begin(rows), std::end(rows), 0);
-        std::shuffle(std::begin(rows), std::end(rows), rng);
+        std::vector<int> order(this->data[0].size());
+        std::iota(std::begin(order), std::end(order), 1);
+        std::shuffle(std::begin(order), std::end(order), rng);
 
         // TODO fix the shuffle of the rows
         // https://stackoverflow.com/questions/236172/how-do-i-sort-a-stdvector-by-the-values-of-a-different-stdvector
+        // Probably want to speed this up
+
+        for (auto kv : this->data) {
+            for (int s = 1, d; s < order.size(); ++s) {
+                for (d = order[s]; d < s; d = order[d])
+                    ;
+                if (d == s) {
+                    while (d = order[d], d != s) {
+                        std::swap(kv.second[s], kv.second[d]);
+                    }
+                }
+            }
+        }
     }
 
-    std::string DataTable::min(int col) const {
+    std::string DataTable::min(std::string column) const {
         std::vector<int> colData =
-            this->convertStringVecToInt(this->getColumn(col));
+            this->convertStringVecToInt(this->getColumn(column));
 
         std::vector<int>::iterator minElement =
             std::min_element(std::begin(colData), std::end(colData));
@@ -320,9 +333,9 @@ namespace Data {
         return std::to_string(*minElement);
     }
 
-    std::string DataTable::max(int col) const {
+    std::string DataTable::max(std::string column) const {
         std::vector<int> colData =
-            this->convertStringVecToInt(this->getColumn(col));
+            this->convertStringVecToInt(this->getColumn(column));
 
         std::vector<int>::iterator maxElement =
             std::max_element(std::begin(colData), std::end(colData));
@@ -332,8 +345,8 @@ namespace Data {
 
     std::string DataTable::min() const {
         std::vector<int> intData;
-        for (std::vector<std::string> col : this->data) {
-            std::vector<int> tempData = this->convertStringVecToInt(col);
+        for (auto kv : this->data) {
+            std::vector<int> tempData = this->convertStringVecToInt(kv.second);
             std::vector<int>::iterator minElement =
                 std::min_element(std::begin(tempData), std::end(tempData));
             intData.push_back(*minElement);
@@ -346,8 +359,8 @@ namespace Data {
 
     std::string DataTable::max() const {
         std::vector<int> intData;
-        for (std::vector<std::string> col : this->data) {
-            std::vector<int> tempData = this->convertStringVecToInt(col);
+        for (auto kv : this->data) {
+            std::vector<int> tempData = this->convertStringVecToInt(kv.second);
             std::vector<int>::iterator maxElement =
                 std::max_element(std::begin(tempData), std::end(tempData));
             intData.push_back(*maxElement);
@@ -358,9 +371,9 @@ namespace Data {
         return std::to_string(*maxElement);
     }
 
-    double DataTable::sum(int col) const {
+    double DataTable::sum(std::string column) const {
         std::vector<int> colData =
-            this->convertStringVecToInt(this->getColumn(col));
+            this->convertStringVecToInt(this->getColumn(column));
         double result = std::reduce(colData.begin(), colData.end());
         return result;
     }
@@ -368,16 +381,16 @@ namespace Data {
     double DataTable::sum() const {
         std::vector<int> intData;
         double runningSum = 0;
-        for (std::vector<std::string> col : this->data) {
-            std::vector<int> tempData = this->convertStringVecToInt(col);
+        for (auto kv : this->data) {
+            std::vector<int> tempData = this->convertStringVecToInt(kv.second);
             runningSum += std::reduce(tempData.begin(), tempData.end());
         }
         return runningSum;
     }
 
-    double DataTable::mean(int col) const {
+    double DataTable::mean(std::string column) const {
         std::vector<int> colData =
-            this->convertStringVecToInt(this->getColumn(col));
+            this->convertStringVecToInt(this->getColumn(column));
         double result = std::reduce(colData.begin(), colData.end()) /
                         ((double)(colData.size()));
         return result;
@@ -387,8 +400,8 @@ namespace Data {
         std::vector<int> intData;
         double runningSum = 0;
         double count = 0;
-        for (std::vector<std::string> col : this->data) {
-            std::vector<int> tempData = this->convertStringVecToInt(col);
+        for (auto kv : this->data) {
+            std::vector<int> tempData = this->convertStringVecToInt(kv.second);
             runningSum += std::reduce(tempData.begin(), tempData.end());
             count += tempData.size();
         }
@@ -428,71 +441,6 @@ namespace Data {
             os << rowBuffer << "\n";
         }
         return os;
-    }
-
-    // int DataTable::getIdxOfColumnName(std::string columnName) const {
-    //     int idx = 0;
-    //     for (std::string colname : this->headers) {
-    //         if (columnName == colname) {
-    //             return idx;
-    //         }
-    //         idx++;
-    //     }
-
-    //     return -1;
-    // }
-
-    void DataTable::checkJoin(int &t1ColIdx, std::string tableOneColumnName,
-                              DataTable const &tableTwo, int &t2ColIdx,
-                              std::string tableTwoColumnName,
-                              std::vector<std::string> &headerVec) const {
-
-        t1ColIdx = getIdxOfColumnName(tableOneColumnName);
-        t2ColIdx = tableTwo.getIdxOfColumnName(tableTwoColumnName);
-        if (t1ColIdx < 0 || t2ColIdx < 0) {
-            return;
-        }
-
-        std::vector<std::string> temp = tableTwo.getHeaders();
-        temp.erase(temp.begin() + t2ColIdx);
-
-        std::vector<std::string> combinedHeaders = headers;
-        combinedHeaders.insert(combinedHeaders.end(), temp.begin(), temp.end());
-
-        headerVec = combinedHeaders;
-    }
-
-    void DataTable::checkJoin(std::vector<int> &t1ColIndices,
-                              std::vector<std::string> tableOneColumnNames,
-                              DataTable const &tableTwo,
-                              std::vector<int> &t2ColIndices,
-                              std::vector<std::string> tableTwoColumnNames,
-                              std::vector<std::string> &headerVec) const {
-        if (tableOneColumnNames.size() != tableTwoColumnNames.size()) {
-            return;
-        }
-        for (int i = 0; i < tableTwoColumnNames.size(); ++i) {
-            int t1ColIdx = getIdxOfColumnName(tableOneColumnNames[i]);
-            int t2ColIdx = tableTwo.getIdxOfColumnName(tableTwoColumnNames[i]);
-            if (t1ColIdx < 0 || t2ColIdx < 0) {
-                return;
-            }
-            t1ColIndices.push_back(t1ColIdx);
-            t2ColIndices.push_back(t2ColIdx);
-        }
-
-        std::vector<std::string> temp = tableTwo.getHeaders();
-
-        for (std::vector<int>::reverse_iterator rIt = t2ColIndices.rbegin();
-             rIt != t2ColIndices.rend(); ++rIt) {
-            int idx = std::distance(begin(t2ColIndices), rIt.base()) - 1;
-            temp.erase(temp.begin() + idx);
-        }
-
-        std::vector<std::string> combinedHeaders = headers;
-        combinedHeaders.insert(combinedHeaders.end(), temp.begin(), temp.end());
-
-        headerVec = combinedHeaders;
     }
 
 } // namespace Data

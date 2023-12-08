@@ -73,18 +73,6 @@ namespace Data {
             return elems;
         };
 
-        void checkJoin(int &t1ColIdx, std::string tableOneColumnName,
-                       DataTable const &tableTwo, int &t2ColIdx,
-                       std::string tableTwoColumnName,
-                       std::vector<std::string> &headerVec) const;
-
-        void checkJoin(std::vector<int> &t1ColIndices,
-                       std::vector<std::string> tableOneColumnNames,
-                       DataTable const &tableTwo,
-                       std::vector<int> &t2ColIndices,
-                       std::vector<std::string> tableTwoColumnNames,
-                       std::vector<std::string> &headerVec) const;
-
     public:
         DataTable(){};
         DataTable(const std::string &filename, bool hasHeaders = true,
@@ -154,13 +142,13 @@ namespace Data {
         void dropColumn(std::string column);
         void shuffleRows(int seed = 0);
 
-        std::string min(int col) const;
-        std::string max(int col) const;
+        std::string min(std::string column) const;
+        std::string max(std::string column) const;
         std::string min() const;
         std::string max() const;
-        double sum(int col) const;
+        double sum(std::string column) const;
         double sum() const;
-        double mean(int col) const;
+        double mean(std::string column) const;
         double mean() const;
 
         // overridden operators
