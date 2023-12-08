@@ -27,6 +27,18 @@ namespace Data {
         }
 
         /// @brief
+        /// @param T
+        /// @param str
+        /// @return
+        template <typename T> T optional(std::string str) {
+            boost::optional<T> result = this->ptree.get_optional<T>(str);
+            if (result) {
+                return *result;
+            }
+            return T();
+        }
+
+        /// @brief
         /// @param
         /// @return
         std::vector<std::string> parseString2VectorOfStrings(std::string st);
