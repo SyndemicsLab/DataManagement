@@ -45,7 +45,6 @@ TEST_F(ConfigurationTest, ParseVectorOfStrings) {
 TEST_F(ConfigurationTest, OptionalValueProvided) {
     outStream << "[section]\noptional = 11235813" << std::endl;
     Data::Configuration config(tempFilePath.string());
-    // trying with multiple types, just for thoroughness
     int optional = config.optional<int>("section.optional");
     EXPECT_EQ(11235813, optional);
 }
