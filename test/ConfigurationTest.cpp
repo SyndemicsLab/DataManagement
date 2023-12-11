@@ -41,3 +41,27 @@ TEST_F(ConfigurationTest, ParseVectorOfStrings) {
     std::vector<std::string> expected = {"foo", "bar", "baz", "bat"};
     EXPECT_EQ(expected, config.parseString2VectorOfStrings(strings));
 }
+
+TEST_F(ConfigurationTest, OptionalValueProvided) {
+    outStream << "[section]\noptional = 11235813" << std::endl;
+    Data::Configuration config(tempFilePath.string());
+    std::shared_ptr<int> optional = config.optional<int>("section.optional");
+    EXPECT_EQ(11235813, *optional);
+}
+
+TEST_F(ConfigurationTest, OptionalIntNotProvided) {
+    outStream << "[section]\noptional =" << std::endl;
+    Data::Configuration config(tempFilePath.string());
+    std::shared_ptr<int> optional = config.optional<int>("section.optional");
+    std::shared_ptr<std::string> optional2 =
+        config.optional<std::string>("section.optional");
+    EXPECT_EQ(nullptr, optional);
+    EXPECT_EQ(nullptr, optional);
+}
+
+TEST_F(ConfigurationTest, OptionalStringNotProvided) {
+    outStream << "[section]\noptional =" << std::endl;
+    Data::Configuration config(tempFilePath.string());
+    std::shared_ptr<std::string> optional = config.optional("section.optional");
+    EXPECT_EQ(nullptr, optional);
+}
