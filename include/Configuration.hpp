@@ -44,15 +44,6 @@ namespace Data {
         /// @return
         std::shared_ptr<std::string> optional(std::string str);
 
-        std::shared_ptr<std::string> optionalString(std::string str) {
-            boost::optional<std::string> result =
-                this->ptree.get_optional<std::string>(str);
-            if (result.value() != "") {
-                return std::make_shared<std::string>(*result);
-            }
-            return nullptr;
-        }
-
         /// @brief
         /// @param
         /// @return
