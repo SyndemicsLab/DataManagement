@@ -39,6 +39,9 @@ namespace Data {
             return nullptr;
         }
 
+        /// @brief An overload of \code{optional} for strings
+        /// @param str
+        /// @return
         std::shared_ptr<std::string> optional(std::string str);
 
         std::shared_ptr<std::string> optionalString(std::string str) {
