@@ -9,7 +9,8 @@ namespace Data {
     }
 
     template <>
-    std::shared_ptr<std::string> Configuration::optional(std::string str) {
+    std::shared_ptr<std::string>
+    Configuration::optional<std::string>(std::string str) {
         boost::optional<std::string> result =
             this->ptree.get_optional<std::string>(str);
         if (*result != "") {
