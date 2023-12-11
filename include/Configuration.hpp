@@ -6,6 +6,7 @@
 #include <boost/property_tree/ini_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <cassert>
+#include <memory>
 
 namespace Data {
     class Configuration {
@@ -30,12 +31,12 @@ namespace Data {
         /// @param T
         /// @param str
         /// @return
-        template <typename T> T optional(std::string str) {
+        template <typename T> std::shared_ptr<T> optional(std::string str) {
             boost::optional<T> result = this->ptree.get_optional<T>(str);
             if (result) {
-                return *result;
+                return std::make_shared<T>(*result);
             }
-            return T();
+            return nullptr;
         }
 
         /// @brief
@@ -48,5 +49,4 @@ namespace Data {
         std::vector<int> parseString2VectorOfInts(std::string st);
     };
 } // namespace Data
-
 #endif

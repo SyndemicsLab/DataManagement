@@ -45,16 +45,17 @@ TEST_F(ConfigurationTest, ParseVectorOfStrings) {
 TEST_F(ConfigurationTest, OptionalValueProvided) {
     outStream << "[section]\noptional = 11235813" << std::endl;
     Data::Configuration config(tempFilePath.string());
-    int optional = config.optional<int>("section.optional");
-    EXPECT_EQ(11235813, optional);
+    std::shared_ptr<int> optional = config.optional<int>("section.optional");
+    EXPECT_EQ(11235813, *optional);
 }
 
 TEST_F(ConfigurationTest, OptionalValueNotProvided) {
     outStream << "[section]\noptional =" << std::endl;
     Data::Configuration config(tempFilePath.string());
     // trying with multiple types, just for thoroughness
-    int optional = config.optional<int>("section.optional");
-    std::string optional2 = config.optional<std::string>("section.optional");
-    EXPECT_EQ(0, optional);
-    EXPECT_EQ("", optional2);
+    std::shared_ptr<int> optional = config.optional<int>("section.optional");
+    std::shared_ptr<std::string> optional2 =
+        config.optional<std::string>("section.optional");
+    EXPECT_EQ(nullptr, optional);
+    EXPECT_EQ(nullptr, optional2);
 }
