@@ -64,5 +64,6 @@ TEST_F(ConfigurationTest, OptionalStringNotProvided) {
     Data::Configuration config(tempFilePath.string());
     std::shared_ptr<std::string> optional =
         config.optional<std::string>("section.optional");
-    EXPECT_EQ(nullptr, optional);
+    std::shared_ptr<std::string> expected = nullptr;
+    EXPECT_EQ(expected, optional);
 }
