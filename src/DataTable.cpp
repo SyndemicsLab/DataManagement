@@ -15,7 +15,7 @@ namespace Data {
         this->shape = shape;
     }
 
-    std::vector<std::string> DataTable::loadData(std::ifstream &csvStream) {
+    std::vector<std::string> DataTable::loadRows(std::ifstream &csvStream) {
         std::vector<std::string> contents;
         std::string line;
         while (std::getline(csvStream, line)) {
@@ -31,7 +31,7 @@ namespace Data {
             return false;
         }
 
-        std::vector<std::string> contents = this->loadData(csvFile);
+        std::vector<std::string> contents = this->loadRows(csvFile);
         csvFile.close();
 
         std::vector<std::string> firstLine = this->split(contents[0], delim);
@@ -128,6 +128,10 @@ namespace Data {
     DataTable DataTable::selectRows(std::vector<int> idxs) const {
         std::map<std::string, std::vector<std::string>> newData;
         for (auto kv : this->data) {
+            if (idxs.size() > kv.second.size()) {
+                DataTable newDT(this->data, this->shape);
+                return newDT;
+            }
             newData[kv.first] = {};
             for (int idx : idxs) {
                 newData[kv.first].push_back(kv.second[idx]);
@@ -149,7 +153,9 @@ namespace Data {
     }
 
     DataTable DataTable::selectWhere(
-        std::unordered_map<std::string, std::string> columnDataMap) const {}
+        std::unordered_map<std::string, std::string> columnDataMap) const {
+        return {};
+    }
 
     DataTable DataTable::innerJoin(DataTable const &tableTwo,
                                    std::string tableOneColumnName,
@@ -177,21 +183,21 @@ namespace Data {
         std::map<std::string, std::vector<std::string>> newData;
         for (std::string t1header : t1headers) {
             std::vector<std::string> column = this->data.at(t1header);
-            std::vector<std::string> result(indices.size(), 0);
-            std::transform(
-                indices.begin(), indices.end(), result.begin(),
-                [column](std::vector<int> pos) { return column[pos[0]]; });
-            newData[t1header] = result;
+            std::vector<std::string> newColumn;
+            for (std::vector<int> idxs : indices) {
+                newColumn.push_back(column[idxs[0]]);
+            }
+            newData[t1header] = newColumn;
         }
 
         // Add the t2 rows column by column
         for (std::string t2header : t2headers) {
-            std::vector<std::string> column = this->data.at(t2header);
-            std::vector<std::string> result(indices.size(), 0);
-            std::transform(
-                indices.begin(), indices.end(), result.begin(),
-                [column](std::vector<int> pos) { return column[pos[1]]; });
-            newData[t2header] = result;
+            std::vector<std::string> column = tableTwo.getColumn(t2header);
+            std::vector<std::string> newColumn;
+            for (std::vector<int> idxs : indices) {
+                newColumn.push_back(column[idxs[1]]);
+            }
+            newData[t2header] = newColumn;
         }
         DataTableShape newShape(indices.size(),
                                 t1headers.size() + t2headers.size());
@@ -250,21 +256,21 @@ namespace Data {
         std::map<std::string, std::vector<std::string>> newData;
         for (std::string t1header : t1headers) {
             std::vector<std::string> column = this->data.at(t1header);
-            std::vector<std::string> result(indices.size(), 0);
-            std::transform(
-                indices.begin(), indices.end(), result.begin(),
-                [column](std::vector<int> pos) { return column[pos[0]]; });
-            newData[t1header] = result;
+            std::vector<std::string> newColumn;
+            for (std::vector<int> idxs : indices) {
+                newColumn.push_back(column[idxs[0]]);
+            }
+            newData[t1header] = newColumn;
         }
 
         // Add the t2 rows column by column
         for (std::string t2header : t2headers) {
-            std::vector<std::string> column = this->data.at(t2header);
-            std::vector<std::string> result(indices.size(), 0);
-            std::transform(
-                indices.begin(), indices.end(), result.begin(),
-                [column](std::vector<int> pos) { return column[pos[1]]; });
-            newData[t2header] = result;
+            std::vector<std::string> column = tableTwo.getColumn(t2header);
+            std::vector<std::string> newColumn;
+            for (std::vector<int> idxs : indices) {
+                newColumn.push_back(column[idxs[1]]);
+            }
+            newData[t2header] = newColumn;
         }
         DataTableShape newShape(indices.size(),
                                 t1headers.size() + t2headers.size());
@@ -298,29 +304,33 @@ namespace Data {
 
     void DataTable::dropColumn(std::string column) { this->data.erase(column); }
 
+    // TODO Implement Shuffling
     void DataTable::shuffleRows(int seed) {
-        auto rng = std::default_random_engine{};
-        rng.seed(seed);
+        // auto rng = std::default_random_engine{};
+        // rng.seed(seed);
 
-        std::vector<int> order(this->data[0].size());
-        std::iota(std::begin(order), std::end(order), 1);
-        std::shuffle(std::begin(order), std::end(order), rng);
+        // std::vector<int> order(this->data.begin()->second.size());
+        // std::iota(std::begin(order), std::end(order), 1);
+        // std::shuffle(std::begin(order), std::end(order), rng);
 
-        // TODO fix the shuffle of the rows
+        //
+        // //
         // https://stackoverflow.com/questions/236172/how-do-i-sort-a-stdvector-by-the-values-of-a-different-stdvector
-        // Probably want to speed this up
+        // // Probably want to speed this up
 
-        for (auto kv : this->data) {
-            for (int s = 1, d; s < order.size(); ++s) {
-                for (d = order[s]; d < s; d = order[d])
-                    ;
-                if (d == s) {
-                    while (d = order[d], d != s) {
-                        std::swap(kv.second[s], kv.second[d]);
-                    }
-                }
-            }
-        }
+        // for (auto &kv : this->data) {
+        //     for (int s = 0, d; s < order.size(); ++s) {
+        //         for (d = order[s]; d < s; d = order[d])
+        //             ;
+        //         if (d == s) {
+        //             while (d = order[d], d != s) {
+        //                 std::swap(kv.second[s], kv.second[d]);
+        //             }
+        //         }
+        //     }
+        // }
+
+        throw std::logic_error("Not Implemented Yet");
     }
 
     std::string DataTable::min(std::string column) const {

@@ -55,7 +55,7 @@ namespace Data {
         std::vector<int>
         convertStringVecToInt(std::vector<std::string> data) const;
 
-        std::vector<std::string> loadData(std::ifstream &csvStream);
+        std::vector<std::string> loadRows(std::ifstream &csvStream);
         // int getIdxOfColumnName(std::string columnName) const;
 
         template <typename T>
