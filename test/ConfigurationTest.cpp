@@ -49,13 +49,20 @@ TEST_F(ConfigurationTest, OptionalValueProvided) {
     EXPECT_EQ(11235813, *optional);
 }
 
-TEST_F(ConfigurationTest, OptionalValueNotProvided) {
+TEST_F(ConfigurationTest, OptionalIntNotProvided) {
     outStream << "[section]\noptional =" << std::endl;
     Data::Configuration config(tempFilePath.string());
-    // trying with multiple types, just for thoroughness
     std::shared_ptr<int> optional = config.optional<int>("section.optional");
     std::shared_ptr<std::string> optional2 =
         config.optional<std::string>("section.optional");
     EXPECT_EQ(nullptr, optional);
-    EXPECT_EQ(nullptr, optional2);
+    EXPECT_EQ(nullptr, optional);
+}
+
+TEST_F(ConfigurationTest, OptionalStringNotProvided) {
+    outStream << "[section]\noptional =" << std::endl;
+    Data::Configuration config(tempFilePath.string());
+    std::shared_ptr<std::string> optional =
+        config.optional<std::string>("section.optional");
+    EXPECT_EQ(nullptr, optional);
 }
