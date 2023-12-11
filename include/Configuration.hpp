@@ -6,7 +6,6 @@
 #include <boost/property_tree/ini_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <cassert>
-#include <iostream>
 #include <memory>
 
 namespace Data {
@@ -39,6 +38,8 @@ namespace Data {
             }
             return nullptr;
         }
+
+        std::shared_ptr<std::string> optional(std::string str);
 
         std::shared_ptr<std::string> optionalString(std::string str) {
             boost::optional<std::string> result =

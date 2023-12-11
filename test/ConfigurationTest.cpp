@@ -62,7 +62,6 @@ TEST_F(ConfigurationTest, OptionalIntNotProvided) {
 TEST_F(ConfigurationTest, OptionalStringNotProvided) {
     outStream << "[section]\noptional =" << std::endl;
     Data::Configuration config(tempFilePath.string());
-    std::shared_ptr<std::string> optional =
-        config.optional<std::string>("section.optional");
+    std::shared_ptr<std::string> optional = config.optional("section.optional");
     EXPECT_EQ(nullptr, optional);
 }

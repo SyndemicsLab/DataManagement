@@ -8,13 +8,10 @@ namespace Data {
         read_ini(configFile, this->ptree);
     }
 
-    template <>
-    std::shared_ptr<std::string>
-    Configuration::optional<std::string>(std::string str) {
+    std::shared_ptr<std::string> Configuration::optional(std::string str) {
         boost::optional<std::string> result =
             this->ptree.get_optional<std::string>(str);
-        std::cout << result.value() << std::endl;
-        if (result.value() != "") {
+        if (*result != "") {
             return std::make_shared<std::string>(*result);
         }
         return nullptr;
