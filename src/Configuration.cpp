@@ -13,7 +13,7 @@ namespace Data {
     Configuration::optional<std::string>(std::string str) {
         boost::optional<std::string> result =
             this->ptree.get_optional<std::string>(str);
-        if (result.get() != "") {
+        if (result.get_value_or("") != "") {
             return std::make_shared<std::string>(*result);
         }
         return nullptr;
