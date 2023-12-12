@@ -4,11 +4,13 @@
 #include <algorithm>
 #include <fstream>
 #include <iostream>
+#include <map>
 #include <memory>
 #include <numeric>
 #include <random>
 #include <sstream>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 // Built in part on the back of:
@@ -22,6 +24,11 @@ namespace Data {
         int ncols = 0;
 
     public:
+        DataTableShape(){};
+        DataTableShape(int nrows, int ncols) {
+            this->nrows = nrows;
+            this->ncols = ncols;
+        };
         int getNRows() const { return this->nrows; }
         int getNCols() const { return this->ncols; }
         void setNRows(int nrows) { this->nrows = nrows; }
@@ -43,12 +50,13 @@ namespace Data {
 
     class DataTable {
     private:
-        std::vector<std::string> headers;
-        std::vector<std::vector<std::string>> data;
+        std::map<std::string, std::vector<std::string>> data;
         DataTableShape shape;
         std::vector<int>
         convertStringVecToInt(std::vector<std::string> data) const;
-        int getIdxOfColumnName(std::string columnName) const;
+
+        std::vector<std::string> loadRows(std::ifstream &csvStream);
+        // int getIdxOfColumnName(std::string columnName) const;
 
         template <typename T>
         void split(const std::string &s, char delim, T result) {
@@ -65,38 +73,34 @@ namespace Data {
             return elems;
         };
 
-        void checkJoin(int &t1ColIdx, std::string tableOneColumnName,
-                       DataTable const &tableTwo, int &t2ColIdx,
-                       std::string tableTwoColumnName,
-                       std::vector<std::string> &headerVec) const;
-
-        void checkJoin(std::vector<int> &t1ColIndices,
-                       std::vector<std::string> tableOneColumnNames,
-                       DataTable const &tableTwo,
-                       std::vector<int> &t2ColIndices,
-                       std::vector<std::string> tableTwoColumnNames,
-                       std::vector<std::string> &headerVec) const;
-
     public:
         DataTable(){};
         DataTable(const std::string &filename, bool hasHeaders = true,
                   char delim = ',');
         DataTable(const std::string &dbfile, const std::string &tablename);
-        DataTable(std::vector<std::vector<std::string>> data,
-                  std::vector<std::string> headers, DataTableShape shape);
+        DataTable(std::map<std::string, std::vector<std::string>> data,
+                  DataTableShape shape);
         ~DataTable(){};
         void toCSV(const std::string &filename) const;
         bool fromCSV(const std::string &filename, bool hasHeaders = true,
                      char delim = ',');
         bool fromSQL(const std::string &dbfile, const std::string &tablename);
-        std::vector<std::vector<std::string>> getData() const { return data; }
+
+        std::vector<std::vector<std::string>> getData() const {
+            std::vector<std::vector<std::string>> dat;
+            for (auto kv : this->data) {
+                dat.push_back(kv.second);
+            }
+            return dat;
+        }
+
         std::vector<std::string> getRow(int idx) const;
-        std::vector<std::string> getColumn(int idx) const;
         std::vector<std::string> getColumn(std::string columnName) const;
-        DataTable selectColumns(std::vector<int> columnIdxs) const;
         DataTable selectColumns(std::vector<std::string> columnNames) const;
         DataTable selectRows(std::vector<int> idxs) const;
         DataTable selectRowRange(int start, int end) const;
+        DataTable selectWhere(
+            std::unordered_map<std::string, std::string> columnDataMap) const;
 
         DataTable innerJoin(DataTable const &tableTwo,
                             std::string tableOneColumnName,
@@ -124,22 +128,27 @@ namespace Data {
         }
         DataTable head() const { return topNRows(10); }
         DataTable tail() const { return bottomNRows(10); }
-        std::vector<std::string> getHeaders() const { return headers; }
+
+        std::vector<std::string> getHeaders() const {
+            std::vector<std::string> headers;
+            for (auto kv : this->data) {
+                headers.push_back(kv.first);
+            }
+            return headers;
+        }
 
         // table operations
-        void dropColumns(std::vector<int> columns);
         void dropColumns(std::vector<std::string> column_names);
-        void dropColumn(int column);
         void dropColumn(std::string column);
         void shuffleRows(int seed = 0);
 
-        std::string min(int col) const;
-        std::string max(int col) const;
+        std::string min(std::string column) const;
+        std::string max(std::string column) const;
         std::string min() const;
         std::string max() const;
-        double sum(int col) const;
+        double sum(std::string column) const;
         double sum() const;
-        double mean(int col) const;
+        double mean(std::string column) const;
         double mean() const;
 
         // overridden operators
