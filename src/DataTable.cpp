@@ -91,17 +91,25 @@ namespace Data {
         csvFile.close();
     }
 
-    std::vector<std::string> DataTable::getRow(int row) const {
-        std::vector<std::string> ret;
+    // std::vector<std::string> DataTable::getRow(int row) const {
+    //     std::vector<std::string> ret;
+    //     for (auto kv : this->data) {
+    //         ret.push_back(kv.second[row]);
+    //     }
+    //     return ret;
+    // }
+
+    DataTable DataTable::getRow(int row) const {
+        std::map<std::string, std::vector<std::string>> newData;
         for (auto kv : this->data) {
-            ret.push_back(kv.second[row]);
+            newData[kv.first] = {kv.second[row]};
         }
-        return ret;
+        DataTableShape newShape(1, this->shape.getNCols());
+        DataTable newDT(newData, newShape);
+        return newDT;
     }
 
-    std::vector<std::string> DataTable::operator[](int idx) const {
-        return this->getRow(idx);
-    }
+    DataTable DataTable::operator[](int idx) const { return this->getRow(idx); }
 
     std::vector<std::string>
     DataTable::operator[](std::string columnName) const {
