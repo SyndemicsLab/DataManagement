@@ -103,9 +103,11 @@ TEST_F(DataTableTest, GetRow) {
         Data::DataTable dt;
         std::string tFilePath = mTempFileAbsolute.string();
         dt.fromCSV(tFilePath, true);
-        std::vector<std::string> data = dt.getRow(1);
+        Data::DataTable data = dt.getRow(1);
 
-        EXPECT_EQ(expectedData, data);
+        EXPECT_EQ(expectedData[0], data["Test"][0]);
+        EXPECT_EQ(expectedData[1], data["Test1"][0]);
+        EXPECT_EQ(expectedData[2], data["Test2"][0]);
     } catch (const std::exception &e_) {
         FAIL() << "Caught an exception in " << typeid(*this).name() << ": "
                << e_.what();
@@ -519,8 +521,10 @@ TEST_F(DataTableTest, operationalRowIndexing) {
         Data::DataTable dt;
         std::string tFilePath = mTempFileAbsolute.string();
         dt.fromCSV(tFilePath, true);
-        std::vector<std::string> result = dt[1];
-        EXPECT_EQ(expected, result);
+        Data::DataTable result = dt[1];
+        EXPECT_EQ(expected[0], result["Test"][0]);
+        EXPECT_EQ(expected[1], result["Test1"][0]);
+        EXPECT_EQ(expected[2], result["Test2"][0]);
     } catch (const std::exception &e_) {
         FAIL() << "Caught an exception in " << typeid(*this).name() << ": "
                << e_.what();
