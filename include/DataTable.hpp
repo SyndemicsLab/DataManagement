@@ -94,7 +94,8 @@ namespace Data {
             return dat;
         }
 
-        std::vector<std::string> getRow(int idx) const;
+        // std::vector<std::string> getRow(int idx) const;
+        DataTable getRow(int idx) const;
         std::vector<std::string> getColumn(std::string columnName) const;
         DataTable selectColumns(std::vector<std::string> columnNames) const;
         DataTable selectRows(std::vector<int> idxs) const;
@@ -152,7 +153,7 @@ namespace Data {
         double mean() const;
 
         // overridden operators
-        std::vector<std::string> operator[](int idx) const; // select row
+        DataTable operator[](int idx) const; // select row
         std::vector<std::string>
         operator[](std::string columnName) const; // select column into DT
         friend std::ostream &operator<<(std::ostream &os,
@@ -162,6 +163,8 @@ namespace Data {
         int nrows() const { return shape[0]; }
         int ncols() const { return shape[1]; }
         DataTableShape getShape() const { return shape; }
+
+        bool empty() const { return this->data.empty(); }
     };
 } // namespace Data
 
