@@ -721,3 +721,54 @@ TEST_F(DataTableTest, multiInnerJoin) {
         }
     }
 }
+
+TEST_F(DataTableTest, operatorPlusOverload) {
+    std::map<std::string, std::vector<std::string>> d1;
+    d1["id"] = {"1", "2", "2"};
+    d1["test1"] = {"hi1.1", "hi2.1", "hi3.1"};
+    d1["test2"] = {"hi1.2", "hi2.2", "hi3.2"};
+    d1["test3"] = {"hi1.3", "hi2.3", "hi3.3"};
+
+    Data::DataTableShape shape1;
+    shape1.setNCols(5);
+    shape1.setNRows(3);
+
+    std::map<std::string, std::vector<std::string>> d2;
+    d2["id"] = {"1", "2", "3"};
+    d2["test1"] = {"hi1.4", "hi2.4", "hi3.4"};
+    d2["test2"] = {"hi1.5", "hi2.5", "hi3.5"};
+    d2["test3"] = {"hi1.6", "hi2.6", "hi3.6"};
+
+    Data::DataTableShape shape2;
+    shape2.setNCols(5);
+    shape2.setNRows(3);
+
+    Data::DataTable dt1(d1, shape1);
+    Data::DataTable dt2(d2, shape2);
+
+    Data::DataTable resultTable = dt1 + dt2;
+    std::vector<std::string> resultHeaders = resultTable.getHeaders();
+    std::vector<std::vector<std::string>> resultData = resultTable.getData();
+
+    std::vector<std::string> expectedHeaders = {"id", "test1", "test2",
+                                                "test3"};
+
+    std::vector<std::vector<std::string>> expectedData = {
+        {"1", "2", "2", "1", "2", "3"},
+        {"hi1.1", "hi2.1", "hi3.1", "hi1.4", "hi2.4", "hi3.4"},
+        {"hi1.2", "hi2.2", "hi3.2", "hi1.5", "hi2.5", "hi3.5"},
+        {"hi1.3", "hi2.3", "hi3.3", "hi1.6", "hi2.6", "hi3.6"}};
+
+    ASSERT_TRUE(resultData.size() == expectedData.size());
+    ASSERT_TRUE(resultData[0].size() == expectedData[0].size());
+
+    for (int i = 0; i < resultHeaders.size(); ++i) {
+        EXPECT_EQ(resultHeaders[i], expectedHeaders[i]);
+    }
+
+    for (int i = 0; i < resultData.size(); ++i) {
+        for (int j = 0; j < resultData[0].size(); ++j) {
+            EXPECT_EQ(resultData[i][j], expectedData[i][j]);
+        }
+    }
+}
