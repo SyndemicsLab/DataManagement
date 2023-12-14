@@ -158,6 +158,7 @@ namespace Data {
         operator[](std::string columnName) const; // select column into DT
         friend std::ostream &operator<<(std::ostream &os,
                                         const DataTable &table);
+        DataTable operator+(DataTable const &tableTwo) const;
 
         // for other classes
         int nrows() const { return shape[0]; }

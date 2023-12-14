@@ -461,4 +461,22 @@ namespace Data {
         return os;
     }
 
+    DataTable DataTable::operator+(DataTable const &tableTwo) const {
+        std::map<std::string, std::vector<std::string>> newData;
+        for (auto kv : this->data) {
+            std::vector<std::string> tempVec;
+            std::vector<std::string> tableTwoVec = tableTwo[kv.first];
+            tempVec.reserve(kv.second.size() + tableTwoVec.size());
+            tempVec.insert(tempVec.end(), kv.second.begin(), kv.second.end());
+            tempVec.insert(tempVec.end(), tableTwoVec.begin(),
+                           tableTwoVec.end());
+            newData[kv.first] = tempVec;
+        }
+        DataTableShape newShape(this->ncols(),
+                                this->nrows() + tableTwo.nrows());
+
+        DataTable newDT(newData, newShape);
+        return newDT;
+    }
+
 } // namespace Data
