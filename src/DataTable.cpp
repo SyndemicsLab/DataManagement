@@ -75,16 +75,14 @@ namespace Data {
                                      "'.");
         }
 
-        std::vector<std::vector<std::string>> contents;
         for (auto kv : this->data) {
             csvFile << kv.first << ",";
-            contents.push_back(kv.second);
         }
         csvFile << std::endl;
 
-        for (int colIdx = 0; colIdx < this->shape.getNCols(); ++colIdx) {
-            for (int rowIdx = 0; rowIdx < this->shape.getNRows(); ++rowIdx) {
-                csvFile << contents[colIdx][rowIdx] << ",";
+        for (int rowIdx = 0; rowIdx < this->shape.getNRows(); ++rowIdx) {
+            for (auto kv : this->data) {
+                csvFile << this->data.at(kv.first)[rowIdx] << ",";
             }
             csvFile << std::endl;
         }
@@ -472,8 +470,8 @@ namespace Data {
                            tableTwoVec.end());
             newData[kv.first] = tempVec;
         }
-        DataTableShape newShape(this->ncols(),
-                                this->nrows() + tableTwo.nrows());
+        DataTableShape newShape(this->nrows() + tableTwo.nrows(),
+                                this->ncols());
 
         DataTable newDT(newData, newShape);
         return newDT;
