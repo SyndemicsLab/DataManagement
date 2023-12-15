@@ -110,7 +110,7 @@ namespace Data {
             newData[kv.first] = {kv.second[row]};
         }
         DataTableShape newShape(1, this->shape.getNCols());
-        DataTable newDT(newData, newShape);
+        DataTable newDT(newData, newShape, this->headerOrder);
         return newDT;
     }
 
@@ -134,7 +134,7 @@ namespace Data {
         }
         DataTableShape newShape(newData[columnNames[0]].size(),
                                 columnNames.size());
-        DataTable newDT(newData, newShape);
+        DataTable newDT(newData, newShape, this->headerOrder);
         return newDT;
     }
 
@@ -142,7 +142,7 @@ namespace Data {
         std::map<std::string, std::vector<std::string>> newData;
         for (auto kv : this->data) {
             if (idxs.size() > kv.second.size()) {
-                DataTable newDT(this->data, this->shape);
+                DataTable newDT(this->data, this->shape, this->headerOrder);
                 return newDT;
             }
             newData[kv.first] = {};
@@ -151,7 +151,7 @@ namespace Data {
             }
         }
         DataTableShape newShape(idxs.size(), this->data.size());
-        DataTable newDT(newData, newShape);
+        DataTable newDT(newData, newShape, this->headerOrder);
         return newDT;
     }
 
@@ -214,7 +214,7 @@ namespace Data {
         }
         DataTableShape newShape(indices.size(),
                                 t1headers.size() + t2headers.size());
-        DataTable newDT(newData, newShape);
+        DataTable newDT(newData, newShape, this->headerOrder);
         return newDT;
     }
 
@@ -287,7 +287,7 @@ namespace Data {
         }
         DataTableShape newShape(indices.size(),
                                 t1headers.size() + t2headers.size());
-        DataTable newDT(newData, newShape);
+        DataTable newDT(newData, newShape, this->headerOrder);
         return newDT;
     }
 
@@ -489,7 +489,7 @@ namespace Data {
         DataTableShape newShape(this->nrows() + tableTwo.nrows(),
                                 this->ncols());
 
-        DataTable newDT(newData, newShape);
+        DataTable newDT(newData, newShape, this->headerOrder);
         return newDT;
     }
 
