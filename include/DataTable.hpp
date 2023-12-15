@@ -50,6 +50,7 @@ namespace Data {
 
     class DataTable {
     private:
+        std::vector<std::string> headerOrder;
         std::map<std::string, std::vector<std::string>> data;
         DataTableShape shape;
         std::vector<int>
@@ -131,11 +132,7 @@ namespace Data {
         DataTable tail() const { return bottomNRows(10); }
 
         std::vector<std::string> getHeaders() const {
-            std::vector<std::string> headers;
-            for (auto kv : this->data) {
-                headers.push_back(kv.first);
-            }
-            return headers;
+            return this->headerOrder;
         }
 
         // table operations

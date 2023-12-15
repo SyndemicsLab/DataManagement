@@ -13,6 +13,9 @@ namespace Data {
                          DataTableShape shape) {
         this->data = data;
         this->shape = shape;
+        for (auto kv : this->data) {
+            this->headerOrder.push_back(kv.first);
+        }
     }
 
     std::vector<std::string> DataTable::loadRows(std::ifstream &csvStream) {
@@ -37,16 +40,15 @@ namespace Data {
         std::vector<std::string> firstLine = this->split(contents[0], delim);
         this->shape.setNCols(firstLine.size());
 
-        std::vector<std::string> headerOrder;
         if (!hasHeaders) {
             for (int i = 0; i < firstLine.size(); ++i) {
                 this->data[std::to_string(i)] = {};
-                headerOrder.push_back(std::to_string(i));
+                this->headerOrder.push_back(std::to_string(i));
             }
         } else {
             for (std::string header : firstLine) {
                 this->data[header] = {};
-                headerOrder.push_back(header);
+                this->headerOrder.push_back(header);
             }
             // remove the headers from the contents
             contents.erase(contents.begin());
@@ -55,7 +57,7 @@ namespace Data {
         for (std::string line : contents) {
             std::vector<std::string> rowData = this->split(line, delim);
             for (int i = 0; i < rowData.size(); ++i) {
-                this->data[headerOrder[i]].push_back(rowData[i]);
+                this->data[this->headerOrder[i]].push_back(rowData[i]);
             }
             this->shape.setNRows(this->shape.getNRows() + 1);
         }
@@ -75,14 +77,14 @@ namespace Data {
                                      "'.");
         }
 
-        for (auto kv : this->data) {
-            csvFile << kv.first << ",";
+        for (std::string head : this->headerOrder) {
+            csvFile << head << ",";
         }
         csvFile << std::endl;
 
         for (int rowIdx = 0; rowIdx < this->shape.getNRows(); ++rowIdx) {
-            for (auto kv : this->data) {
-                csvFile << this->data.at(kv.first)[rowIdx] << ",";
+            for (std::string head : this->headerOrder) {
+                csvFile << this->data.at(head)[rowIdx] << ",";
             }
             csvFile << std::endl;
         }
@@ -304,11 +306,20 @@ namespace Data {
 
     void DataTable::dropColumns(std::vector<std::string> columnNames) {
         for (std::string col : columnNames) {
-            this->data.erase(col);
+            this->dropColumn(col);
         }
     }
 
-    void DataTable::dropColumn(std::string column) { this->data.erase(column); }
+    void DataTable::dropColumn(std::string column) {
+        this->data.erase(column);
+        for (std::vector<std::string>::iterator it = this->headerOrder.begin();
+             it != this->headerOrder.end(); ++it) {
+            if (*it == column) {
+                this->headerOrder.erase(it);
+                break;
+            }
+        }
+    }
 
     // TODO Implement Shuffling
     void DataTable::shuffleRows(int seed) {
