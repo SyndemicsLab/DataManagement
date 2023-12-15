@@ -609,6 +609,7 @@ TEST_F(DataTableTest, getShape) {
 }
 
 TEST_F(DataTableTest, innerJoin) {
+    std::vector<std::string> headerOrder1 = {"id", "test1", "test2", "test3"};
     std::map<std::string, std::vector<std::string>> d1;
     d1["id"] = {"1", "2", "2"};
     d1["test1"] = {"hi1.1", "hi2.1", "hi3.1"};
@@ -619,6 +620,7 @@ TEST_F(DataTableTest, innerJoin) {
     shape1.setNCols(4);
     shape1.setNRows(3);
 
+    std::vector<std::string> headerOrder2 = {"id", "test4", "test5", "test6"};
     std::map<std::string, std::vector<std::string>> d2;
     d2["id"] = {"1", "2", "3"};
     d2["test4"] = {"hi1.4", "hi2.4", "hi3.4"};
@@ -629,8 +631,8 @@ TEST_F(DataTableTest, innerJoin) {
     shape2.setNCols(4);
     shape2.setNRows(3);
 
-    Data::DataTable dt1(d1, shape1);
-    Data::DataTable dt2(d2, shape2);
+    Data::DataTable dt1(d1, shape1, headerOrder1);
+    Data::DataTable dt2(d2, shape2, headerOrder2);
 
     Data::DataTable resultTable = dt1.innerJoin(dt2, "id", "id");
     std::vector<std::string> resultHeaders = resultTable.getHeaders();

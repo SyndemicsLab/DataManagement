@@ -50,6 +50,7 @@ namespace Data {
 
     class DataTable {
     private:
+        std::vector<std::string> headerOrder;
         std::map<std::string, std::vector<std::string>> data;
         DataTableShape shape;
         std::vector<int>
@@ -79,7 +80,8 @@ namespace Data {
                   char delim = ',');
         DataTable(const std::string &dbfile, const std::string &tablename);
         DataTable(std::map<std::string, std::vector<std::string>> data,
-                  DataTableShape shape);
+                  DataTableShape shape,
+                  std::vector<std::string> headOrder = {});
         ~DataTable(){};
         void toCSV(const std::string &filename) const;
         bool fromCSV(const std::string &filename, bool hasHeaders = true,
@@ -131,11 +133,7 @@ namespace Data {
         DataTable tail() const { return bottomNRows(10); }
 
         std::vector<std::string> getHeaders() const {
-            std::vector<std::string> headers;
-            for (auto kv : this->data) {
-                headers.push_back(kv.first);
-            }
-            return headers;
+            return this->headerOrder;
         }
 
         // table operations

@@ -10,9 +10,17 @@ namespace Data {
                          const std::string &tablename) {}
 
     DataTable::DataTable(std::map<std::string, std::vector<std::string>> data,
-                         DataTableShape shape) {
+                         DataTableShape shape,
+                         std::vector<std::string> headOrder) {
         this->data = data;
         this->shape = shape;
+        if (headOrder.empty()) {
+            for (auto kv : this->data) {
+                this->headerOrder.push_back(kv.first);
+            }
+        } else {
+            this->headerOrder = headOrder;
+        }
     }
 
     std::vector<std::string> DataTable::loadRows(std::ifstream &csvStream) {
@@ -37,16 +45,15 @@ namespace Data {
         std::vector<std::string> firstLine = this->split(contents[0], delim);
         this->shape.setNCols(firstLine.size());
 
-        std::vector<std::string> headerOrder;
         if (!hasHeaders) {
             for (int i = 0; i < firstLine.size(); ++i) {
                 this->data[std::to_string(i)] = {};
-                headerOrder.push_back(std::to_string(i));
+                this->headerOrder.push_back(std::to_string(i));
             }
         } else {
             for (std::string header : firstLine) {
                 this->data[header] = {};
-                headerOrder.push_back(header);
+                this->headerOrder.push_back(header);
             }
             // remove the headers from the contents
             contents.erase(contents.begin());
@@ -55,7 +62,7 @@ namespace Data {
         for (std::string line : contents) {
             std::vector<std::string> rowData = this->split(line, delim);
             for (int i = 0; i < rowData.size(); ++i) {
-                this->data[headerOrder[i]].push_back(rowData[i]);
+                this->data[this->headerOrder[i]].push_back(rowData[i]);
             }
             this->shape.setNRows(this->shape.getNRows() + 1);
         }
@@ -75,14 +82,14 @@ namespace Data {
                                      "'.");
         }
 
-        for (auto kv : this->data) {
-            csvFile << kv.first << ",";
+        for (std::string head : this->headerOrder) {
+            csvFile << head << ",";
         }
         csvFile << std::endl;
 
         for (int rowIdx = 0; rowIdx < this->shape.getNRows(); ++rowIdx) {
-            for (auto kv : this->data) {
-                csvFile << this->data.at(kv.first)[rowIdx] << ",";
+            for (std::string head : this->headerOrder) {
+                csvFile << this->data.at(head)[rowIdx] << ",";
             }
             csvFile << std::endl;
         }
@@ -103,7 +110,7 @@ namespace Data {
             newData[kv.first] = {kv.second[row]};
         }
         DataTableShape newShape(1, this->shape.getNCols());
-        DataTable newDT(newData, newShape);
+        DataTable newDT(newData, newShape, this->headerOrder);
         return newDT;
     }
 
@@ -127,7 +134,7 @@ namespace Data {
         }
         DataTableShape newShape(newData[columnNames[0]].size(),
                                 columnNames.size());
-        DataTable newDT(newData, newShape);
+        DataTable newDT(newData, newShape, columnNames);
         return newDT;
     }
 
@@ -135,7 +142,7 @@ namespace Data {
         std::map<std::string, std::vector<std::string>> newData;
         for (auto kv : this->data) {
             if (idxs.size() > kv.second.size()) {
-                DataTable newDT(this->data, this->shape);
+                DataTable newDT(this->data, this->shape, this->headerOrder);
                 return newDT;
             }
             newData[kv.first] = {};
@@ -144,7 +151,7 @@ namespace Data {
             }
         }
         DataTableShape newShape(idxs.size(), this->data.size());
-        DataTable newDT(newData, newShape);
+        DataTable newDT(newData, newShape, this->headerOrder);
         return newDT;
     }
 
@@ -205,9 +212,10 @@ namespace Data {
             }
             newData[t2header] = newColumn;
         }
-        DataTableShape newShape(indices.size(),
-                                t1headers.size() + t2headers.size());
-        DataTable newDT(newData, newShape);
+
+        t1headers.insert(t1headers.end(), t2headers.begin(), t2headers.end());
+        DataTableShape newShape(indices.size(), t1headers.size());
+        DataTable newDT(newData, newShape, t1headers);
         return newDT;
     }
 
@@ -280,7 +288,7 @@ namespace Data {
         }
         DataTableShape newShape(indices.size(),
                                 t1headers.size() + t2headers.size());
-        DataTable newDT(newData, newShape);
+        DataTable newDT(newData, newShape, this->headerOrder);
         return newDT;
     }
 
@@ -304,11 +312,20 @@ namespace Data {
 
     void DataTable::dropColumns(std::vector<std::string> columnNames) {
         for (std::string col : columnNames) {
-            this->data.erase(col);
+            this->dropColumn(col);
         }
     }
 
-    void DataTable::dropColumn(std::string column) { this->data.erase(column); }
+    void DataTable::dropColumn(std::string column) {
+        this->data.erase(column);
+        for (std::vector<std::string>::iterator it = this->headerOrder.begin();
+             it != this->headerOrder.end(); ++it) {
+            if (*it == column) {
+                this->headerOrder.erase(it);
+                break;
+            }
+        }
+    }
 
     // TODO Implement Shuffling
     void DataTable::shuffleRows(int seed) {
@@ -473,7 +490,7 @@ namespace Data {
         DataTableShape newShape(this->nrows() + tableTwo.nrows(),
                                 this->ncols());
 
-        DataTable newDT(newData, newShape);
+        DataTable newDT(newData, newShape, this->headerOrder);
         return newDT;
     }
 
