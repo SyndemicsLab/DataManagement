@@ -134,7 +134,7 @@ namespace Data {
         }
         DataTableShape newShape(newData[columnNames[0]].size(),
                                 columnNames.size());
-        DataTable newDT(newData, newShape, this->headerOrder);
+        DataTable newDT(newData, newShape, columnNames);
         return newDT;
     }
 
@@ -212,9 +212,10 @@ namespace Data {
             }
             newData[t2header] = newColumn;
         }
-        DataTableShape newShape(indices.size(),
-                                t1headers.size() + t2headers.size());
-        DataTable newDT(newData, newShape, this->headerOrder);
+
+        t1headers.insert(t1headers.end(), t2headers.begin(), t2headers.end());
+        DataTableShape newShape(indices.size(), t1headers.size());
+        DataTable newDT(newData, newShape, t1headers);
         return newDT;
     }
 
