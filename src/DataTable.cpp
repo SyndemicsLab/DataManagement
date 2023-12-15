@@ -96,14 +96,6 @@ namespace Data {
         csvFile.close();
     }
 
-    // std::vector<std::string> DataTable::getRow(int row) const {
-    //     std::vector<std::string> ret;
-    //     for (auto kv : this->data) {
-    //         ret.push_back(kv.second[row]);
-    //     }
-    //     return ret;
-    // }
-
     DataTable DataTable::getRow(int row) const {
         std::map<std::string, std::vector<std::string>> newData;
         for (auto kv : this->data) {
@@ -317,6 +309,10 @@ namespace Data {
     }
 
     void DataTable::dropColumn(std::string column) {
+        if (this->data.find(column) == this->data.end()) {
+            // key not found error
+            return;
+        }
         this->data.erase(column);
         for (std::vector<std::string>::iterator it = this->headerOrder.begin();
              it != this->headerOrder.end(); ++it) {
