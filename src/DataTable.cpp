@@ -10,11 +10,16 @@ namespace Data {
                          const std::string &tablename) {}
 
     DataTable::DataTable(std::map<std::string, std::vector<std::string>> data,
-                         DataTableShape shape) {
+                         DataTableShape shape,
+                         std::vector<std::string> headOrder) {
         this->data = data;
         this->shape = shape;
-        for (auto kv : this->data) {
-            this->headerOrder.push_back(kv.first);
+        if (headOrder.empty()) {
+            for (auto kv : this->data) {
+                this->headerOrder.push_back(kv.first);
+            }
+        } else {
+            this->headerOrder = headOrder;
         }
     }
 
