@@ -146,7 +146,7 @@ namespace Data {
         bool fromSQL(const std::string &dbfile, const std::string &tablename);
 
         /// @brief Function used to get the data row by row
-        /// @return
+        /// @return vector of rows
         std::vector<std::vector<std::string>> getData() const {
             std::vector<std::vector<std::string>> dat;
             for (int i = 0; i < this->nrows(); ++i) {
@@ -160,57 +160,60 @@ namespace Data {
             return dat;
         }
 
-        /// @brief
-        /// @param idx
-        /// @return
+        /// @brief Return a row of data
+        /// @param idx The index of the row of data looked for
+        /// @return DataTable object with the single row of data
         DataTable getRow(int idx) const;
 
-        /// @brief
-        /// @param columnName
-        /// @return
+        /// @brief Return a column of data
+        /// @param columnName The column name to return
+        /// @return vector representing the column of data
         std::vector<std::string> getColumn(std::string columnName) const;
 
-        /// @brief
-        /// @param columnNames
-        /// @return
+        /// @brief Return a set of columns of data as a new DataTable
+        /// @param columnNames the vector of column names to search for
+        /// @return DataTable containing a copy of the columns
         DataTable selectColumns(std::vector<std::string> columnNames) const;
 
-        /// @brief
-        /// @param idxs
-        /// @return
+        /// @brief Return a DataTable containing the asked for rows
+        /// @param idxs indices of the rows to return
+        /// @return DataTable object containing a copy of the rows
         DataTable selectRows(std::vector<int> idxs) const;
 
-        /// @brief
-        /// @param start
-        /// @param end
-        /// @return
+        /// @brief Return a DataTable containing the asked for rows
+        /// @param start start index of the rows asked for
+        /// @param end ending index of the rows asked for
+        /// @return DataTable object containing a copy of the rows
         DataTable selectRowRange(int start, int end) const;
 
-        /// @brief
-        /// @param columnDataMap
-        /// @return
+        /// @brief Return a DataTable containing the data based on a where
+        /// @param columnDataMap Map of column -> value map to search for in the
+        /// DataTable
+        /// @return DataTable containing a copy of the values searched for
         DataTable selectWhere(
             std::unordered_map<std::string, std::string> columnDataMap) const;
 
-        /// @brief
-        /// @param tableTwo
-        /// @param tableOneColumnName
-        /// @param tableTwoColumnName
-        /// @return
+        /// @brief Inner Join done between the current DataTable and the
+        /// provided parameter
+        /// @param tableTwo The other table to join with
+        /// @param tableOneColumnName DataTable column name to join on
+        /// @param tableTwoColumnName DataTable column name to join on
+        /// @return Copy of the joined DataTables
         DataTable innerJoin(DataTable const &tableTwo,
                             std::string tableOneColumnName,
                             std::string tableTwoColumnName) const;
 
-        /// @brief
-        /// @param tableTwo
-        /// @param tableOneColumnNames
-        /// @param tableTwoColumnNames
-        /// @return
+        /// @brief Inner Join done between the current DataTable and the
+        /// provided parameter
+        /// @param tableTwo The other table to join with
+        /// @param tableOneColumnNames DataTable column names to join on
+        /// @param tableTwoColumnNames DataTable column names to join on
+        /// @return Copy of the joined DataTables
         DataTable innerJoin(DataTable const &tableTwo,
                             std::vector<std::string> tableOneColumnNames,
                             std::vector<std::string> tableTwoColumnNames) const;
 
-        /// @brief
+        /// @brief Not implmented yet
         /// @param tableTwo
         /// @param tableOneColumnName
         /// @param tableTwoColumnName
@@ -219,7 +222,7 @@ namespace Data {
                            std::string tableOneColumnName,
                            std::string tableTwoColumnName) const;
 
-        /// @brief
+        /// @brief Not implmented yet
         /// @param tableTwo
         /// @param tableOneColumnName
         /// @param tableTwoColumnName
@@ -228,7 +231,7 @@ namespace Data {
                             std::string tableOneColumnName,
                             std::string tableTwoColumnName) const;
 
-        /// @brief
+        /// @brief Not implmented yet
         /// @param tableTwo
         /// @param tableOneColumnName
         /// @param tableTwoColumnName
@@ -237,123 +240,123 @@ namespace Data {
                             std::string tableOneColumnName,
                             std::string tableTwoColumnName) const;
 
-        /// @brief
-        /// @param n
-        /// @return
+        /// @brief Return the top N rows
+        /// @param n the number of rows to return from the top
+        /// @return Copy of the top N Rows
         DataTable topNRows(int n) const { return this->selectRowRange(0, n); }
 
-        /// @brief
-        /// @param n
-        /// @return
+        /// @brief Return the bottom N Rows
+        /// @param n the number of rows to return from the bottom
+        /// @return Copy of the bottom N Rows
         DataTable bottomNRows(int n) const {
             return selectRowRange(shape[0] - n, shape[0]);
         }
 
-        /// @brief
-        /// @return
+        /// @brief Return a copy of the top 10 rows
+        /// @return A Copy of the top 10 rows
         DataTable head() const { return topNRows(10); }
 
-        /// @brief
-        /// @return
+        /// @brief Return a copy of the bottom 10 rows
+        /// @return A copy of the bottom 10 rows
         DataTable tail() const { return bottomNRows(10); }
 
-        /// @brief
-        /// @return
+        /// @brief Return a copy of the headers
+        /// @return A copy of the headers
         std::vector<std::string> getHeaders() const {
             return this->headerOrder;
         }
 
         // table operations
 
-        /// @brief
-        /// @param column_names
+        /// @brief Drop the provided columns from the DataTable
+        /// @param column_names Vector of Columns to drop from the data table
         void dropColumns(std::vector<std::string> column_names);
 
-        /// @brief
-        /// @param column
+        /// @brief Drop the provided column from the DataTable
+        /// @param column Column to drop from the data table
         void dropColumn(std::string column);
 
-        /// @brief
+        /// @brief Not Implemented Yet
         /// @param seed
         void shuffleRows(int seed = 0);
 
-        /// @brief
-        /// @param column
-        /// @return
+        /// @brief Retrieve the Minimum value in a column
+        /// @param column Column name to search
+        /// @return The minimum value in the column
         std::string min(std::string column) const;
 
-        /// @brief
-        /// @param column
-        /// @return
+        /// @brief Retrieve the Maximum value in a column
+        /// @param column Column name to search
+        /// @return The maximum value in the column
         std::string max(std::string column) const;
 
-        /// @brief
-        /// @return
+        /// @brief Retrieve the Minimum value in the DataTable
+        /// @return The Minimum value in the DataTable
         std::string min() const;
 
-        /// @brief
-        /// @return
+        /// @brief Retrieve teh Maxmimum value in the DataTable
+        /// @return The Maximum value in the DataTable
         std::string max() const;
 
-        /// @brief
-        /// @param column
-        /// @return
+        /// @brief Retrieve the Sum of the Column
+        /// @param column The column name to search
+        /// @return The sum of the values in the Column
         double sum(std::string column) const;
 
-        /// @brief
-        /// @return
+        /// @brief Retrieve the Sum of the DataTable
+        /// @return The sum of the values in the DataTable
         double sum() const;
 
-        /// @brief
-        /// @param column
-        /// @return
+        /// @brief Retrieve the Mean of the Column
+        /// @param column The column name to search
+        /// @return The mean of the values in the Column
         double mean(std::string column) const;
 
-        /// @brief
-        /// @return
+        /// @brief Retrieve the Mean of the DataTable
+        /// @return The Mean of the DataTable
         double mean() const;
 
         // overridden operators
 
-        /// @brief
-        /// @param idx
-        /// @return
+        /// @brief Row indexing
+        /// @param idx Row to copy back
+        /// @return Copy of the row as a DataTable
         DataTable operator[](int idx) const; // select row
 
-        /// @brief
-        /// @param columnName
-        /// @return
+        /// @brief Column Indexing
+        /// @param columnName Column to copy back
+        /// @return copy of the column as a vector
         std::vector<std::string>
         operator[](std::string columnName) const; // select column into DT
 
-        /// @brief
+        /// @brief Not Implemented Yet
         /// @param os
         /// @param table
         /// @return
         friend std::ostream &operator<<(std::ostream &os,
                                         const DataTable &table);
 
-        /// @brief
-        /// @param tableTwo
-        /// @return
+        /// @brief Concatenate two tables
+        /// @param tableTwo table to concatenate with
+        /// @return Copy of concatenated DataTables
         DataTable operator+(DataTable const &tableTwo) const;
 
         // for other classes
 
-        /// @brief
-        /// @return
+        /// @brief Helper to return the number of rows
+        /// @return Number of Rows
         int nrows() const { return shape[0]; }
 
-        /// @brief
-        /// @return
+        /// @brief Helper to return the number of columns
+        /// @return Number of Columns
         int ncols() const { return shape[1]; }
 
-        /// @brief
-        /// @return
+        /// @brief Return the shape
+        /// @return Shape
         DataTableShape getShape() const { return shape; }
 
-        /// @brief
-        /// @return
+        /// @brief Test if the table is empty
+        /// @return true if empty, false if contains data
         bool empty() const { return this->data.empty(); }
     };
 } // namespace Data
