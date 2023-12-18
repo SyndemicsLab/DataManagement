@@ -48,8 +48,7 @@ TEST_F(DataTableTest, ReadFromCSVHeader) {
 TEST_F(DataTableTest, ReadFromCSVNoHeader) {
     try {
         std::vector<std::string> expectedHeaders = {"0", "1", "2"};
-        std::vector<std::vector<std::string>> expectedData = {
-            {"1"}, {"2"}, {"3"}};
+        std::vector<std::vector<std::string>> expectedData = {{"1", "2", "3"}};
         std::string csvData = "1,2,3\n";
         outStream << csvData;
         outStream.close();
@@ -72,8 +71,7 @@ TEST_F(DataTableTest, ReadFromCSVNoHeader) {
 TEST_F(DataTableTest, ReadFromCSVHeaderDelimiter) {
     try {
         std::vector<std::string> expectedHeaders = {"Test", "Test1", "Test2"};
-        std::vector<std::vector<std::string>> expectedData = {
-            {"1"}, {"2"}, {"3"}};
+        std::vector<std::vector<std::string>> expectedData = {{"1", "2", "3"}};
         std::string csvData = "Test;Test1;Test2\n1;2;3\n";
         outStream << csvData;
         outStream.close();
@@ -136,8 +134,8 @@ TEST_F(DataTableTest, GetColumnString) {
 TEST_F(DataTableTest, selectColumnsStrings) {
     try {
         std::vector<std::string> expectedHeaders = {"Test1", "Test2"};
-        std::vector<std::vector<std::string>> expectedData = {{"2", "5"},
-                                                              {"3", "6"}};
+        std::vector<std::vector<std::string>> expectedData = {{"2", "3"},
+                                                              {"5", "6"}};
         std::string csvData = "Test,Test1,Test2\n1,2,3\n4,5,6\n";
         outStream << csvData;
         outStream.close();
@@ -159,8 +157,8 @@ TEST_F(DataTableTest, selectColumnsStrings) {
 TEST_F(DataTableTest, selectRowsInt) {
     try {
         std::vector<std::string> expectedHeaders = {"Test", "Test1", "Test2"};
-        std::vector<std::vector<std::string>> expectedData = {
-            {"1", "7"}, {"2", "8"}, {"3", "9"}};
+        std::vector<std::vector<std::string>> expectedData = {{"1", "2", "3"},
+                                                              {"7", "8", "9"}};
         std::string csvData = "Test,Test1,Test2\n1,2,3\n4,5,6\n7,8,9\n";
         outStream << csvData;
         outStream.close();
@@ -181,8 +179,8 @@ TEST_F(DataTableTest, selectRowsInt) {
 TEST_F(DataTableTest, selectRowRange) {
     try {
         std::vector<std::string> expectedHeaders = {"Test", "Test1", "Test2"};
-        std::vector<std::vector<std::string>> expectedData = {
-            {"4", "7"}, {"5", "8"}, {"6", "9"}};
+        std::vector<std::vector<std::string>> expectedData = {{"4", "5", "6"},
+                                                              {"7", "8", "9"}};
         std::string csvData =
             "Test,Test1,Test2\n1,2,3\n4,5,6\n7,8,9\n10,11,12\n";
         outStream << csvData;
@@ -204,8 +202,8 @@ TEST_F(DataTableTest, selectRowRange) {
 TEST_F(DataTableTest, selectTopNRows) {
     try {
         std::vector<std::string> expectedHeaders = {"Test", "Test1", "Test2"};
-        std::vector<std::vector<std::string>> expectedData = {
-            {"1", "4"}, {"2", "5"}, {"3", "6"}};
+        std::vector<std::vector<std::string>> expectedData = {{"1", "2", "3"},
+                                                              {"4", "5", "6"}};
         std::string csvData =
             "Test,Test1,Test2\n1,2,3\n4,5,6\n7,8,9\n10,11,12\n";
         outStream << csvData;
@@ -228,7 +226,7 @@ TEST_F(DataTableTest, selectBottomNRows) {
     try {
         std::vector<std::string> expectedHeaders = {"Test", "Test1", "Test2"};
         std::vector<std::vector<std::string>> expectedData = {
-            {"7", "10"}, {"8", "11"}, {"9", "12"}};
+            {"7", "8", "9"}, {"10", "11", "12"}};
         std::string csvData =
             "Test,Test1,Test2\n1,2,3\n4,5,6\n7,8,9\n10,11,12\n";
         outStream << csvData;
@@ -251,9 +249,10 @@ TEST_F(DataTableTest, head) {
     try {
         std::vector<std::string> expectedHeaders = {"Test", "Test1", "Test2"};
         std::vector<std::vector<std::string>> expectedData = {
-            {"1", "4", "7", "10"},
-            {"2", "5", "8", "11"},
-            {"3", "6", "9", "12"}};
+            {"1", "2", "3"},
+            {"4", "5", "6"},
+            {"7", "8", "9"},
+            {"10", "11", "12"}};
         std::string csvData =
             "Test,Test1,Test2\n1,2,3\n4,5,6\n7,8,9\n10,11,12\n";
         outStream << csvData;
@@ -276,9 +275,10 @@ TEST_F(DataTableTest, tail) {
     try {
         std::vector<std::string> expectedHeaders = {"Test", "Test1", "Test2"};
         std::vector<std::vector<std::string>> expectedData = {
-            {"1", "4", "7", "10"},
-            {"2", "5", "8", "11"},
-            {"3", "6", "9", "12"}};
+            {"1", "2", "3"},
+            {"4", "5", "6"},
+            {"7", "8", "9"},
+            {"10", "11", "12"}};
         std::string csvData =
             "Test,Test1,Test2\n1,2,3\n4,5,6\n7,8,9\n10,11,12\n";
         outStream << csvData;
@@ -300,8 +300,8 @@ TEST_F(DataTableTest, tail) {
 TEST_F(DataTableTest, dropColumnString) {
     try {
         std::vector<std::string> expectedHeaders = {"Test1", "Test2"};
-        std::vector<std::vector<std::string>> expectedData = {{"2", "5"},
-                                                              {"3", "6"}};
+        std::vector<std::vector<std::string>> expectedData = {{"2", "3"},
+                                                              {"5", "6"}};
         std::string csvData = "Test,Test1,Test2\n1,2,3\n4,5,6\n";
         outStream << csvData;
         outStream.close();
@@ -322,7 +322,7 @@ TEST_F(DataTableTest, dropColumnString) {
 TEST_F(DataTableTest, dropColumnsString) {
     try {
         std::vector<std::string> expectedHeaders = {"Test1"};
-        std::vector<std::vector<std::string>> expectedData = {{"2", "5"}};
+        std::vector<std::vector<std::string>> expectedData = {{"2"}, {"5"}};
         std::string csvData = "Test,Test1,Test2\n1,2,3\n4,5,6\n";
         outStream << csvData;
         outStream.close();
@@ -644,13 +644,9 @@ TEST_F(DataTableTest, innerJoin) {
     ASSERT_TRUE(resultHeaders.size() == expectedHeaders.size());
 
     std::vector<std::vector<std::string>> expectedData = {
-        {"1", "2", "2"},
-        {"hi1.1", "hi2.1", "hi3.1"},
-        {"hi1.2", "hi2.2", "hi3.2"},
-        {"hi1.3", "hi2.3", "hi3.3"},
-        {"hi1.4", "hi2.4", "hi2.4"},
-        {"hi1.5", "hi2.5", "hi2.5"},
-        {"hi1.6", "hi2.6", "hi2.6"}};
+        {"1", "hi1.1", "hi1.2", "hi1.3", "hi1.4", "hi1.5", "hi1.6"},
+        {"2", "hi2.1", "hi2.2", "hi2.3", "hi2.4", "hi2.5", "hi2.6"},
+        {"2", "hi3.1", "hi3.2", "hi3.3", "hi2.4", "hi2.5", "hi2.6"}};
 
     ASSERT_TRUE(resultData.size() == expectedData.size());
     ASSERT_TRUE(resultData[0].size() == expectedData[0].size());
@@ -701,14 +697,9 @@ TEST_F(DataTableTest, multiInnerJoin) {
         "id", "id2", "test1", "test2", "test3", "test4", "test5", "test6"};
 
     std::vector<std::vector<std::string>> expectedData = {
-        {"1", "2", "2"},
-        {"a", "b", "c"},
-        {"hi1.1", "hi2.1", "hi3.1"},
-        {"hi1.2", "hi2.2", "hi3.2"},
-        {"hi1.3", "hi2.3", "hi3.3"},
-        {"hi1.4", "hi2.4", "hi3.4"},
-        {"hi1.5", "hi2.5", "hi3.5"},
-        {"hi1.6", "hi2.6", "hi3.6"}};
+        {"1", "a", "hi1.1", "hi1.2", "hi1.3", "hi1.4", "hi1.5", "hi1.6"},
+        {"2", "b", "hi2.1", "hi2.2", "hi2.3", "hi2.4", "hi2.5", "hi2.6"},
+        {"2", "c", "hi3.1", "hi3.2", "hi3.3", "hi3.4", "hi3.5", "hi3.6"}};
 
     ASSERT_TRUE(resultData.size() == expectedData.size());
     ASSERT_TRUE(resultData[0].size() == expectedData[0].size());
@@ -756,10 +747,9 @@ TEST_F(DataTableTest, operatorPlusOverload) {
                                                 "test3"};
 
     std::vector<std::vector<std::string>> expectedData = {
-        {"1", "2", "2", "1", "2", "3"},
-        {"hi1.1", "hi2.1", "hi3.1", "hi1.4", "hi2.4", "hi3.4"},
-        {"hi1.2", "hi2.2", "hi3.2", "hi1.5", "hi2.5", "hi3.5"},
-        {"hi1.3", "hi2.3", "hi3.3", "hi1.6", "hi2.6", "hi3.6"}};
+        {"1", "hi1.1", "hi1.2", "hi1.3"}, {"2", "hi2.1", "hi2.2", "hi2.3"},
+        {"2", "hi3.1", "hi3.2", "hi3.3"}, {"1", "hi1.4", "hi1.5", "hi1.6"},
+        {"2", "hi2.4", "hi2.5", "hi2.6"}, {"3", "hi3.4", "hi3.5", "hi3.6"}};
 
     ASSERT_TRUE(resultData.size() == expectedData.size());
     ASSERT_TRUE(resultData[0].size() == expectedData[0].size());
