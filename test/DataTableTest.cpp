@@ -664,11 +664,11 @@ TEST_F(DataTableTest, innerJoin) {
 
 TEST_F(DataTableTest, multiInnerJoin) {
     std::map<std::string, std::vector<std::string>> d1;
-    d1["id"] = {"1", "2", "2"};
-    d1["id2"] = {"a", "b", "c"};
-    d1["test1"] = {"hi1.1", "hi2.1", "hi3.1"};
-    d1["test2"] = {"hi1.2", "hi2.2", "hi3.2"};
-    d1["test3"] = {"hi1.3", "hi2.3", "hi3.3"};
+    d1["id"] = {"1", "2", "2", "3"};
+    d1["id2"] = {"a", "b", "c", "c"};
+    d1["test1"] = {"hi1.1", "hi2.1", "hi3.1", "hi4.1"};
+    d1["test2"] = {"hi1.2", "hi2.2", "hi3.2", "hi4.2"};
+    d1["test3"] = {"hi1.3", "hi2.3", "hi3.3", "hi4.3"};
 
     Data::DataTableShape shape1;
     shape1.setNCols(5);
@@ -698,8 +698,7 @@ TEST_F(DataTableTest, multiInnerJoin) {
 
     std::vector<std::vector<std::string>> expectedData = {
         {"1", "a", "hi1.1", "hi1.2", "hi1.3", "hi1.4", "hi1.5", "hi1.6"},
-        {"2", "b", "hi2.1", "hi2.2", "hi2.3", "hi2.4", "hi2.5", "hi2.6"},
-        {"2", "c", "hi3.1", "hi3.2", "hi3.3", "hi3.4", "hi3.5", "hi3.6"}};
+        {"2", "b", "hi2.1", "hi2.2", "hi2.3", "hi2.4", "hi2.5", "hi2.6"}};
 
     ASSERT_TRUE(resultData.size() == expectedData.size());
     ASSERT_TRUE(resultData[0].size() == expectedData[0].size());

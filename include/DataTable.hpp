@@ -83,6 +83,24 @@ namespace Data {
         std::vector<int>
         convertStringVecToInt(std::vector<std::string> data) const;
 
+        void columnErrorCheck(std::string const columnName) const {
+            if (this->data.find(columnName) == this->data.end()) {
+                std::string message =
+                    "Invalid Column Name of " + columnName + " for DataTable.";
+                throw new std::logic_error(message);
+            }
+        }
+
+        void rowErrorCheck(int const idx) const {
+            if (idx > this->nrows()) {
+                std::string message = "Invalid Row Index of " +
+                                      std::to_string(idx) +
+                                      " for DataTable with " +
+                                      std::to_string(this->nrows()) + " rows.";
+                throw new std::logic_error(message);
+            }
+        }
+
         std::vector<std::string> loadRows(std::ifstream &csvStream);
 
         template <typename T>
@@ -254,7 +272,10 @@ namespace Data {
 
         /// @brief Return a copy of the top 10 rows
         /// @return A Copy of the top 10 rows
-        DataTable head() const { return topNRows(10); }
+        DataTable head() const {
+            int val = (this->nrows() < 10) ? this->nrows() : 10;
+            return topNRows(val);
+        }
 
         /// @brief Return a copy of the bottom 10 rows
         /// @return A copy of the bottom 10 rows
