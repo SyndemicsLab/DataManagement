@@ -279,7 +279,10 @@ namespace Data {
 
         /// @brief Return a copy of the bottom 10 rows
         /// @return A copy of the bottom 10 rows
-        DataTable tail() const { return bottomNRows(10); }
+        DataTable tail() const {
+            int val = (this->nrows() < 10) ? this->nrows() : 10;
+            return bottomNRows(val);
+        }
 
         /// @brief Return a copy of the headers
         /// @return A copy of the headers

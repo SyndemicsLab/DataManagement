@@ -341,10 +341,7 @@ namespace Data {
     }
 
     void DataTable::dropColumn(std::string column) {
-        if (this->data.find(column) == this->data.end()) {
-            // key not found error
-            return;
-        }
+        columnErrorCheck(column);
         this->data.erase(column);
         for (std::vector<std::string>::iterator it = this->headerOrder.begin();
              it != this->headerOrder.end(); ++it) {
@@ -505,7 +502,7 @@ namespace Data {
     }
 
     DataTable DataTable::operator+(DataTable const &tableTwo) const {
-        std::map<std::string, std::vector<std::string>> newData;
+        std::map<std::string, std::vector<std::string>> newData = {};
         for (auto kv : this->data) {
             std::vector<std::string> tempVec;
             std::vector<std::string> tableTwoVec = tableTwo[kv.first];
