@@ -163,6 +163,8 @@ namespace Data {
 
         if (end < 0) {
             end = 0;
+        } else if (end > this->nrows()) {
+            end = this->nrows();
         }
 
         int total = end - start;
