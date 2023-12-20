@@ -7,14 +7,16 @@ namespace Data {
     }
 
     DataTable::DataTable(const std::string &dbfile,
-                         const std::string &tablename) {}
+                         const std::string &tablename) {
+        throw new std::logic_error("Not Implemented Yet");
+    }
 
     DataTable::DataTable(std::map<std::string, std::vector<std::string>> data,
                          DataTableShape shape,
                          std::vector<std::string> headOrder) {
         this->data = data;
         this->shape = shape;
-        if (headOrder.empty()) {
+        if (headOrder.empty() || headerOrder.size() != data.size()) {
             for (auto kv : this->data) {
                 this->headerOrder.push_back(kv.first);
             }
@@ -24,7 +26,7 @@ namespace Data {
     }
 
     std::vector<std::string> DataTable::loadRows(std::ifstream &csvStream) {
-        std::vector<std::string> contents;
+        std::vector<std::string> contents = {};
         std::string line;
         while (std::getline(csvStream, line)) {
             contents.push_back(line);
@@ -41,6 +43,10 @@ namespace Data {
 
         std::vector<std::string> contents = this->loadRows(csvFile);
         csvFile.close();
+
+        if (contents.empty()) {
+            return false;
+        }
 
         std::vector<std::string> firstLine = this->split(contents[0], delim);
         this->shape.setNCols(firstLine.size());
@@ -72,7 +78,7 @@ namespace Data {
 
     bool DataTable::fromSQL(const std::string &dbfile,
                             const std::string &tablename) {
-        return false;
+        throw new std::logic_error("Not Implemented Yet");
     }
 
     void DataTable::toCSV(const std::string &filename) const {
@@ -96,15 +102,8 @@ namespace Data {
         csvFile.close();
     }
 
-    // std::vector<std::string> DataTable::getRow(int row) const {
-    //     std::vector<std::string> ret;
-    //     for (auto kv : this->data) {
-    //         ret.push_back(kv.second[row]);
-    //     }
-    //     return ret;
-    // }
-
     DataTable DataTable::getRow(int row) const {
+        rowErrorCheck(row);
         std::map<std::string, std::vector<std::string>> newData;
         for (auto kv : this->data) {
             newData[kv.first] = {kv.second[row]};
@@ -123,13 +122,18 @@ namespace Data {
 
     std::vector<std::string>
     DataTable::getColumn(std::string columnName) const {
+        columnErrorCheck(columnName);
         return this->data.at(columnName);
     }
 
     DataTable
     DataTable::selectColumns(std::vector<std::string> columnNames) const {
+        if (columnNames.empty()) {
+            return {};
+        }
         std::map<std::string, std::vector<std::string>> newData;
         for (std::string colName : columnNames) {
+            columnErrorCheck(colName);
             newData[colName] = this->data.at(colName);
         }
         DataTableShape newShape(newData[columnNames[0]].size(),
@@ -141,12 +145,9 @@ namespace Data {
     DataTable DataTable::selectRows(std::vector<int> idxs) const {
         std::map<std::string, std::vector<std::string>> newData;
         for (auto kv : this->data) {
-            if (idxs.size() > kv.second.size()) {
-                DataTable newDT(this->data, this->shape, this->headerOrder);
-                return newDT;
-            }
             newData[kv.first] = {};
             for (int idx : idxs) {
+                rowErrorCheck(idx);
                 newData[kv.first].push_back(kv.second[idx]);
             }
         }
@@ -156,10 +157,23 @@ namespace Data {
     }
 
     DataTable DataTable::selectRowRange(int start, int end) const {
+        if (start < 0) {
+            start = 0;
+        }
+
+        if (end < 0) {
+            end = 0;
+        } else if (end > this->nrows()) {
+            end = this->nrows();
+        }
+
         int total = end - start;
         if (total < 0) {
             return {};
         }
+
+        rowErrorCheck(total);
+
         std::vector<int> idxs(total);
         std::iota(std::begin(idxs), std::end(idxs), start);
         return this->selectRows(idxs);
@@ -167,13 +181,14 @@ namespace Data {
 
     DataTable DataTable::selectWhere(
         std::unordered_map<std::string, std::string> columnDataMap) const {
-        return {};
+        throw new std::logic_error("Not Implemented Yet");
     }
 
     DataTable DataTable::innerJoin(DataTable const &tableTwo,
                                    std::string tableOneColumnName,
                                    std::string tableTwoColumnName) const {
-        std::vector<std::string> columnOne = this->data.at(tableOneColumnName);
+        std::vector<std::string> columnOne =
+            this->getColumn(tableOneColumnName);
         std::vector<std::string> columnTwo =
             tableTwo.getColumn(tableTwoColumnName);
 
@@ -195,7 +210,7 @@ namespace Data {
         // Add the t1 rows column by column
         std::map<std::string, std::vector<std::string>> newData;
         for (std::string t1header : t1headers) {
-            std::vector<std::string> column = this->data.at(t1header);
+            std::vector<std::string> column = this->getColumn(t1header);
             std::vector<std::string> newColumn;
             for (std::vector<int> idxs : indices) {
                 newColumn.push_back(column[idxs[0]]);
@@ -224,19 +239,30 @@ namespace Data {
                          std::vector<std::string> tableOneColumnNames,
                          std::vector<std::string> tableTwoColumnNames) const {
 
+        // throw error on invalid 1-1 join columns
         if (tableOneColumnNames.size() != tableTwoColumnNames.size()) {
-            // Invalid table comparisons
+            throw new std::logic_error("Joining columns are not one-to-one.");
+        }
+
+        // return nothing if the column names are empty
+        if (tableOneColumnNames.empty() || tableTwoColumnNames.empty()) {
             return {};
         }
 
-        std::vector<std::vector<std::string>> t1Columns;
+        std::vector<std::vector<std::string>> t1Columns = {};
         for (std::string tableOneColumnName : tableOneColumnNames) {
-            t1Columns.push_back(this->data.at(tableOneColumnName));
+            t1Columns.push_back(this->getColumn(tableOneColumnName));
         }
 
-        std::vector<std::vector<std::string>> t2Columns;
+        std::vector<std::vector<std::string>> t2Columns = {};
         for (std::string tableTwoColumnName : tableTwoColumnNames) {
-            t2Columns.push_back(this->data.at(tableTwoColumnName));
+            t2Columns.push_back(tableTwo.getColumn(tableTwoColumnName));
+        }
+
+        // Should never be true if the getColumn fails and the ColumnNames
+        // Params are not empty
+        if (t1Columns.empty() || t2Columns.empty()) {
+            throw new std::logic_error("Joining columns not found in tables.");
         }
 
         std::vector<std::vector<int>> indices;
@@ -269,7 +295,7 @@ namespace Data {
         // Add the t1 rows column by column
         std::map<std::string, std::vector<std::string>> newData;
         for (std::string t1header : t1headers) {
-            std::vector<std::string> column = this->data.at(t1header);
+            std::vector<std::string> column = this->getColumn(t1header);
             std::vector<std::string> newColumn;
             for (std::vector<int> idxs : indices) {
                 newColumn.push_back(column[idxs[0]]);
@@ -317,6 +343,7 @@ namespace Data {
     }
 
     void DataTable::dropColumn(std::string column) {
+        columnErrorCheck(column);
         this->data.erase(column);
         for (std::vector<std::string>::iterator it = this->headerOrder.begin();
              it != this->headerOrder.end(); ++it) {
@@ -477,7 +504,7 @@ namespace Data {
     }
 
     DataTable DataTable::operator+(DataTable const &tableTwo) const {
-        std::map<std::string, std::vector<std::string>> newData;
+        std::map<std::string, std::vector<std::string>> newData = {};
         for (auto kv : this->data) {
             std::vector<std::string> tempVec;
             std::vector<std::string> tableTwoVec = tableTwo[kv.first];

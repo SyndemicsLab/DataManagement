@@ -13,32 +13,58 @@
 #include <unordered_map>
 #include <vector>
 
-// Built in part on the back of:
-// https://github.com/anthonymorast/DataTables/tree/master
-
+/// @brief Namespace defining Data Containers
 namespace Data {
 
+    /// @brief Helper Class used to hold DataTable Shapes
     class DataTableShape {
     private:
         int nrows = 0;
         int ncols = 0;
 
     public:
+        /// @brief Default constructor. Leaves Rows and Cols set to 0.
         DataTableShape(){};
+
+        /// @brief Primary use constructor. Provides a setter for Rows and Cols.
+        /// @param nrows Number of Rows to provide to the shape
+        /// @param ncols Number of Cols to provide to the shape
         DataTableShape(int nrows, int ncols) {
-            this->nrows = nrows;
-            this->ncols = ncols;
+            if (nrows > 0 || ncols > 0) {
+                this->nrows = nrows;
+                this->ncols = ncols;
+            }
         };
+
+        /// @brief Getter for the Number of Rows
+        /// @return Number of Rows as an Integer
         int getNRows() const { return this->nrows; }
+
+        /// @brief Getter for Number of Columns
+        /// @return Number of Columns as an Integer
         int getNCols() const { return this->ncols; }
-        void setNRows(int nrows) { this->nrows = nrows; }
-        void setNCols(int ncols) { this->ncols = ncols; }
+
+        /// @brief Setter for Number of Rows
+        /// @param nrows Number of Rows
+        void setNRows(int nrows) { this->nrows = (nrows < 0) ? 0 : nrows; }
+
+        /// @brief Setter for Number of Columns
+        /// @param ncols Number of Columns
+        void setNCols(int ncols) { this->ncols = (ncols < 0) ? 0 : ncols; }
+
+        /// @brief Operator overload for outputting the shape
+        /// @param os Stream to pass output to
+        /// @param shape Class of DataTableShape to print
+        /// @return stream with the shape printed
         friend std::ostream &operator<<(std::ostream &os,
                                         const DataTableShape shape) {
             os << "(" << shape.nrows << ", " << shape.ncols << ")";
             return os;
         }
 
+        /// @brief Operator overload for getting rows and columns
+        /// @param index 0 for rows, 1 for columns
+        /// @return number of rows or columns
         int operator[](int index) const {
             if (index != 0 && index != 1) {
                 throw std::runtime_error("Invalid data shape. Valid indices "
@@ -48,6 +74,7 @@ namespace Data {
         }
     };
 
+    /// @brief Class for Containing data in a row by column table format
     class DataTable {
     private:
         std::vector<std::string> headerOrder;
@@ -56,8 +83,25 @@ namespace Data {
         std::vector<int>
         convertStringVecToInt(std::vector<std::string> data) const;
 
+        void columnErrorCheck(std::string const columnName) const {
+            if (this->data.find(columnName) == this->data.end()) {
+                std::string message =
+                    "Invalid Column Name of " + columnName + " for DataTable.";
+                throw new std::logic_error(message);
+            }
+        }
+
+        void rowErrorCheck(int const idx) const {
+            if (idx > this->nrows()) {
+                std::string message = "Invalid Row Index of " +
+                                      std::to_string(idx) +
+                                      " for DataTable with " +
+                                      std::to_string(this->nrows()) + " rows.";
+                throw new std::logic_error(message);
+            }
+        }
+
         std::vector<std::string> loadRows(std::ifstream &csvStream);
-        // int getIdxOfColumnName(std::string columnName) const;
 
         template <typename T>
         void split(const std::string &s, char delim, T result) {
@@ -75,94 +119,268 @@ namespace Data {
         };
 
     public:
+        /// @brief Default constructor. Sets everything to default
         DataTable(){};
+
+        /// @brief Constructor used to load a file to a DataTable
+        /// @param filename file path as a string
+        /// @param hasHeaders flag to read headers. False if no headers in file
+        /// @param delim Signal character that separates the data
         DataTable(const std::string &filename, bool hasHeaders = true,
                   char delim = ',');
+
+        /// @brief Constructor used to load an SQL Table to a DataTable
+        /// @param dbfile file path to the database file
+        /// @param tablename Table name to search for in the database
         DataTable(const std::string &dbfile, const std::string &tablename);
+
+        /// @brief Constructor used to take a data map to a DataTable
+        /// @param data map of string headers to vector columns
+        /// @param shape class containing shape details
+        /// @param headOrder order of which to write the headers
         DataTable(std::map<std::string, std::vector<std::string>> data,
                   DataTableShape shape,
                   std::vector<std::string> headOrder = {});
+
+        /// @brief Default destructor
         ~DataTable(){};
+
+        /// @brief Function used to load a DataTable to the provided CSV
+        /// @param filename csv file to write data to
         void toCSV(const std::string &filename) const;
+
+        /// @brief Function used to read from a file to the current DataTable
+        /// @param filename csv file to read from
+        /// @param hasHeaders flag to identify if there are headers
+        /// @param delim Signal character that separates the data
+        /// @return true if successful, false if failure
         bool fromCSV(const std::string &filename, bool hasHeaders = true,
                      char delim = ',');
+
+        /// @brief Function used to read from a SQL Table to a DataTable
+        /// @param dbfile database file containing the SQL Table to read from
+        /// @param tablename SQL Table name to read
+        /// @return true if successful, false if failure
         bool fromSQL(const std::string &dbfile, const std::string &tablename);
 
+        /// @brief Function used to get the data row by row
+        /// @return vector of rows
         std::vector<std::vector<std::string>> getData() const {
             std::vector<std::vector<std::string>> dat;
+            for (int i = 0; i < this->nrows(); ++i) {
+                dat.push_back({});
+            }
             for (auto kv : this->data) {
-                dat.push_back(kv.second);
+                for (int i = 0; i < kv.second.size(); ++i) {
+                    dat[i].push_back(kv.second[i]);
+                }
             }
             return dat;
         }
 
-        // std::vector<std::string> getRow(int idx) const;
+        /// @brief Return a row of data
+        /// @param idx The index of the row of data looked for
+        /// @return DataTable object with the single row of data
         DataTable getRow(int idx) const;
+
+        /// @brief Return a column of data
+        /// @param columnName The column name to return
+        /// @return vector representing the column of data
         std::vector<std::string> getColumn(std::string columnName) const;
+
+        /// @brief Return a set of columns of data as a new DataTable
+        /// @param columnNames the vector of column names to search for
+        /// @return DataTable containing a copy of the columns
         DataTable selectColumns(std::vector<std::string> columnNames) const;
+
+        /// @brief Return a DataTable containing the asked for rows
+        /// @param idxs indices of the rows to return
+        /// @return DataTable object containing a copy of the rows
         DataTable selectRows(std::vector<int> idxs) const;
+
+        /// @brief Return a DataTable containing the asked for rows
+        /// @param start start index of the rows asked for
+        /// @param end ending index of the rows asked for
+        /// @return DataTable object containing a copy of the rows
         DataTable selectRowRange(int start, int end) const;
+
+        /// @brief Return a DataTable containing the data based on a where
+        /// @param columnDataMap Map of column -> value map to search for in the
+        /// DataTable
+        /// @return DataTable containing a copy of the values searched for
         DataTable selectWhere(
             std::unordered_map<std::string, std::string> columnDataMap) const;
 
+        /// @brief Inner Join done between the current DataTable and the
+        /// provided parameter
+        /// @param tableTwo The other table to join with
+        /// @param tableOneColumnName DataTable column name to join on
+        /// @param tableTwoColumnName DataTable column name to join on
+        /// @return Copy of the joined DataTables
         DataTable innerJoin(DataTable const &tableTwo,
                             std::string tableOneColumnName,
                             std::string tableTwoColumnName) const;
 
+        /// @brief Inner Join done between the current DataTable and the
+        /// provided parameter
+        /// @param tableTwo The other table to join with
+        /// @param tableOneColumnNames DataTable column names to join on
+        /// @param tableTwoColumnNames DataTable column names to join on
+        /// @return Copy of the joined DataTables
         DataTable innerJoin(DataTable const &tableTwo,
                             std::vector<std::string> tableOneColumnNames,
                             std::vector<std::string> tableTwoColumnNames) const;
 
+        /// @brief Not implmented yet
+        /// @param tableTwo
+        /// @param tableOneColumnName
+        /// @param tableTwoColumnName
+        /// @return
         DataTable leftJoin(DataTable const &tableTwo,
                            std::string tableOneColumnName,
                            std::string tableTwoColumnName) const;
 
+        /// @brief Not implmented yet
+        /// @param tableTwo
+        /// @param tableOneColumnName
+        /// @param tableTwoColumnName
+        /// @return
         DataTable rightJoin(DataTable const &tableTwo,
                             std::string tableOneColumnName,
                             std::string tableTwoColumnName) const;
 
+        /// @brief Not implmented yet
+        /// @param tableTwo
+        /// @param tableOneColumnName
+        /// @param tableTwoColumnName
+        /// @return
         DataTable outerJoin(DataTable const &tableTwo,
                             std::string tableOneColumnName,
                             std::string tableTwoColumnName) const;
 
+        /// @brief Return the top N rows
+        /// @param n the number of rows to return from the top
+        /// @return Copy of the top N Rows
         DataTable topNRows(int n) const { return this->selectRowRange(0, n); }
+
+        /// @brief Return the bottom N Rows
+        /// @param n the number of rows to return from the bottom
+        /// @return Copy of the bottom N Rows
         DataTable bottomNRows(int n) const {
             return selectRowRange(shape[0] - n, shape[0]);
         }
-        DataTable head() const { return topNRows(10); }
-        DataTable tail() const { return bottomNRows(10); }
 
+        /// @brief Return a copy of the top 10 rows
+        /// @return A Copy of the top 10 rows
+        DataTable head() const {
+            int val = (this->nrows() < 10) ? this->nrows() : 10;
+            return topNRows(val);
+        }
+
+        /// @brief Return a copy of the bottom 10 rows
+        /// @return A copy of the bottom 10 rows
+        DataTable tail() const {
+            int val = (this->nrows() < 10) ? this->nrows() : 10;
+            return bottomNRows(val);
+        }
+
+        /// @brief Return a copy of the headers
+        /// @return A copy of the headers
         std::vector<std::string> getHeaders() const {
             return this->headerOrder;
         }
 
         // table operations
+
+        /// @brief Drop the provided columns from the DataTable
+        /// @param column_names Vector of Columns to drop from the data table
         void dropColumns(std::vector<std::string> column_names);
+
+        /// @brief Drop the provided column from the DataTable
+        /// @param column Column to drop from the data table
         void dropColumn(std::string column);
+
+        /// @brief Not Implemented Yet
+        /// @param seed
         void shuffleRows(int seed = 0);
 
+        /// @brief Retrieve the Minimum value in a column
+        /// @param column Column name to search
+        /// @return The minimum value in the column
         std::string min(std::string column) const;
+
+        /// @brief Retrieve the Maximum value in a column
+        /// @param column Column name to search
+        /// @return The maximum value in the column
         std::string max(std::string column) const;
+
+        /// @brief Retrieve the Minimum value in the DataTable
+        /// @return The Minimum value in the DataTable
         std::string min() const;
+
+        /// @brief Retrieve teh Maxmimum value in the DataTable
+        /// @return The Maximum value in the DataTable
         std::string max() const;
+
+        /// @brief Retrieve the Sum of the Column
+        /// @param column The column name to search
+        /// @return The sum of the values in the Column
         double sum(std::string column) const;
+
+        /// @brief Retrieve the Sum of the DataTable
+        /// @return The sum of the values in the DataTable
         double sum() const;
+
+        /// @brief Retrieve the Mean of the Column
+        /// @param column The column name to search
+        /// @return The mean of the values in the Column
         double mean(std::string column) const;
+
+        /// @brief Retrieve the Mean of the DataTable
+        /// @return The Mean of the DataTable
         double mean() const;
 
         // overridden operators
+
+        /// @brief Row indexing
+        /// @param idx Row to copy back
+        /// @return Copy of the row as a DataTable
         DataTable operator[](int idx) const; // select row
+
+        /// @brief Column Indexing
+        /// @param columnName Column to copy back
+        /// @return copy of the column as a vector
         std::vector<std::string>
         operator[](std::string columnName) const; // select column into DT
+
+        /// @brief Not Implemented Yet
+        /// @param os
+        /// @param table
+        /// @return
         friend std::ostream &operator<<(std::ostream &os,
                                         const DataTable &table);
+
+        /// @brief Concatenate two tables
+        /// @param tableTwo table to concatenate with
+        /// @return Copy of concatenated DataTables
         DataTable operator+(DataTable const &tableTwo) const;
 
         // for other classes
+
+        /// @brief Helper to return the number of rows
+        /// @return Number of Rows
         int nrows() const { return shape[0]; }
+
+        /// @brief Helper to return the number of columns
+        /// @return Number of Columns
         int ncols() const { return shape[1]; }
+
+        /// @brief Return the shape
+        /// @return Shape
         DataTableShape getShape() const { return shape; }
 
+        /// @brief Test if the table is empty
+        /// @return true if empty, false if contains data
         bool empty() const { return this->data.empty(); }
     };
 } // namespace Data

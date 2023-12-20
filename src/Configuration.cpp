@@ -20,7 +20,7 @@ namespace Data {
     std::vector<std::string>
     Configuration::parseString2VectorOfStrings(std::string st) {
         std::stringstream ss(st);
-        std::vector<std::string> result;
+        std::vector<std::string> result = {};
 
         while (ss.good()) {
             std::string substr;
@@ -39,7 +39,7 @@ namespace Data {
     }
 
     std::vector<int> Configuration::parseString2VectorOfInts(std::string st) {
-        std::vector<int> result;
+        std::vector<int> result = {};
 
         std::istringstream iss(st);
         std::string token;
