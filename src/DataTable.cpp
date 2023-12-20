@@ -181,7 +181,28 @@ namespace Data {
 
     DataTable DataTable::selectWhere(
         std::unordered_map<std::string, std::string> columnDataMap) const {
-        throw new std::logic_error("Not Implemented Yet");
+        std::unordered_map<int, int> rowIdxHits = {};
+        for (auto kv : columnDataMap) {
+            columnErrorCheck(kv.first);
+            std::vector<int> hits = {};
+            std::vector<std::string> column = getColumn(kv.first);
+            for (int i = 0; i < column.size(); ++i) {
+                if (kv.second == column[i]) {
+                    if (rowIdxHits.find(i) != rowIdxHits.end()) {
+                        rowIdxHits[i]++;
+                    } else {
+                        rowIdxHits[i] = 1;
+                    }
+                }
+            }
+        }
+        std::vector<int> rowIdxs = {};
+        for (auto kv : rowIdxHits) {
+            if (kv.second == columnDataMap.size()) {
+                rowIdxs.push_back(kv.first);
+            }
+        }
+        return selectRows(rowIdxs);
     }
 
     DataTable DataTable::innerJoin(DataTable const &tableTwo,
