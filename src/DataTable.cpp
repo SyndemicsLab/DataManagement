@@ -202,6 +202,7 @@ namespace Data {
                 rowIdxs.push_back(kv.first);
             }
         }
+        std::sort(rowIdxs.begin(), rowIdxs.end());
         return selectRows(rowIdxs);
     }
 
