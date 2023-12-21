@@ -608,6 +608,80 @@ TEST_F(DataTableTest, getShape) {
     }
 }
 
+TEST_F(DataTableTest, selectWhere) {
+    try {
+        std::vector<std::string> expectedHeaders = {"Test", "Test1", "Test2"};
+        std::vector<std::vector<std::string>> expectedData = {{"1", "2", "3"}};
+        std::string csvData = "Test,Test1,Test2\n1,2,3\n4,5,6\n7,8,9\n";
+
+        std::unordered_map<std::string, std::string> selectMap;
+        selectMap["Test"] = "1";
+        outStream << csvData;
+        outStream.close();
+
+        Data::DataTable dt;
+        std::string tFilePath = mTempFileAbsolute.string();
+        dt.fromCSV(tFilePath, true);
+        Data::DataTable resultDT = dt.selectWhere(selectMap);
+
+        EXPECT_EQ(expectedHeaders, resultDT.getHeaders());
+        EXPECT_EQ(expectedData, resultDT.getData());
+    } catch (const std::exception &e_) {
+        FAIL() << "Caught an exception in " << typeid(*this).name() << ": "
+               << e_.what();
+    }
+}
+
+TEST_F(DataTableTest, selectWhereMultiHit) {
+    try {
+        std::vector<std::string> expectedHeaders = {"Test", "Test1", "Test2"};
+        std::vector<std::vector<std::string>> expectedData = {{"1", "2", "3"},
+                                                              {"1", "4", "6"}};
+        std::string csvData = "Test,Test1,Test2\n1,2,3\n1,4,6\n7,8,9\n";
+
+        std::unordered_map<std::string, std::string> selectMap;
+        selectMap["Test"] = "1";
+        outStream << csvData;
+        outStream.close();
+
+        Data::DataTable dt;
+        std::string tFilePath = mTempFileAbsolute.string();
+        dt.fromCSV(tFilePath, true);
+        Data::DataTable resultDT = dt.selectWhere(selectMap);
+
+        EXPECT_EQ(expectedHeaders, resultDT.getHeaders());
+        EXPECT_EQ(expectedData, resultDT.getData());
+    } catch (const std::exception &e_) {
+        FAIL() << "Caught an exception in " << typeid(*this).name() << ": "
+               << e_.what();
+    }
+}
+
+TEST_F(DataTableTest, selectWhereMultiSelect) {
+    try {
+        std::vector<std::string> expectedHeaders = {"Test", "Test1", "Test2"};
+        std::vector<std::vector<std::string>> expectedData = {{"1", "2", "3"}};
+        std::string csvData = "Test,Test1,Test2\n1,2,3\n1,4,6\n7,8,9\n";
+
+        std::unordered_map<std::string, std::string> selectMap;
+        selectMap["Test"] = "1";
+        selectMap["Test1"] = "2";
+        outStream << csvData;
+        outStream.close();
+
+        Data::DataTable dt;
+        std::string tFilePath = mTempFileAbsolute.string();
+        dt.fromCSV(tFilePath, true);
+        Data::DataTable resultDT = dt.selectWhere(selectMap);
+
+        EXPECT_EQ(expectedHeaders, resultDT.getHeaders());
+        EXPECT_EQ(expectedData, resultDT.getData());
+    } catch (const std::exception &e_) {
+        FAIL() << "Caught an exception in " << typeid(*this).name() << ": "
+               << e_.what();
+    }
+}
+
 TEST_F(DataTableTest, innerJoin) {
     std::vector<std::string> headerOrder1 = {"id", "test1", "test2", "test3"};
     std::map<std::string, std::vector<std::string>> d1;
