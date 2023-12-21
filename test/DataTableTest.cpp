@@ -102,7 +102,7 @@ TEST_F(DataTableTest, GetRow) {
         Data::DataTable dt;
         std::string tFilePath = mTempFileAbsolute.string();
         dt.fromCSV(tFilePath, true);
-        std::shared_ptr<Data::IDataTable> data = dt.getRow(1);
+        Data::IDataTablePtr data = dt.getRow(1);
 
         EXPECT_EQ(expectedData[0], (*data)["Test"][0]);
         EXPECT_EQ(expectedData[1], (*data)["Test1"][0]);
@@ -145,8 +145,7 @@ TEST_F(DataTableTest, selectColumnsStrings) {
         std::string tFilePath = mTempFileAbsolute.string();
         dt.fromCSV(tFilePath, true);
         std::vector<std::string> columnNames = {"Test1", "Test2"};
-        std::shared_ptr<Data::IDataTable> resultDT =
-            dt.selectColumns(columnNames);
+        Data::IDataTablePtr resultDT = dt.selectColumns(columnNames);
 
         EXPECT_EQ(expectedHeaders, resultDT->getHeaders());
         EXPECT_EQ(expectedData, resultDT->getData());
@@ -168,7 +167,7 @@ TEST_F(DataTableTest, selectRowsInt) {
         Data::DataTable dt;
         std::string tFilePath = mTempFileAbsolute.string();
         dt.fromCSV(tFilePath, true);
-        std::shared_ptr<Data::IDataTable> resultDT = dt.selectRows({0, 2});
+        Data::IDataTablePtr resultDT = dt.selectRows({0, 2});
 
         EXPECT_EQ(expectedHeaders, resultDT->getHeaders());
         EXPECT_EQ(expectedData, resultDT->getData());
@@ -191,7 +190,7 @@ TEST_F(DataTableTest, selectRowRange) {
         Data::DataTable dt;
         std::string tFilePath = mTempFileAbsolute.string();
         dt.fromCSV(tFilePath, true);
-        std::shared_ptr<Data::IDataTable> resultDT = dt.selectRowRange(1, 3);
+        Data::IDataTablePtr resultDT = dt.selectRowRange(1, 3);
 
         EXPECT_EQ(expectedHeaders, resultDT->getHeaders());
         EXPECT_EQ(expectedData, resultDT->getData());
@@ -214,7 +213,7 @@ TEST_F(DataTableTest, selectTopNRows) {
         Data::DataTable dt;
         std::string tFilePath = mTempFileAbsolute.string();
         dt.fromCSV(tFilePath, true);
-        std::shared_ptr<Data::IDataTable> resultDT = dt.topNRows(2);
+        Data::IDataTablePtr resultDT = dt.topNRows(2);
 
         EXPECT_EQ(expectedHeaders, resultDT->getHeaders());
         EXPECT_EQ(expectedData, resultDT->getData());
@@ -237,7 +236,7 @@ TEST_F(DataTableTest, selectBottomNRows) {
         Data::DataTable dt;
         std::string tFilePath = mTempFileAbsolute.string();
         dt.fromCSV(tFilePath, true);
-        std::shared_ptr<Data::IDataTable> resultDT = dt.bottomNRows(2);
+        Data::IDataTablePtr resultDT = dt.bottomNRows(2);
 
         EXPECT_EQ(expectedHeaders, resultDT->getHeaders());
         EXPECT_EQ(expectedData, resultDT->getData());
@@ -263,7 +262,7 @@ TEST_F(DataTableTest, head) {
         Data::DataTable dt;
         std::string tFilePath = mTempFileAbsolute.string();
         dt.fromCSV(tFilePath, true);
-        std::shared_ptr<Data::IDataTable> resultDT = dt.head();
+        Data::IDataTablePtr resultDT = dt.head();
 
         EXPECT_EQ(expectedHeaders, resultDT->getHeaders());
         EXPECT_EQ(expectedData, resultDT->getData());
@@ -289,7 +288,7 @@ TEST_F(DataTableTest, tail) {
         Data::DataTable dt;
         std::string tFilePath = mTempFileAbsolute.string();
         dt.fromCSV(tFilePath, true);
-        std::shared_ptr<Data::IDataTable> resultDT = dt.tail();
+        Data::IDataTablePtr resultDT = dt.tail();
 
         EXPECT_EQ(expectedHeaders, resultDT->getHeaders());
         EXPECT_EQ(expectedData, resultDT->getData());
@@ -523,7 +522,7 @@ TEST_F(DataTableTest, operationalRowIndexing) {
         Data::DataTable dt;
         std::string tFilePath = mTempFileAbsolute.string();
         dt.fromCSV(tFilePath, true);
-        std::shared_ptr<Data::IDataTable> result = dt[1];
+        Data::IDataTablePtr result = dt[1];
         EXPECT_EQ(expected[0], (*result)["Test"][0]);
         EXPECT_EQ(expected[1], (*result)["Test1"][0]);
         EXPECT_EQ(expected[2], (*result)["Test2"][0]);
@@ -624,7 +623,7 @@ TEST_F(DataTableTest, selectWhere) {
         Data::DataTable dt;
         std::string tFilePath = mTempFileAbsolute.string();
         dt.fromCSV(tFilePath, true);
-        std::shared_ptr<Data::IDataTable> resultDT = dt.selectWhere(selectMap);
+        Data::IDataTablePtr resultDT = dt.selectWhere(selectMap);
 
         EXPECT_EQ(expectedHeaders, resultDT->getHeaders());
         EXPECT_EQ(expectedData, resultDT->getData());
@@ -649,7 +648,7 @@ TEST_F(DataTableTest, selectWhereMultiHit) {
         Data::DataTable dt;
         std::string tFilePath = mTempFileAbsolute.string();
         dt.fromCSV(tFilePath, true);
-        std::shared_ptr<Data::IDataTable> resultDT = dt.selectWhere(selectMap);
+        Data::IDataTablePtr resultDT = dt.selectWhere(selectMap);
 
         EXPECT_EQ(expectedHeaders, resultDT->getHeaders());
         EXPECT_EQ(expectedData, resultDT->getData());
@@ -674,7 +673,7 @@ TEST_F(DataTableTest, selectWhereMultiSelect) {
         Data::DataTable dt;
         std::string tFilePath = mTempFileAbsolute.string();
         dt.fromCSV(tFilePath, true);
-        std::shared_ptr<Data::IDataTable> resultDT = dt.selectWhere(selectMap);
+        Data::IDataTablePtr resultDT = dt.selectWhere(selectMap);
 
         EXPECT_EQ(expectedHeaders, resultDT->getHeaders());
         EXPECT_EQ(expectedData, resultDT->getData());
@@ -708,11 +707,10 @@ TEST_F(DataTableTest, innerJoin) {
     shape2.setNRows(3);
 
     Data::DataTable dt1(d1, shape1, headerOrder1);
-    std::shared_ptr<Data::IDataTable> dt2 =
+    Data::IDataTablePtr dt2 =
         std::make_shared<Data::DataTable>(d2, shape2, headerOrder2);
 
-    std::shared_ptr<Data::IDataTable> resultTable =
-        dt1.innerJoin(dt2, "id", "id");
+    Data::IDataTablePtr resultTable = dt1.innerJoin(dt2, "id", "id");
     std::vector<std::string> resultHeaders = resultTable->getHeaders();
     std::vector<std::vector<std::string>> resultData = resultTable->getData();
 
@@ -764,11 +762,10 @@ TEST_F(DataTableTest, multiInnerJoin) {
     shape2.setNRows(3);
 
     Data::DataTable dt1(d1, shape1);
-    std::shared_ptr<Data::IDataTable> dt2 =
-        std::make_shared<Data::DataTable>(d2, shape2);
+    Data::IDataTablePtr dt2 = std::make_shared<Data::DataTable>(d2, shape2);
 
     std::vector<std::string> columnNames = {"id", "id2"};
-    std::shared_ptr<Data::IDataTable> resultTable =
+    Data::IDataTablePtr resultTable =
         dt1.innerJoin(dt2, columnNames, columnNames);
     std::vector<std::string> resultHeaders = resultTable->getHeaders();
     std::vector<std::vector<std::string>> resultData = resultTable->getData();
@@ -815,12 +812,10 @@ TEST_F(DataTableTest, operatorPlusOverload) {
     shape2.setNCols(5);
     shape2.setNRows(3);
 
-    std::shared_ptr<Data::IDataTable> dt1 =
-        std::make_shared<Data::DataTable>(d1, shape1);
-    std::shared_ptr<Data::IDataTable> dt2 =
-        std::make_shared<Data::DataTable>(d2, shape2);
+    Data::IDataTablePtr dt1 = std::make_shared<Data::DataTable>(d1, shape1);
+    Data::IDataTablePtr dt2 = std::make_shared<Data::DataTable>(d2, shape2);
 
-    std::shared_ptr<Data::IDataTable> resultTable = (*dt1) + (*dt2);
+    Data::IDataTablePtr resultTable = (*dt1) + (*dt2);
     std::vector<std::string> resultHeaders = resultTable->getHeaders();
     std::vector<std::vector<std::string>> resultData = resultTable->getData();
 
