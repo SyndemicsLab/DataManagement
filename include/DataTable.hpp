@@ -182,7 +182,7 @@ namespace Data {
         virtual bool empty() const = 0;
     };
 
-    typedef std::shared_ptr<Data::IDataTable> IDataTablePtr;
+    using IDataTablePtr = std::shared_ptr<Data::IDataTable>;
 
     /// @brief Class for Containing data in a row by column table format
     class DataTable : public IDataTable {
