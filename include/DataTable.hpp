@@ -16,8 +16,18 @@
 /// @brief Namespace defining Data Containers
 namespace Data {
 
+    class IDataTableShape {
+    public:
+        virtual ~IDataTableShape() = default;
+        virtual int getNRows() const = 0;
+        virtual int getNCols() const = 0;
+        virtual void setNRows(int nrows) = 0;
+        virtual void setNCols(int ncols) = 0;
+        virtual int operator[](int index) const = 0;
+    };
+
     /// @brief Helper Class used to hold DataTable Shapes
-    class DataTableShape {
+    class DataTableShape : public IDataTableShape {
     private:
         int nrows = 0;
         int ncols = 0;
@@ -38,19 +48,23 @@ namespace Data {
 
         /// @brief Getter for the Number of Rows
         /// @return Number of Rows as an Integer
-        int getNRows() const { return this->nrows; }
+        int getNRows() const override { return this->nrows; }
 
         /// @brief Getter for Number of Columns
         /// @return Number of Columns as an Integer
-        int getNCols() const { return this->ncols; }
+        int getNCols() const override { return this->ncols; }
 
         /// @brief Setter for Number of Rows
         /// @param nrows Number of Rows
-        void setNRows(int nrows) { this->nrows = (nrows < 0) ? 0 : nrows; }
+        void setNRows(int nrows) override {
+            this->nrows = (nrows < 0) ? 0 : nrows;
+        }
 
         /// @brief Setter for Number of Columns
         /// @param ncols Number of Columns
-        void setNCols(int ncols) { this->ncols = (ncols < 0) ? 0 : ncols; }
+        void setNCols(int ncols) override {
+            this->ncols = (ncols < 0) ? 0 : ncols;
+        }
 
         /// @brief Operator overload for outputting the shape
         /// @param os Stream to pass output to
@@ -65,7 +79,7 @@ namespace Data {
         /// @brief Operator overload for getting rows and columns
         /// @param index 0 for rows, 1 for columns
         /// @return number of rows or columns
-        int operator[](int index) const {
+        int operator[](int index) const override {
             if (index != 0 && index != 1) {
                 throw std::runtime_error("Invalid data shape. Valid indices "
                                          "are 0 for rows and 1 for columns.");
@@ -74,8 +88,102 @@ namespace Data {
         }
     };
 
+    class IDataTable {
+    public:
+        virtual ~IDataTable() = default;
+        virtual void toCSV(const std::string &filename) const = 0;
+        virtual bool fromCSV(const std::string &filename,
+                             bool hasHeaders = true, char delim = ',') = 0;
+        virtual bool fromSQL(const std::string &dbfile,
+                             const std::string &tablename) = 0;
+        virtual std::vector<std::vector<std::string>> getData() const = 0;
+        virtual std::shared_ptr<IDataTable> getRow(int idx) const = 0;
+        virtual std::vector<std::string>
+        getColumn(std::string columnName) const = 0;
+        virtual std::shared_ptr<IDataTable>
+        selectColumns(std::vector<std::string> columnNames) const = 0;
+        virtual std::shared_ptr<IDataTable>
+        selectRows(std::vector<int> idxs) const = 0;
+        virtual std::shared_ptr<IDataTable> selectRowRange(int start,
+                                                           int end) const = 0;
+        virtual std::shared_ptr<IDataTable>
+        selectWhere(std::unordered_map<std::string, std::string> columnDataMap)
+            const = 0;
+        virtual std::shared_ptr<IDataTable>
+        innerJoin(std::shared_ptr<IDataTable> const tableTwo,
+                  std::string tableOneColumnName,
+                  std::string tableTwoColumnName) const = 0;
+        virtual std::shared_ptr<IDataTable>
+        innerJoin(std::shared_ptr<IDataTable> const tableTwo,
+                  std::vector<std::string> tableOneColumnNames,
+                  std::vector<std::string> tableTwoColumnNames) const = 0;
+
+        virtual std::shared_ptr<IDataTable>
+        leftJoin(std::shared_ptr<IDataTable> const tableTwo,
+                 std::string tableOneColumnName,
+                 std::string tableTwoColumnName) const = 0;
+
+        virtual std::shared_ptr<IDataTable>
+        rightJoin(std::shared_ptr<IDataTable> const tableTwo,
+                  std::string tableOneColumnName,
+                  std::string tableTwoColumnName) const = 0;
+
+        virtual std::shared_ptr<IDataTable>
+        outerJoin(std::shared_ptr<IDataTable> const tableTwo,
+                  std::string tableOneColumnName,
+                  std::string tableTwoColumnName) const = 0;
+
+        virtual std::shared_ptr<IDataTable> topNRows(int n) const = 0;
+
+        virtual std::shared_ptr<IDataTable> bottomNRows(int n) const = 0;
+
+        virtual std::shared_ptr<IDataTable> head() const = 0;
+
+        virtual std::shared_ptr<IDataTable> tail() const = 0;
+
+        virtual std::vector<std::string> getHeaders() const = 0;
+
+        virtual void dropColumns(std::vector<std::string> column_names) = 0;
+
+        virtual void dropColumn(std::string column) = 0;
+
+        virtual void shuffleRows(int seed = 0) = 0;
+
+        virtual std::string min(std::string column) const = 0;
+
+        virtual std::string max(std::string column) const = 0;
+
+        virtual std::string min() const = 0;
+
+        virtual std::string max() const = 0;
+
+        virtual double sum(std::string column) const = 0;
+
+        virtual double sum() const = 0;
+
+        virtual double mean(std::string column) const = 0;
+
+        virtual double mean() const = 0;
+
+        virtual std::shared_ptr<IDataTable> operator[](int idx) const = 0;
+
+        virtual std::vector<std::string>
+        operator[](std::string columnName) const = 0;
+
+        virtual std::shared_ptr<IDataTable>
+        operator+(IDataTable const &tableTwo) const = 0;
+
+        virtual int nrows() const = 0;
+
+        virtual int ncols() const = 0;
+
+        virtual DataTableShape getShape() const = 0;
+
+        virtual bool empty() const = 0;
+    };
+
     /// @brief Class for Containing data in a row by column table format
-    class DataTable {
+    class DataTable : public IDataTable {
     private:
         std::vector<std::string> headerOrder;
         std::map<std::string, std::vector<std::string>> data;
@@ -147,7 +255,7 @@ namespace Data {
 
         /// @brief Function used to load a DataTable to the provided CSV
         /// @param filename csv file to write data to
-        void toCSV(const std::string &filename) const;
+        void toCSV(const std::string &filename) const override;
 
         /// @brief Function used to read from a file to the current DataTable
         /// @param filename csv file to read from
@@ -155,17 +263,18 @@ namespace Data {
         /// @param delim Signal character that separates the data
         /// @return true if successful, false if failure
         bool fromCSV(const std::string &filename, bool hasHeaders = true,
-                     char delim = ',');
+                     char delim = ',') override;
 
         /// @brief Function used to read from a SQL Table to a DataTable
         /// @param dbfile database file containing the SQL Table to read from
         /// @param tablename SQL Table name to read
         /// @return true if successful, false if failure
-        bool fromSQL(const std::string &dbfile, const std::string &tablename);
+        bool fromSQL(const std::string &dbfile,
+                     const std::string &tablename) override;
 
         /// @brief Function used to get the data row by row
         /// @return vector of rows
-        std::vector<std::vector<std::string>> getData() const {
+        std::vector<std::vector<std::string>> getData() const override {
             std::vector<std::vector<std::string>> dat;
             for (int i = 0; i < this->nrows(); ++i) {
                 dat.push_back({});
@@ -180,208 +289,232 @@ namespace Data {
 
         /// @brief Return a row of data
         /// @param idx The index of the row of data looked for
-        /// @return DataTable object with the single row of data
-        DataTable getRow(int idx) const;
+        /// @return std::shared_ptr<IDataTable> object with the single row of
+        /// data
+        std::shared_ptr<IDataTable> getRow(int idx) const override;
 
         /// @brief Return a column of data
         /// @param columnName The column name to return
         /// @return vector representing the column of data
-        std::vector<std::string> getColumn(std::string columnName) const;
+        std::vector<std::string>
+        getColumn(std::string columnName) const override;
 
-        /// @brief Return a set of columns of data as a new DataTable
+        /// @brief Return a set of columns of data as a new
+        /// std::shared_ptr<IDataTable>
         /// @param columnNames the vector of column names to search for
-        /// @return DataTable containing a copy of the columns
-        DataTable selectColumns(std::vector<std::string> columnNames) const;
+        /// @return std::shared_ptr<IDataTable> containing a copy of the columns
+        std::shared_ptr<IDataTable>
+        selectColumns(std::vector<std::string> columnNames) const override;
 
-        /// @brief Return a DataTable containing the asked for rows
+        /// @brief Return a std::shared_ptr<IDataTable> containing the asked for
+        /// rows
         /// @param idxs indices of the rows to return
-        /// @return DataTable object containing a copy of the rows
-        DataTable selectRows(std::vector<int> idxs) const;
+        /// @return std::shared_ptr<IDataTable> object containing a copy of the
+        /// rows
+        std::shared_ptr<IDataTable>
+        selectRows(std::vector<int> idxs) const override;
 
-        /// @brief Return a DataTable containing the asked for rows
+        /// @brief Return a std::shared_ptr<IDataTable> containing the asked for
+        /// rows
         /// @param start start index of the rows asked for
         /// @param end ending index of the rows asked for
-        /// @return DataTable object containing a copy of the rows
-        DataTable selectRowRange(int start, int end) const;
+        /// @return std::shared_ptr<IDataTable> object containing a copy of the
+        /// rows
+        std::shared_ptr<IDataTable> selectRowRange(int start,
+                                                   int end) const override;
 
-        /// @brief Return a DataTable containing the data based on a where
+        /// @brief Return a std::shared_ptr<IDataTable> containing the data
+        /// based on a where
         /// @param columnDataMap Map of column -> value map to search for in the
-        /// DataTable
-        /// @return DataTable containing a copy of the values searched for
-        DataTable selectWhere(
-            std::unordered_map<std::string, std::string> columnDataMap) const;
+        /// std::shared_ptr<IDataTable>
+        /// @return std::shared_ptr<IDataTable> containing a copy of the values
+        /// searched for
+        std::shared_ptr<IDataTable>
+        selectWhere(std::unordered_map<std::string, std::string> columnDataMap)
+            const override;
 
-        /// @brief Inner Join done between the current DataTable and the
+        /// @brief Inner Join done between the current
+        /// std::shared_ptr<IDataTable> and the provided parameter
+        /// @param tableTwo The other table to join with
+        /// @param tableOneColumnName std::shared_ptr<IDataTable> column name to
+        /// join on
+        /// @param tableTwoColumnName std::shared_ptr<IDataTable> column name to
+        /// join on
+        /// @return Copy of the joined DataTables
+        std::shared_ptr<IDataTable>
+        innerJoin(std::shared_ptr<IDataTable> const tableTwo,
+                  std::string tableOneColumnName,
+                  std::string tableTwoColumnName) const override;
+
+        /// @brief Inner Join done between the current IDataTable and the
         /// provided parameter
         /// @param tableTwo The other table to join with
-        /// @param tableOneColumnName DataTable column name to join on
-        /// @param tableTwoColumnName DataTable column name to join on
+        /// @param tableOneColumnNames IDataTable column names to join on
+        /// @param tableTwoColumnNames IDataTable column names to join on
         /// @return Copy of the joined DataTables
-        DataTable innerJoin(DataTable const &tableTwo,
-                            std::string tableOneColumnName,
-                            std::string tableTwoColumnName) const;
-
-        /// @brief Inner Join done between the current DataTable and the
-        /// provided parameter
-        /// @param tableTwo The other table to join with
-        /// @param tableOneColumnNames DataTable column names to join on
-        /// @param tableTwoColumnNames DataTable column names to join on
-        /// @return Copy of the joined DataTables
-        DataTable innerJoin(DataTable const &tableTwo,
-                            std::vector<std::string> tableOneColumnNames,
-                            std::vector<std::string> tableTwoColumnNames) const;
+        std::shared_ptr<IDataTable>
+        innerJoin(std::shared_ptr<IDataTable> const tableTwo,
+                  std::vector<std::string> tableOneColumnNames,
+                  std::vector<std::string> tableTwoColumnNames) const override;
 
         /// @brief Not implmented yet
         /// @param tableTwo
         /// @param tableOneColumnName
         /// @param tableTwoColumnName
         /// @return
-        DataTable leftJoin(DataTable const &tableTwo,
-                           std::string tableOneColumnName,
-                           std::string tableTwoColumnName) const;
+        std::shared_ptr<IDataTable>
+        leftJoin(std::shared_ptr<IDataTable> const tableTwo,
+                 std::string tableOneColumnName,
+                 std::string tableTwoColumnName) const override;
 
         /// @brief Not implmented yet
         /// @param tableTwo
         /// @param tableOneColumnName
         /// @param tableTwoColumnName
         /// @return
-        DataTable rightJoin(DataTable const &tableTwo,
-                            std::string tableOneColumnName,
-                            std::string tableTwoColumnName) const;
+        std::shared_ptr<IDataTable>
+        rightJoin(std::shared_ptr<IDataTable> const tableTwo,
+                  std::string tableOneColumnName,
+                  std::string tableTwoColumnName) const override;
 
         /// @brief Not implmented yet
         /// @param tableTwo
         /// @param tableOneColumnName
         /// @param tableTwoColumnName
         /// @return
-        DataTable outerJoin(DataTable const &tableTwo,
-                            std::string tableOneColumnName,
-                            std::string tableTwoColumnName) const;
+        std::shared_ptr<IDataTable>
+        outerJoin(std::shared_ptr<IDataTable> const tableTwo,
+                  std::string tableOneColumnName,
+                  std::string tableTwoColumnName) const override;
 
         /// @brief Return the top N rows
         /// @param n the number of rows to return from the top
         /// @return Copy of the top N Rows
-        DataTable topNRows(int n) const { return this->selectRowRange(0, n); }
+        std::shared_ptr<IDataTable> topNRows(int n) const override {
+            return this->selectRowRange(0, n);
+        }
 
         /// @brief Return the bottom N Rows
         /// @param n the number of rows to return from the bottom
         /// @return Copy of the bottom N Rows
-        DataTable bottomNRows(int n) const {
+        std::shared_ptr<IDataTable> bottomNRows(int n) const override {
             return selectRowRange(shape[0] - n, shape[0]);
         }
 
         /// @brief Return a copy of the top 10 rows
         /// @return A Copy of the top 10 rows
-        DataTable head() const {
+        std::shared_ptr<IDataTable> head() const override {
             int val = (this->nrows() < 10) ? this->nrows() : 10;
             return topNRows(val);
         }
 
         /// @brief Return a copy of the bottom 10 rows
         /// @return A copy of the bottom 10 rows
-        DataTable tail() const {
+        std::shared_ptr<IDataTable> tail() const override {
             int val = (this->nrows() < 10) ? this->nrows() : 10;
             return bottomNRows(val);
         }
 
         /// @brief Return a copy of the headers
         /// @return A copy of the headers
-        std::vector<std::string> getHeaders() const {
+        std::vector<std::string> getHeaders() const override {
             return this->headerOrder;
         }
 
         // table operations
 
-        /// @brief Drop the provided columns from the DataTable
+        /// @brief Drop the provided columns from the IDataTable
         /// @param column_names Vector of Columns to drop from the data table
-        void dropColumns(std::vector<std::string> column_names);
+        void dropColumns(std::vector<std::string> column_names) override;
 
-        /// @brief Drop the provided column from the DataTable
+        /// @brief Drop the provided column from the IDataTable
         /// @param column Column to drop from the data table
-        void dropColumn(std::string column);
+        void dropColumn(std::string column) override;
 
         /// @brief Not Implemented Yet
         /// @param seed
-        void shuffleRows(int seed = 0);
+        void shuffleRows(int seed = 0) override;
 
         /// @brief Retrieve the Minimum value in a column
         /// @param column Column name to search
         /// @return The minimum value in the column
-        std::string min(std::string column) const;
+        std::string min(std::string column) const override;
 
         /// @brief Retrieve the Maximum value in a column
         /// @param column Column name to search
         /// @return The maximum value in the column
-        std::string max(std::string column) const;
+        std::string max(std::string column) const override;
 
-        /// @brief Retrieve the Minimum value in the DataTable
-        /// @return The Minimum value in the DataTable
-        std::string min() const;
+        /// @brief Retrieve the Minimum value in the IDataTable
+        /// @return The Minimum value in the IDataTable
+        std::string min() const override;
 
-        /// @brief Retrieve teh Maxmimum value in the DataTable
-        /// @return The Maximum value in the DataTable
-        std::string max() const;
+        /// @brief Retrieve teh Maxmimum value in the IDataTable
+        /// @return The Maximum value in the IDataTable
+        std::string max() const override;
 
         /// @brief Retrieve the Sum of the Column
         /// @param column The column name to search
         /// @return The sum of the values in the Column
-        double sum(std::string column) const;
+        double sum(std::string column) const override;
 
-        /// @brief Retrieve the Sum of the DataTable
-        /// @return The sum of the values in the DataTable
-        double sum() const;
+        /// @brief Retrieve the Sum of the IDataTable
+        /// @return The sum of the values in the IDataTable
+        double sum() const override;
 
         /// @brief Retrieve the Mean of the Column
         /// @param column The column name to search
         /// @return The mean of the values in the Column
-        double mean(std::string column) const;
+        double mean(std::string column) const override;
 
-        /// @brief Retrieve the Mean of the DataTable
-        /// @return The Mean of the DataTable
-        double mean() const;
+        /// @brief Retrieve the Mean of the IDataTable
+        /// @return The Mean of the IDataTable
+        double mean() const override;
 
         // overridden operators
 
         /// @brief Row indexing
         /// @param idx Row to copy back
-        /// @return Copy of the row as a DataTable
-        DataTable operator[](int idx) const; // select row
+        /// @return Copy of the row as a IDataTable
+        std::shared_ptr<IDataTable>
+        operator[](int idx) const override; // select row
 
         /// @brief Column Indexing
         /// @param columnName Column to copy back
         /// @return copy of the column as a vector
-        std::vector<std::string>
-        operator[](std::string columnName) const; // select column into DT
+        std::vector<std::string> operator[](
+            std::string columnName) const override; // select column into DT
 
         /// @brief Not Implemented Yet
         /// @param os
         /// @param table
         /// @return
-        friend std::ostream &operator<<(std::ostream &os,
-                                        const DataTable &table);
+        friend std::ostream &
+        operator<<(std::ostream &os, std::shared_ptr<IDataTable> const table);
 
         /// @brief Concatenate two tables
         /// @param tableTwo table to concatenate with
         /// @return Copy of concatenated DataTables
-        DataTable operator+(DataTable const &tableTwo) const;
+        std::shared_ptr<IDataTable>
+        operator+(IDataTable const &tableTwo) const override;
 
         // for other classes
 
         /// @brief Helper to return the number of rows
         /// @return Number of Rows
-        int nrows() const { return shape[0]; }
+        int nrows() const override { return shape[0]; }
 
         /// @brief Helper to return the number of columns
         /// @return Number of Columns
-        int ncols() const { return shape[1]; }
+        int ncols() const override { return shape[1]; }
 
         /// @brief Return the shape
         /// @return Shape
-        DataTableShape getShape() const { return shape; }
+        DataTableShape getShape() const override { return shape; }
 
         /// @brief Test if the table is empty
         /// @return true if empty, false if contains data
-        bool empty() const { return this->data.empty(); }
+        bool empty() const override { return this->data.empty(); }
     };
 } // namespace Data
 

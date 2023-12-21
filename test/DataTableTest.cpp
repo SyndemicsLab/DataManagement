@@ -1,6 +1,7 @@
 #include "DataTable.hpp"
 #include <boost/filesystem.hpp>
 #include <gtest/gtest.h>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -101,11 +102,11 @@ TEST_F(DataTableTest, GetRow) {
         Data::DataTable dt;
         std::string tFilePath = mTempFileAbsolute.string();
         dt.fromCSV(tFilePath, true);
-        Data::DataTable data = dt.getRow(1);
+        std::shared_ptr<Data::IDataTable> data = dt.getRow(1);
 
-        EXPECT_EQ(expectedData[0], data["Test"][0]);
-        EXPECT_EQ(expectedData[1], data["Test1"][0]);
-        EXPECT_EQ(expectedData[2], data["Test2"][0]);
+        EXPECT_EQ(expectedData[0], (*data)["Test"][0]);
+        EXPECT_EQ(expectedData[1], (*data)["Test1"][0]);
+        EXPECT_EQ(expectedData[2], (*data)["Test2"][0]);
     } catch (const std::exception &e_) {
         FAIL() << "Caught an exception in " << typeid(*this).name() << ": "
                << e_.what();
@@ -144,10 +145,11 @@ TEST_F(DataTableTest, selectColumnsStrings) {
         std::string tFilePath = mTempFileAbsolute.string();
         dt.fromCSV(tFilePath, true);
         std::vector<std::string> columnNames = {"Test1", "Test2"};
-        Data::DataTable resultDT = dt.selectColumns(columnNames);
+        std::shared_ptr<Data::IDataTable> resultDT =
+            dt.selectColumns(columnNames);
 
-        EXPECT_EQ(expectedHeaders, resultDT.getHeaders());
-        EXPECT_EQ(expectedData, resultDT.getData());
+        EXPECT_EQ(expectedHeaders, resultDT->getHeaders());
+        EXPECT_EQ(expectedData, resultDT->getData());
     } catch (const std::exception &e_) {
         FAIL() << "Caught an exception in " << typeid(*this).name() << ": "
                << e_.what();
@@ -166,10 +168,10 @@ TEST_F(DataTableTest, selectRowsInt) {
         Data::DataTable dt;
         std::string tFilePath = mTempFileAbsolute.string();
         dt.fromCSV(tFilePath, true);
-        Data::DataTable resultDT = dt.selectRows({0, 2});
+        std::shared_ptr<Data::IDataTable> resultDT = dt.selectRows({0, 2});
 
-        EXPECT_EQ(expectedHeaders, resultDT.getHeaders());
-        EXPECT_EQ(expectedData, resultDT.getData());
+        EXPECT_EQ(expectedHeaders, resultDT->getHeaders());
+        EXPECT_EQ(expectedData, resultDT->getData());
     } catch (const std::exception &e_) {
         FAIL() << "Caught an exception in " << typeid(*this).name() << ": "
                << e_.what();
@@ -189,10 +191,10 @@ TEST_F(DataTableTest, selectRowRange) {
         Data::DataTable dt;
         std::string tFilePath = mTempFileAbsolute.string();
         dt.fromCSV(tFilePath, true);
-        Data::DataTable resultDT = dt.selectRowRange(1, 3);
+        std::shared_ptr<Data::IDataTable> resultDT = dt.selectRowRange(1, 3);
 
-        EXPECT_EQ(expectedHeaders, resultDT.getHeaders());
-        EXPECT_EQ(expectedData, resultDT.getData());
+        EXPECT_EQ(expectedHeaders, resultDT->getHeaders());
+        EXPECT_EQ(expectedData, resultDT->getData());
     } catch (const std::exception &e_) {
         FAIL() << "Caught an exception in " << typeid(*this).name() << ": "
                << e_.what();
@@ -212,10 +214,10 @@ TEST_F(DataTableTest, selectTopNRows) {
         Data::DataTable dt;
         std::string tFilePath = mTempFileAbsolute.string();
         dt.fromCSV(tFilePath, true);
-        Data::DataTable resultDT = dt.topNRows(2);
+        std::shared_ptr<Data::IDataTable> resultDT = dt.topNRows(2);
 
-        EXPECT_EQ(expectedHeaders, resultDT.getHeaders());
-        EXPECT_EQ(expectedData, resultDT.getData());
+        EXPECT_EQ(expectedHeaders, resultDT->getHeaders());
+        EXPECT_EQ(expectedData, resultDT->getData());
     } catch (const std::exception &e_) {
         FAIL() << "Caught an exception in " << typeid(*this).name() << ": "
                << e_.what();
@@ -235,10 +237,10 @@ TEST_F(DataTableTest, selectBottomNRows) {
         Data::DataTable dt;
         std::string tFilePath = mTempFileAbsolute.string();
         dt.fromCSV(tFilePath, true);
-        Data::DataTable resultDT = dt.bottomNRows(2);
+        std::shared_ptr<Data::IDataTable> resultDT = dt.bottomNRows(2);
 
-        EXPECT_EQ(expectedHeaders, resultDT.getHeaders());
-        EXPECT_EQ(expectedData, resultDT.getData());
+        EXPECT_EQ(expectedHeaders, resultDT->getHeaders());
+        EXPECT_EQ(expectedData, resultDT->getData());
     } catch (const std::exception &e_) {
         FAIL() << "Caught an exception in " << typeid(*this).name() << ": "
                << e_.what();
@@ -261,10 +263,10 @@ TEST_F(DataTableTest, head) {
         Data::DataTable dt;
         std::string tFilePath = mTempFileAbsolute.string();
         dt.fromCSV(tFilePath, true);
-        Data::DataTable resultDT = dt.head();
+        std::shared_ptr<Data::IDataTable> resultDT = dt.head();
 
-        EXPECT_EQ(expectedHeaders, resultDT.getHeaders());
-        EXPECT_EQ(expectedData, resultDT.getData());
+        EXPECT_EQ(expectedHeaders, resultDT->getHeaders());
+        EXPECT_EQ(expectedData, resultDT->getData());
     } catch (const std::exception &e_) {
         FAIL() << "Caught an exception in " << typeid(*this).name() << ": "
                << e_.what();
@@ -287,10 +289,10 @@ TEST_F(DataTableTest, tail) {
         Data::DataTable dt;
         std::string tFilePath = mTempFileAbsolute.string();
         dt.fromCSV(tFilePath, true);
-        Data::DataTable resultDT = dt.tail();
+        std::shared_ptr<Data::IDataTable> resultDT = dt.tail();
 
-        EXPECT_EQ(expectedHeaders, resultDT.getHeaders());
-        EXPECT_EQ(expectedData, resultDT.getData());
+        EXPECT_EQ(expectedHeaders, resultDT->getHeaders());
+        EXPECT_EQ(expectedData, resultDT->getData());
     } catch (const std::exception &e_) {
         FAIL() << "Caught an exception in " << typeid(*this).name() << ": "
                << e_.what();
@@ -521,10 +523,10 @@ TEST_F(DataTableTest, operationalRowIndexing) {
         Data::DataTable dt;
         std::string tFilePath = mTempFileAbsolute.string();
         dt.fromCSV(tFilePath, true);
-        Data::DataTable result = dt[1];
-        EXPECT_EQ(expected[0], result["Test"][0]);
-        EXPECT_EQ(expected[1], result["Test1"][0]);
-        EXPECT_EQ(expected[2], result["Test2"][0]);
+        std::shared_ptr<Data::IDataTable> result = dt[1];
+        EXPECT_EQ(expected[0], (*result)["Test"][0]);
+        EXPECT_EQ(expected[1], (*result)["Test1"][0]);
+        EXPECT_EQ(expected[2], (*result)["Test2"][0]);
     } catch (const std::exception &e_) {
         FAIL() << "Caught an exception in " << typeid(*this).name() << ": "
                << e_.what();
@@ -622,10 +624,10 @@ TEST_F(DataTableTest, selectWhere) {
         Data::DataTable dt;
         std::string tFilePath = mTempFileAbsolute.string();
         dt.fromCSV(tFilePath, true);
-        Data::DataTable resultDT = dt.selectWhere(selectMap);
+        std::shared_ptr<Data::IDataTable> resultDT = dt.selectWhere(selectMap);
 
-        EXPECT_EQ(expectedHeaders, resultDT.getHeaders());
-        EXPECT_EQ(expectedData, resultDT.getData());
+        EXPECT_EQ(expectedHeaders, resultDT->getHeaders());
+        EXPECT_EQ(expectedData, resultDT->getData());
     } catch (const std::exception &e_) {
         FAIL() << "Caught an exception in " << typeid(*this).name() << ": "
                << e_.what();
@@ -647,10 +649,10 @@ TEST_F(DataTableTest, selectWhereMultiHit) {
         Data::DataTable dt;
         std::string tFilePath = mTempFileAbsolute.string();
         dt.fromCSV(tFilePath, true);
-        Data::DataTable resultDT = dt.selectWhere(selectMap);
+        std::shared_ptr<Data::IDataTable> resultDT = dt.selectWhere(selectMap);
 
-        EXPECT_EQ(expectedHeaders, resultDT.getHeaders());
-        EXPECT_EQ(expectedData, resultDT.getData());
+        EXPECT_EQ(expectedHeaders, resultDT->getHeaders());
+        EXPECT_EQ(expectedData, resultDT->getData());
     } catch (const std::exception &e_) {
         FAIL() << "Caught an exception in " << typeid(*this).name() << ": "
                << e_.what();
@@ -672,10 +674,10 @@ TEST_F(DataTableTest, selectWhereMultiSelect) {
         Data::DataTable dt;
         std::string tFilePath = mTempFileAbsolute.string();
         dt.fromCSV(tFilePath, true);
-        Data::DataTable resultDT = dt.selectWhere(selectMap);
+        std::shared_ptr<Data::IDataTable> resultDT = dt.selectWhere(selectMap);
 
-        EXPECT_EQ(expectedHeaders, resultDT.getHeaders());
-        EXPECT_EQ(expectedData, resultDT.getData());
+        EXPECT_EQ(expectedHeaders, resultDT->getHeaders());
+        EXPECT_EQ(expectedData, resultDT->getData());
     } catch (const std::exception &e_) {
         FAIL() << "Caught an exception in " << typeid(*this).name() << ": "
                << e_.what();
@@ -706,11 +708,13 @@ TEST_F(DataTableTest, innerJoin) {
     shape2.setNRows(3);
 
     Data::DataTable dt1(d1, shape1, headerOrder1);
-    Data::DataTable dt2(d2, shape2, headerOrder2);
+    std::shared_ptr<Data::IDataTable> dt2 =
+        std::make_shared<Data::DataTable>(d2, shape2, headerOrder2);
 
-    Data::DataTable resultTable = dt1.innerJoin(dt2, "id", "id");
-    std::vector<std::string> resultHeaders = resultTable.getHeaders();
-    std::vector<std::vector<std::string>> resultData = resultTable.getData();
+    std::shared_ptr<Data::IDataTable> resultTable =
+        dt1.innerJoin(dt2, "id", "id");
+    std::vector<std::string> resultHeaders = resultTable->getHeaders();
+    std::vector<std::vector<std::string>> resultData = resultTable->getData();
 
     std::vector<std::string> expectedHeaders = {
         "id", "test1", "test2", "test3", "test4", "test5", "test6"};
@@ -760,12 +764,14 @@ TEST_F(DataTableTest, multiInnerJoin) {
     shape2.setNRows(3);
 
     Data::DataTable dt1(d1, shape1);
-    Data::DataTable dt2(d2, shape2);
+    std::shared_ptr<Data::IDataTable> dt2 =
+        std::make_shared<Data::DataTable>(d2, shape2);
 
     std::vector<std::string> columnNames = {"id", "id2"};
-    Data::DataTable resultTable = dt1.innerJoin(dt2, columnNames, columnNames);
-    std::vector<std::string> resultHeaders = resultTable.getHeaders();
-    std::vector<std::vector<std::string>> resultData = resultTable.getData();
+    std::shared_ptr<Data::IDataTable> resultTable =
+        dt1.innerJoin(dt2, columnNames, columnNames);
+    std::vector<std::string> resultHeaders = resultTable->getHeaders();
+    std::vector<std::vector<std::string>> resultData = resultTable->getData();
 
     std::vector<std::string> expectedHeaders = {
         "id", "id2", "test1", "test2", "test3", "test4", "test5", "test6"};
@@ -809,12 +815,14 @@ TEST_F(DataTableTest, operatorPlusOverload) {
     shape2.setNCols(5);
     shape2.setNRows(3);
 
-    Data::DataTable dt1(d1, shape1);
-    Data::DataTable dt2(d2, shape2);
+    std::shared_ptr<Data::IDataTable> dt1 =
+        std::make_shared<Data::DataTable>(d1, shape1);
+    std::shared_ptr<Data::IDataTable> dt2 =
+        std::make_shared<Data::DataTable>(d2, shape2);
 
-    Data::DataTable resultTable = dt1 + dt2;
-    std::vector<std::string> resultHeaders = resultTable.getHeaders();
-    std::vector<std::vector<std::string>> resultData = resultTable.getData();
+    std::shared_ptr<Data::IDataTable> resultTable = (*dt1) + (*dt2);
+    std::vector<std::string> resultHeaders = resultTable->getHeaders();
+    std::vector<std::vector<std::string>> resultData = resultTable->getData();
 
     std::vector<std::string> expectedHeaders = {"id", "test1", "test2",
                                                 "test3"};
