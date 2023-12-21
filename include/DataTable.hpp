@@ -171,6 +171,9 @@ namespace Data {
         operator[](std::string columnName) const = 0;
 
         virtual std::shared_ptr<IDataTable>
+        concat(IDataTable const &tableTwo) const = 0;
+
+        virtual std::shared_ptr<IDataTable>
         operator+(IDataTable const &tableTwo) const = 0;
 
         virtual int nrows() const = 0;
@@ -494,11 +497,16 @@ namespace Data {
         friend std::ostream &
         operator<<(std::ostream &os, std::shared_ptr<IDataTable> const table);
 
+        std::shared_ptr<IDataTable>
+        concat(IDataTable const &tableTwo) const override;
+
         /// @brief Concatenate two tables
         /// @param tableTwo table to concatenate with
         /// @return Copy of concatenated DataTables
         std::shared_ptr<IDataTable>
-        operator+(IDataTable const &tableTwo) const override;
+        operator+(IDataTable const &tableTwo) const override {
+            return concat(tableTwo);
+        };
 
         // for other classes
 
