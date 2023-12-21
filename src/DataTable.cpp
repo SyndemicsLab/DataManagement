@@ -539,7 +539,7 @@ namespace Data {
     }
 
     std::shared_ptr<IDataTable>
-    DataTable::operator+(IDataTable const &tableTwo) const {
+    DataTable::concat(IDataTable const &tableTwo) const {
         std::map<std::string, std::vector<std::string>> newData = {};
         for (auto kv : this->data) {
             std::vector<std::string> tempVec;
