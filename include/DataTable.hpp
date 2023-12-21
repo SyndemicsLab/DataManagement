@@ -182,6 +182,8 @@ namespace Data {
         virtual bool empty() const = 0;
     };
 
+    using IDataTablePtr = std::shared_ptr<Data::IDataTable>;
+
     /// @brief Class for Containing data in a row by column table format
     class DataTable : public IDataTable {
     private:
