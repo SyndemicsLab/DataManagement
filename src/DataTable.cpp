@@ -102,18 +102,21 @@ namespace Data {
         csvFile.close();
     }
 
-    DataTable DataTable::getRow(int row) const {
+    std::shared_ptr<IDataTable> DataTable::getRow(int row) const {
         rowErrorCheck(row);
         std::map<std::string, std::vector<std::string>> newData;
         for (auto kv : this->data) {
             newData[kv.first] = {kv.second[row]};
         }
         DataTableShape newShape(1, this->shape.getNCols());
-        DataTable newDT(newData, newShape, this->headerOrder);
+        std::shared_ptr<IDataTable> newDT =
+            std::make_shared<DataTable>(newData, newShape, this->headerOrder);
         return newDT;
     }
 
-    DataTable DataTable::operator[](int idx) const { return this->getRow(idx); }
+    std::shared_ptr<IDataTable> DataTable::operator[](int idx) const {
+        return this->getRow(idx);
+    }
 
     std::vector<std::string>
     DataTable::operator[](std::string columnName) const {
@@ -126,7 +129,7 @@ namespace Data {
         return this->data.at(columnName);
     }
 
-    DataTable
+    std::shared_ptr<IDataTable>
     DataTable::selectColumns(std::vector<std::string> columnNames) const {
         if (columnNames.empty()) {
             return {};
@@ -138,11 +141,13 @@ namespace Data {
         }
         DataTableShape newShape(newData[columnNames[0]].size(),
                                 columnNames.size());
-        DataTable newDT(newData, newShape, columnNames);
+        std::shared_ptr<IDataTable> newDT =
+            std::make_shared<DataTable>(newData, newShape, columnNames);
         return newDT;
     }
 
-    DataTable DataTable::selectRows(std::vector<int> idxs) const {
+    std::shared_ptr<IDataTable>
+    DataTable::selectRows(std::vector<int> idxs) const {
         std::map<std::string, std::vector<std::string>> newData;
         for (auto kv : this->data) {
             newData[kv.first] = {};
@@ -152,11 +157,13 @@ namespace Data {
             }
         }
         DataTableShape newShape(idxs.size(), this->data.size());
-        DataTable newDT(newData, newShape, this->headerOrder);
+        std::shared_ptr<IDataTable> newDT =
+            std::make_shared<DataTable>(newData, newShape, this->headerOrder);
         return newDT;
     }
 
-    DataTable DataTable::selectRowRange(int start, int end) const {
+    std::shared_ptr<IDataTable> DataTable::selectRowRange(int start,
+                                                          int end) const {
         if (start < 0) {
             start = 0;
         }
@@ -179,7 +186,7 @@ namespace Data {
         return this->selectRows(idxs);
     }
 
-    DataTable DataTable::selectWhere(
+    std::shared_ptr<IDataTable> DataTable::selectWhere(
         std::unordered_map<std::string, std::string> columnDataMap) const {
         std::unordered_map<int, int> rowIdxHits = {};
         for (auto kv : columnDataMap) {
@@ -206,13 +213,14 @@ namespace Data {
         return selectRows(rowIdxs);
     }
 
-    DataTable DataTable::innerJoin(DataTable const &tableTwo,
-                                   std::string tableOneColumnName,
-                                   std::string tableTwoColumnName) const {
+    std::shared_ptr<IDataTable>
+    DataTable::innerJoin(std::shared_ptr<IDataTable> const tableTwo,
+                         std::string tableOneColumnName,
+                         std::string tableTwoColumnName) const {
         std::vector<std::string> columnOne =
             this->getColumn(tableOneColumnName);
         std::vector<std::string> columnTwo =
-            tableTwo.getColumn(tableTwoColumnName);
+            tableTwo->getColumn(tableTwoColumnName);
 
         std::vector<std::vector<int>> indices;
         for (int colOneIter = 0; colOneIter < columnOne.size(); ++colOneIter) {
@@ -225,7 +233,7 @@ namespace Data {
         }
 
         std::vector<std::string> t1headers = this->getHeaders();
-        std::vector<std::string> t2headers = tableTwo.getHeaders();
+        std::vector<std::string> t2headers = tableTwo->getHeaders();
         auto it = find(t2headers.begin(), t2headers.end(), tableTwoColumnName);
         t2headers.erase(it);
 
@@ -242,7 +250,7 @@ namespace Data {
 
         // Add the t2 rows column by column
         for (std::string t2header : t2headers) {
-            std::vector<std::string> column = tableTwo.getColumn(t2header);
+            std::vector<std::string> column = tableTwo->getColumn(t2header);
             std::vector<std::string> newColumn;
             for (std::vector<int> idxs : indices) {
                 newColumn.push_back(column[idxs[1]]);
@@ -252,12 +260,13 @@ namespace Data {
 
         t1headers.insert(t1headers.end(), t2headers.begin(), t2headers.end());
         DataTableShape newShape(indices.size(), t1headers.size());
-        DataTable newDT(newData, newShape, t1headers);
+        std::shared_ptr<IDataTable> newDT =
+            std::make_shared<DataTable>(newData, newShape, t1headers);
         return newDT;
     }
 
-    DataTable
-    DataTable::innerJoin(DataTable const &tableTwo,
+    std::shared_ptr<IDataTable>
+    DataTable::innerJoin(std::shared_ptr<IDataTable> const tableTwo,
                          std::vector<std::string> tableOneColumnNames,
                          std::vector<std::string> tableTwoColumnNames) const {
 
@@ -278,7 +287,7 @@ namespace Data {
 
         std::vector<std::vector<std::string>> t2Columns = {};
         for (std::string tableTwoColumnName : tableTwoColumnNames) {
-            t2Columns.push_back(tableTwo.getColumn(tableTwoColumnName));
+            t2Columns.push_back(tableTwo->getColumn(tableTwoColumnName));
         }
 
         // Should never be true if the getColumn fails and the ColumnNames
@@ -307,7 +316,7 @@ namespace Data {
         }
 
         std::vector<std::string> t1headers = this->getHeaders();
-        std::vector<std::string> t2headers = tableTwo.getHeaders();
+        std::vector<std::string> t2headers = tableTwo->getHeaders();
         for (std::string tableTwoColumnName : tableTwoColumnNames) {
             auto it =
                 find(t2headers.begin(), t2headers.end(), tableTwoColumnName);
@@ -327,7 +336,7 @@ namespace Data {
 
         // Add the t2 rows column by column
         for (std::string t2header : t2headers) {
-            std::vector<std::string> column = tableTwo.getColumn(t2header);
+            std::vector<std::string> column = tableTwo->getColumn(t2header);
             std::vector<std::string> newColumn;
             for (std::vector<int> idxs : indices) {
                 newColumn.push_back(column[idxs[1]]);
@@ -336,25 +345,29 @@ namespace Data {
         }
         DataTableShape newShape(indices.size(),
                                 t1headers.size() + t2headers.size());
-        DataTable newDT(newData, newShape, this->headerOrder);
+        std::shared_ptr<IDataTable> newDT =
+            std::make_shared<DataTable>(newData, newShape, this->headerOrder);
         return newDT;
     }
 
-    DataTable DataTable::leftJoin(DataTable const &tableTwo,
-                                  std::string tableOneColumnName,
-                                  std::string tableTwoColumnName) const {
+    std::shared_ptr<IDataTable>
+    DataTable::leftJoin(std::shared_ptr<IDataTable> const tableTwo,
+                        std::string tableOneColumnName,
+                        std::string tableTwoColumnName) const {
         throw new std::logic_error("Not Implemented Yet");
     }
 
-    DataTable DataTable::rightJoin(DataTable const &tableTwo,
-                                   std::string tableOneColumnName,
-                                   std::string tableTwoColumnName) const {
+    std::shared_ptr<IDataTable>
+    DataTable::rightJoin(std::shared_ptr<IDataTable> const tableTwo,
+                         std::string tableOneColumnName,
+                         std::string tableTwoColumnName) const {
         throw new std::logic_error("Not Implemented Yet");
     }
 
-    DataTable DataTable::outerJoin(DataTable const &tableTwo,
-                                   std::string tableOneColumnName,
-                                   std::string tableTwoColumnName) const {
+    std::shared_ptr<IDataTable>
+    DataTable::outerJoin(std::shared_ptr<IDataTable> const tableTwo,
+                         std::string tableOneColumnName,
+                         std::string tableTwoColumnName) const {
         throw new std::logic_error("Not Implemented Yet");
     }
 
@@ -525,7 +538,8 @@ namespace Data {
         return os;
     }
 
-    DataTable DataTable::operator+(DataTable const &tableTwo) const {
+    std::shared_ptr<IDataTable>
+    DataTable::operator+(IDataTable const &tableTwo) const {
         std::map<std::string, std::vector<std::string>> newData = {};
         for (auto kv : this->data) {
             std::vector<std::string> tempVec;
@@ -539,7 +553,8 @@ namespace Data {
         DataTableShape newShape(this->nrows() + tableTwo.nrows(),
                                 this->ncols());
 
-        DataTable newDT(newData, newShape, this->headerOrder);
+        std::shared_ptr<IDataTable> newDT =
+            std::make_shared<DataTable>(newData, newShape, this->headerOrder);
         return newDT;
     }
 

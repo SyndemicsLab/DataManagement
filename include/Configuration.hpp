@@ -10,8 +10,18 @@
 /// @brief Namespace defining Data Containers
 namespace Data {
 
+    class IConfiguration {
+    public:
+        virtual ~IConfiguration() = default;
+        virtual std::string get(std::string str) = 0;
+        virtual std::shared_ptr<std::string> optional(std::string str) = 0;
+        virtual std::vector<std::string>
+        parseString2VectorOfStrings(std::string st) = 0;
+        virtual std::vector<int> parseString2VectorOfInts(std::string st) = 0;
+    };
+
     /// @brief Class describing a standard configuration file
-    class Configuration {
+    class Configuration : public IConfiguration {
     private:
         boost::property_tree::ptree ptree;
 
@@ -36,6 +46,10 @@ namespace Data {
             return this->ptree.get<T>(str);
         }
 
+        std::string get(std::string str) override {
+            return this->ptree.get<std::string>(str);
+        }
+
         /// @brief Template for the optional parameters
         /// @param T Type to return
         /// @param str String key to search for
@@ -51,17 +65,18 @@ namespace Data {
         /// @brief An overload of \code{optional} for strings
         /// @param str String key to search for
         /// @return The optional value searched for of type string
-        std::shared_ptr<std::string> optional(std::string str);
+        std::shared_ptr<std::string> optional(std::string str) override;
 
         /// @brief Helper function to parse a string to a vector of strings
         /// @param st string to parse
         /// @return vector of parsed strings
-        std::vector<std::string> parseString2VectorOfStrings(std::string st);
+        std::vector<std::string>
+        parseString2VectorOfStrings(std::string st) override;
 
         /// @brief Helper function to parse a string to a vector of ints
         /// @param st string to parse
         /// @return vector of parsed ints
-        std::vector<int> parseString2VectorOfInts(std::string st);
+        std::vector<int> parseString2VectorOfInts(std::string st) override;
     };
 } // namespace Data
 #endif
