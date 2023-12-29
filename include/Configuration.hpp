@@ -18,6 +18,8 @@ namespace Data {
         virtual std::vector<std::string>
         parseString2VectorOfStrings(std::string st) = 0;
         virtual std::vector<int> parseString2VectorOfInts(std::string st) = 0;
+        virtual std::vector<std::string> getStringVector(std::string str) = 0;
+        virtual std::vector<int> getIntVector(std::string str) = 0;
     };
 
     /// @brief Class describing a standard configuration file
@@ -77,6 +79,34 @@ namespace Data {
         /// @param st string to parse
         /// @return vector of parsed ints
         std::vector<int> parseString2VectorOfInts(std::string st) override;
+
+        /// @brief Wrapper function around `optional` and
+        /// `parseString2VectorofStrings`.
+        /// @param str string to parse
+        /// @return vector of parsed strings
+        std::vector<std::string> getStringVector(std::string str) override {
+            std::shared_ptr<std::string> value =
+                this->optional<std::string>(str);
+            if (value) {
+                return this->parseString2VectorOfStrings(*value);
+            } else {
+                return {};
+            }
+        }
+
+        /// @brief Wrapper function around `optional` and
+        /// `parseString2VectorofInts`.
+        /// @param str string to parse
+        /// @return vector of parsed ints
+        std::vector<int> getIntVector(std::string str) override {
+            std::shared_ptr<std::string> value =
+                this->optional<std::string>(str);
+            if (value) {
+                return this->parseString2VectorOfInts(*value);
+            } else {
+                return {};
+            }
+        }
     };
 } // namespace Data
 #endif
