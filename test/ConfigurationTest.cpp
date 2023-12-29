@@ -65,3 +65,24 @@ TEST_F(ConfigurationTest, OptionalStringNotProvided) {
     std::shared_ptr<std::string> optional = config.optional("section.optional");
     EXPECT_EQ(nullptr, optional);
 }
+
+TEST_F(ConfigurationTest, GetStringVector) {
+    outStream << "[section]\nvector = foo, bar, baz" << std::endl;
+    Data::Configuration config(tempFilePath.string());
+    std::vector<std::string> expected = {"foo", "bar", "baz"};
+    EXPECT_EQ(expected, config.getStringVector("section.vector"));
+}
+
+TEST_F(ConfigurationTest, GetIntVector) {
+    outStream << "[section]\nvector = 1, 2, 3" << std::endl;
+    Data::Configuration config(tempFilePath.string());
+    std::vector<int> expected = {1, 2, 3};
+    EXPECT_EQ(expected, config.getIntVector("section.vector"));
+}
+
+TEST_F(ConfigurationTest, GetNoVector) {
+    outStream << "[section]\nvector =" << std::endl;
+    Data::Configuration config(tempFilePath.string());
+    std::vector<int> expected = {};
+    EXPECT_EQ(expected, config.getIntVector("section.vector"));
+}
