@@ -114,6 +114,14 @@ namespace Data {
         return newDT;
     }
 
+    std::vector<std::string> DataTable::getColumnNames() const {
+        std::vector<std::string> columnVec;
+        for (auto kv : this->data) {
+            columnVec.push_back(kv.first);
+        }
+        return columnVec;
+    }
+
     std::shared_ptr<IDataTable> DataTable::operator[](int idx) const {
         return this->getRow(idx);
     }
