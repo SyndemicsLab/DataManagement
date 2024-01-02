@@ -16,7 +16,7 @@ namespace Data {
                          std::vector<std::string> headOrder) {
         this->data = data;
         this->shape = shape;
-        if (headOrder.empty() || headerOrder.size() != data.size()) {
+        if (headOrder.empty() || headOrder.size() != data.size()) {
             for (auto kv : this->data) {
                 this->headerOrder.push_back(kv.first);
             }
