@@ -100,6 +100,7 @@ namespace Data {
         virtual std::shared_ptr<IDataTable> getRow(int idx) const = 0;
         virtual std::vector<std::string>
         getColumn(std::string columnName) const = 0;
+        virtual std::vector<std::string> getColumnNames() const = 0;
         virtual std::shared_ptr<IDataTable>
         selectColumns(std::vector<std::string> columnNames) const = 0;
         virtual std::shared_ptr<IDataTable>
@@ -303,6 +304,8 @@ namespace Data {
         /// @return vector representing the column of data
         std::vector<std::string>
         getColumn(std::string columnName) const override;
+
+        std::vector<std::string> getColumnNames() const override;
 
         /// @brief Return a set of columns of data as a new
         /// std::shared_ptr<IDataTable>
