@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.19)
+cmake_minimum_required(VERSION 3.20)
 
 set (CMAKE_CXX_STANDARD 17)
 
@@ -8,7 +8,9 @@ project(
     DESCRIPTION "A Data Management Library Used By RESPOND and HEP-CE Models"
 )
 
-find_package(Boost REQUIRED COMPONENTS filesystem PATHS libs/)
+find_package(Boost 
+REQUIRED COMPONENTS filesystem 
+    PATHS libs/)
 
 add_library(data
     src/DataTable.cpp
