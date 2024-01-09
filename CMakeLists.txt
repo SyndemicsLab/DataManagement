@@ -44,7 +44,7 @@ if(BUILD_DATA_TESTS STREQUAL ON)
     enable_testing()
 
     add_executable(dataTests test/main.cpp test/DataTableTest.cpp test/ConfigurationTest.cpp)
-    target_link_libraries(dataTests dm Boost::filesystem gtest gtest_main)
+    target_link_libraries(dataTests dataManagement Boost::filesystem gtest gtest_main)
     include(GoogleTest)
     gtest_discover_tests(dataTests)
 endif()
