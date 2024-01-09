@@ -35,9 +35,15 @@ jobs:
       working-directory: ${{github.workspace}}/build
       run: ./dataTests
 
-    - name: Archive Library
+    - name: Archive Static Library
       uses: actions/upload-artifact@v3
       with:
         name: dm-binary
         path: ${{github.workspace}}/build/libdata.a
+
+    - name: Archive Headers
+      uses: actions/upload-artifact@v3
+      with:
+        name: dm-headers
+        path: include
 
