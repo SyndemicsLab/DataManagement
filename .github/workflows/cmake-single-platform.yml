@@ -34,3 +34,10 @@ jobs:
     - name: Test
       working-directory: ${{github.workspace}}/build
       run: ./dataTests
+
+    - name: Archive Library
+      uses: actions/upload-artifact@v3
+      with:
+        name: dm-binary
+        path: ${{github.workspace}}/build/libdata.a
+
