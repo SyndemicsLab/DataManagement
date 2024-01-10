@@ -51,41 +51,51 @@ endif()
 
 include(GNUInstallDirs)
 
-set(INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_INCLUDEDIR}/DataManagement
-    CACHE PATH "Location of header files")
-set(SYSCONFIG_INSTALL_DIR ${CMAKE_INSTALL_SYSCONFDIR}/dataManagement
-    CACHE PATH "Location of configuration files")
-
 install(TARGETS dataManagement
     EXPORT dataManagementTargets
-    INCLUDES DESTINATION include
-    RUNTIME DESTINATION bin
-    ARCHIVE DESTINATION lib
-    LIBRARY DESTINATION lib)
+    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/DataManagement
+    RUNTIME DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/DataManagement
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/DataManagement
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/DataManagement)
+
+list(APPEND LIB_INCLUDE_FILES 
+    "include/Configuration.hpp"
+    "include/DataManagement.hpp"
+    "include/DataTable.hpp"
+    "include/Reader.hpp"
+    "include/SQLite3.hpp"
+    "include/Writer.hpp")
 
 install(
     FILES
-        "include/DataManagement.hpp"
+        ${LIB_INCLUDE_FILES}
     DESTINATION
-        include
+        ${CMAKE_INSTALL_INCLUDEDIR}/DataManagement
     COMPONENT
         Devel
 )
 
+set(INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_INCLUDEDIR}/DataManagement
+    CACHE PATH "Location of header files")
+set(SYSCONFIG_INSTALL_DIR ${CMAKE_INSTALL_SYSCONFDIR}/DataManagement
+    CACHE PATH "Location of configuration files")
+
 include(CMakePackageConfigHelpers)
+configure_package_config_file(DataManagementConfig.cmake.in
+  ${CMAKE_CURRENT_BINARY_DIR}/DataManagementConfig.cmake
+  INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/DataManagement
+  PATH_VARS INCLUDE_INSTALL_DIR SYSCONFIG_INSTALL_DIR
+)
+
 write_basic_package_version_file(
   "${CMAKE_CURRENT_BINARY_DIR}/DataManagementConfigVersion.cmake"
   VERSION 1.0.0
   COMPATIBILITY SameMajorVersion
 )
 
-export(EXPORT dataManagementTargets
-  FILE "${CMAKE_CURRENT_BINARY_DIR}/DataManagement/DataManagementTargets.cmake"
-  NAMESPACE Upstream::
-)
-configure_package_config_file(DataManagementConfig.cmake.in
-  "${CMAKE_CURRENT_BINARY_DIR}/DataManagementConfig.cmake"
-  INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/DataManagement
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/DataManagementConfig.cmake
+              ${CMAKE_CURRENT_BINARY_DIR}/DataManagementConfigVersion.cmake
+    DESTINATION ${CMAKE_INSTALL_SYSCONFDIR}/DataManagement
 )
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/DataManagementConfig.cmake
