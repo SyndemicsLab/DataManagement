@@ -32,21 +32,7 @@ target_link_libraries(dataManagement
 option(BUILD_DATA_TESTS "enable Data tests" OFF)
 
 if(BUILD_DATA_TESTS STREQUAL ON)
-    include(FetchContent)
-    FetchContent_Declare(
-    googletest
-    URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
-    )
-    # For Windows: Prevent overriding the parent project's compiler/linker settings
-    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-    FetchContent_MakeAvailable(googletest)
-
-    enable_testing()
-
-    add_executable(dataTests test/main.cpp test/DataTableTest.cpp test/ConfigurationTest.cpp)
-    target_link_libraries(dataTests dataManagement Boost::filesystem gtest gtest_main)
-    include(GoogleTest)
-    gtest_discover_tests(dataTests)
+    add_subdirectory(test)
 endif()
 
 include(GNUInstallDirs)
