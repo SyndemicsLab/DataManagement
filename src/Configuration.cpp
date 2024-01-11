@@ -11,6 +11,18 @@ namespace Data {
         boost::property_tree::ptree ptree;
     };
 
+    Configuration::Configuration() { dmTree = std::make_unique<PTree>(); }
+
+    Configuration::Configuration(std::string configFile) {
+        dmTree = std::make_unique<PTree>();
+        std::ifstream f(configFile.c_str());
+        assert((f.good(), "Valid Config File Provided"));
+
+        read_ini(configFile, this->dmTree->ptree);
+    }
+
+    Configuration::~Configuration(){};
+
     /// @brief Default template for getting parameters from the config
     /// @param T Type to return
     /// @param str String key to search for
@@ -25,24 +37,6 @@ namespace Data {
     template double Configuration::get<double>(std::string str);
     template char Configuration::get<char>(std::string str);
     template std::string Configuration::get<std::string>(std::string str);
-
-    void Configuration::get(
-        std::string str,
-        std::variant<int, bool, float, double, char, std::string> &value) {
-        if (std::holds_alternative<int>(value)) {
-            value = this->get<int>(str);
-        } else if (std::holds_alternative<bool>(value)) {
-            value = this->get<bool>(str);
-        } else if (std::holds_alternative<float>(value)) {
-            value = this->get<float>(str);
-        } else if (std::holds_alternative<double>(value)) {
-            value = this->get<double>(str);
-        } else if (std::holds_alternative<char>(value)) {
-            value = this->get<char>(str);
-        } else if (std::holds_alternative<std::string>(value)) {
-            value = this->get<std::string>(str);
-        }
-    }
 
     /// @brief Template for the optional parameters
     /// @param T Type to return
@@ -68,36 +62,6 @@ namespace Data {
     Configuration::optional<char>(std::string str);
     template std::shared_ptr<std::string>
     Configuration::optional<std::string>(std::string str);
-
-    void Configuration::optional(
-        std::string str,
-        std::variant<std::shared_ptr<int>, std::shared_ptr<bool>,
-                     std::shared_ptr<float>, std::shared_ptr<double>,
-                     std::shared_ptr<char>, std::shared_ptr<std::string>>
-            &value) {
-
-        if (std::holds_alternative<std::shared_ptr<int>>(value)) {
-            value = this->optional<int>(str);
-        } else if (std::holds_alternative<std::shared_ptr<bool>>(value)) {
-            value = this->optional<bool>(str);
-        } else if (std::holds_alternative<std::shared_ptr<float>>(value)) {
-            value = this->optional<float>(str);
-        } else if (std::holds_alternative<std::shared_ptr<double>>(value)) {
-            value = this->optional<double>(str);
-        } else if (std::holds_alternative<std::shared_ptr<char>>(value)) {
-            value = this->optional<char>(str);
-        } else if (std::holds_alternative<std::shared_ptr<std::string>>(
-                       value)) {
-            value = this->optional<std::string>(str);
-        }
-    }
-
-    Configuration::Configuration(std::string configFile) {
-        std::ifstream f(configFile.c_str());
-        assert((f.good(), "Valid Config File Provided"));
-
-        read_ini(configFile, this->dmTree->ptree);
-    }
 
     std::vector<std::string>
     Configuration::parseString2VectorOfStrings(std::string st) {

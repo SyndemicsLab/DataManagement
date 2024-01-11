@@ -14,15 +14,15 @@ namespace Data {
     class IConfiguration {
     public:
         virtual ~IConfiguration() = default;
-        virtual void get(std::string str,
-                         std::variant<int, bool, float, double, char,
-                                      std::string> &value) = 0;
-        virtual void
-        optional(std::string str,
-                 std::variant<std::shared_ptr<int>, std::shared_ptr<bool>,
-                              std::shared_ptr<float>, std::shared_ptr<double>,
-                              std::shared_ptr<char>,
-                              std::shared_ptr<std::string>> &value) = 0;
+        // virtual void get(std::string str,
+        //                  std::variant<int, bool, float, double, char,
+        //                               std::string> &value) = 0;
+        // virtual void
+        // optional(std::string str,
+        //          std::variant<std::shared_ptr<int>, std::shared_ptr<bool>,
+        //                       std::shared_ptr<float>,
+        //                       std::shared_ptr<double>, std::shared_ptr<char>,
+        //                       std::shared_ptr<std::string>> &value) = 0;
         virtual std::vector<std::string>
         parseString2VectorOfStrings(std::string st) = 0;
         virtual std::vector<int> parseString2VectorOfInts(std::string st) = 0;
@@ -34,6 +34,19 @@ namespace Data {
     class Configuration : public IConfiguration {
     private:
         std::unique_ptr<PTree> dmTree;
+
+    public:
+        // CONSTRUCTORS
+
+        /// @brief Default constructor with no file
+        Configuration();
+
+        /// @brief Primary Constructor used with a file
+        /// @param configFile string path to the config file
+        Configuration(std::string configFile);
+
+        /// @brief Default destructor
+        ~Configuration();
 
         /// @brief Default template for getting parameters from the config
         /// @param T Type to return
@@ -47,35 +60,22 @@ namespace Data {
         /// @return The optional value searched for of type T
         template <typename T> std::shared_ptr<T> optional(std::string str);
 
-    public:
-        // CONSTRUCTORS
+        // /// @brief
+        // /// @param str
+        // /// @param value
+        // void get(std::string str,
+        //          std::variant<int, bool, float, double, char, std::string>
+        //              &value) override;
 
-        /// @brief Default constructor with no file
-        Configuration(){};
-
-        /// @brief Primary Constructor used with a file
-        /// @param configFile string path to the config file
-        Configuration(std::string configFile);
-
-        /// @brief Default destructor
-        virtual ~Configuration() = default;
-
-        /// @brief
-        /// @param str
-        /// @param value
-        void get(std::string str,
-                 std::variant<int, bool, float, double, char, std::string>
-                     &value) override;
-
-        /// @brief An overload of \code{optional} for strings
-        /// @param str String key to search for
-        /// @return The optional value searched for of type string
-        void
-        optional(std::string str,
-                 std::variant<std::shared_ptr<int>, std::shared_ptr<bool>,
-                              std::shared_ptr<float>, std::shared_ptr<double>,
-                              std::shared_ptr<char>,
-                              std::shared_ptr<std::string>> &value) override;
+        // /// @brief An overload of \code{optional} for strings
+        // /// @param str String key to search for
+        // /// @return The optional value searched for of type string
+        // void
+        // optional(std::string str,
+        //          std::variant<std::shared_ptr<int>, std::shared_ptr<bool>,
+        //                       std::shared_ptr<float>,
+        //                       std::shared_ptr<double>, std::shared_ptr<char>,
+        //                       std::shared_ptr<std::string>> &value) override;
 
         /// @brief Helper function to parse a string to a vector of strings
         /// @param st string to parse

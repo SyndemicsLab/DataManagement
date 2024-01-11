@@ -1,5 +1,6 @@
-#include "Configuration.hpp"
+#include "../include/Configuration.hpp"
 #include <boost/filesystem.hpp>
+#include <fstream>
 #include <gtest/gtest.h>
 
 class ConfigurationTest : public ::testing::Test {
@@ -23,7 +24,9 @@ protected:
 TEST_F(ConfigurationTest, ParseSingleValue) {
     outStream << "[section]\nvalue = 120" << std::endl;
     Data::Configuration config(tempFilePath.string());
-    EXPECT_EQ(120, config.get<int>("section.value"));
+    int retVal = 0;
+    retVal = config.get<int>("section.value");
+    EXPECT_EQ(120, retVal);
 }
 
 TEST_F(ConfigurationTest, ParseVectorOfInts) {
@@ -62,8 +65,9 @@ TEST_F(ConfigurationTest, OptionalIntNotProvided) {
 TEST_F(ConfigurationTest, OptionalStringNotProvided) {
     outStream << "[section]\noptional =" << std::endl;
     Data::Configuration config(tempFilePath.string());
-    std::shared_ptr<std::string> optional = config.optional("section.optional");
-    EXPECT_EQ(nullptr, optional);
+    std::shared_ptr<std::string> optional =
+        config.optional<std::string>("section.optional");
+    EXPECT_TRUE(optional->empty());
 }
 
 TEST_F(ConfigurationTest, GetStringVector) {
