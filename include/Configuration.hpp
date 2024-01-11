@@ -1,20 +1,28 @@
 #ifndef CONFIGURATION_HPP_
 #define CONFIGURATION_HPP_
 
-#include <boost/lexical_cast.hpp>
-#include <boost/property_tree/ini_parser.hpp>
-#include <boost/property_tree/ptree.hpp>
-#include <cassert>
 #include <memory>
+#include <string>
+#include <variant>
+#include <vector>
 
 /// @brief Namespace defining Data Containers
 namespace Data {
 
+    class PTree;
+
     class IConfiguration {
     public:
         virtual ~IConfiguration() = default;
-        virtual std::string get(std::string str) = 0;
-        virtual std::shared_ptr<std::string> optional(std::string str) = 0;
+        // virtual void get(std::string str,
+        //                  std::variant<int, bool, float, double, char,
+        //                               std::string> &value) = 0;
+        // virtual void
+        // optional(std::string str,
+        //          std::variant<std::shared_ptr<int>, std::shared_ptr<bool>,
+        //                       std::shared_ptr<float>,
+        //                       std::shared_ptr<double>, std::shared_ptr<char>,
+        //                       std::shared_ptr<std::string>> &value) = 0;
         virtual std::vector<std::string>
         parseString2VectorOfStrings(std::string st) = 0;
         virtual std::vector<int> parseString2VectorOfInts(std::string st) = 0;
@@ -25,49 +33,49 @@ namespace Data {
     /// @brief Class describing a standard configuration file
     class Configuration : public IConfiguration {
     private:
-        boost::property_tree::ptree ptree;
+        std::unique_ptr<PTree> dmTree;
 
     public:
         // CONSTRUCTORS
 
         /// @brief Default constructor with no file
-        Configuration(){};
+        Configuration();
 
         /// @brief Primary Constructor used with a file
         /// @param configFile string path to the config file
         Configuration(std::string configFile);
 
         /// @brief Default destructor
-        virtual ~Configuration() = default;
+        ~Configuration();
 
         /// @brief Default template for getting parameters from the config
         /// @param T Type to return
         /// @param str String key to search for
         /// @return The value searched for of type T
-        template <typename T> T get(std::string str) {
-            return this->ptree.get<T>(str);
-        }
-
-        std::string get(std::string str) override {
-            return this->ptree.get<std::string>(str);
-        }
+        template <typename T> T get(std::string str);
 
         /// @brief Template for the optional parameters
         /// @param T Type to return
         /// @param str String key to search for
         /// @return The optional value searched for of type T
-        template <typename T> std::shared_ptr<T> optional(std::string str) {
-            boost::optional<T> result = this->ptree.get_optional<T>(str);
-            if (result) {
-                return std::make_shared<T>(*result);
-            }
-            return nullptr;
-        }
+        template <typename T> std::shared_ptr<T> optional(std::string str);
 
-        /// @brief An overload of \code{optional} for strings
-        /// @param str String key to search for
-        /// @return The optional value searched for of type string
-        std::shared_ptr<std::string> optional(std::string str) override;
+        // /// @brief
+        // /// @param str
+        // /// @param value
+        // void get(std::string str,
+        //          std::variant<int, bool, float, double, char, std::string>
+        //              &value) override;
+
+        // /// @brief An overload of \code{optional} for strings
+        // /// @param str String key to search for
+        // /// @return The optional value searched for of type string
+        // void
+        // optional(std::string str,
+        //          std::variant<std::shared_ptr<int>, std::shared_ptr<bool>,
+        //                       std::shared_ptr<float>,
+        //                       std::shared_ptr<double>, std::shared_ptr<char>,
+        //                       std::shared_ptr<std::string>> &value) override;
 
         /// @brief Helper function to parse a string to a vector of strings
         /// @param st string to parse

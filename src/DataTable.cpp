@@ -1,6 +1,21 @@
 #include "DataTable.hpp"
 
+#include <algorithm>
+#include <fstream>
+#include <iostream>
+#include <numeric>
+#include <random>
+#include <stdexcept>
+
 namespace Data {
+    int DataTableShape::operator[](int index) const {
+        if (index != 0 && index != 1) {
+            throw std::runtime_error("Invalid data shape. Valid indices "
+                                     "are 0 for rows and 1 for columns.");
+        }
+        return index == 0 ? nrows : ncols;
+    }
+
     DataTable::DataTable(const std::string &filename, bool hasHeaders,
                          char delim) {
         this->fromCSV(filename, hasHeaders, delim);

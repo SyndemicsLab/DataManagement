@@ -1,13 +1,8 @@
 #ifndef DATATABLE_HPP_
 #define DATATABLE_HPP_
 
-#include <algorithm>
-#include <fstream>
-#include <iostream>
 #include <map>
 #include <memory>
-#include <numeric>
-#include <random>
 #include <sstream>
 #include <string>
 #include <unordered_map>
@@ -79,13 +74,7 @@ namespace Data {
         /// @brief Operator overload for getting rows and columns
         /// @param index 0 for rows, 1 for columns
         /// @return number of rows or columns
-        int operator[](int index) const override {
-            if (index != 0 && index != 1) {
-                throw std::runtime_error("Invalid data shape. Valid indices "
-                                         "are 0 for rows and 1 for columns.");
-            }
-            return index == 0 ? nrows : ncols;
-        }
+        int operator[](int index) const override;
     };
 
     class IDataTable {
