@@ -21,6 +21,6 @@ target_include_directories(dataTests PUBLIC
     ${CMAKE_SOURCE_DIR}lib/sqlite3/
     ${CMAKE_SOURCE_DIR}lib/boost/include/boost/)
 
-target_link_libraries(dataTests dataManagement Boost::filesystem gtest gtest_main)
+target_link_libraries(dataTests DataManagement Boost::filesystem gtest gtest_main)
 include(GoogleTest)
 gtest_discover_tests(dataTests)

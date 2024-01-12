@@ -8,24 +8,22 @@ project(
     DESCRIPTION "A Data Management Library Used By RESPOND and HEP-CE Models"
 )
 
-find_package(Boost 
-REQUIRED COMPONENTS filesystem 
-    PATHS lib/boost)
+find_package(Boost REQUIRED COMPONENTS filesystem)
 
-add_library(dataManagement
+add_library(DataManagement SHARED
     src/DataTable.cpp
     src/Configuration.cpp
     src/SQLite3.cpp
     lib/sqlite3/sqlite3.c
 )
-add_library(dataManagement::dataManagement ALIAS dataManagement)
+add_library(DataManagement::DataManagement ALIAS DataManagement)
 
-target_include_directories(dataManagement PRIVATE 
+target_include_directories(DataManagement PRIVATE 
     "include/"
     "lib/sqlite3/"
-    "lib/boost/include/boost/")
+    ${Boost_INCLUDE_DIRS})
 
-target_link_libraries(dataManagement
+target_link_libraries(DataManagement
     Boost::filesystem
 )
 
@@ -37,12 +35,7 @@ endif()
 
 include(GNUInstallDirs)
 
-install(TARGETS dataManagement
-    EXPORT dataManagementTargets
-    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/DataManagement
-    RUNTIME DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/DataManagement
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/DataManagement
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/DataManagement)
+install(TARGETS DataManagement DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/DataManagement)
 
 list(APPEND LIB_INCLUDE_FILES 
     "include/Configuration.hpp"
@@ -53,24 +46,22 @@ list(APPEND LIB_INCLUDE_FILES
     "include/Writer.hpp")
 
 install(
-    FILES
-        ${LIB_INCLUDE_FILES}
-    DESTINATION
-        ${CMAKE_INSTALL_INCLUDEDIR}/DataManagement
-    COMPONENT
-        Devel
+    FILES ${LIB_INCLUDE_FILES}
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/DataManagement
 )
 
 set(INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_INCLUDEDIR}/DataManagement
     CACHE PATH "Location of header files")
 set(SYSCONFIG_INSTALL_DIR ${CMAKE_INSTALL_SYSCONFDIR}/DataManagement
     CACHE PATH "Location of configuration files")
+set(LIBRARY_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/DataManagement
+    CACHE PATH "Location of Library")
 
 include(CMakePackageConfigHelpers)
 configure_package_config_file(DataManagementConfig.cmake.in
   ${CMAKE_CURRENT_BINARY_DIR}/DataManagementConfig.cmake
   INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/DataManagement
-  PATH_VARS INCLUDE_INSTALL_DIR SYSCONFIG_INSTALL_DIR
+  PATH_VARS INCLUDE_INSTALL_DIR SYSCONFIG_INSTALL_DIR LIBRARY_INSTALL_DIR
 )
 
 write_basic_package_version_file(
@@ -86,5 +77,9 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/DataManagementConfig.cmake
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/DataManagementConfig.cmake
               ${CMAKE_CURRENT_BINARY_DIR}/DataManagementConfigVersion.cmake
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/DataManagement
+)
+
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libDataManagement.a
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/DataManagement
 )
