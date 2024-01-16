@@ -12,6 +12,7 @@ if (MSVC)
 endif()
 
 find_package(Boost REQUIRED COMPONENTS filesystem)
+find_package(SQLite3 REQUIRED)
 
 add_library(DataManagement SHARED)
 target_sources(DataManagement 
@@ -19,7 +20,6 @@ target_sources(DataManagement
         "${CMAKE_SOURCE_DIR}/src/DataTable.cpp"
         "${CMAKE_SOURCE_DIR}/src/Configuration.cpp"
         "${CMAKE_SOURCE_DIR}/src/SQLite3.cpp"
-        "${CMAKE_SOURCE_DIR}/lib/sqlite3/sqlite3.c"
     PUBLIC
         FILE_SET publicheaders 
         TYPE HEADERS
@@ -28,19 +28,18 @@ target_sources(DataManagement
             "${CMAKE_SOURCE_DIR}/include/DataManagement.hpp"
             "${CMAKE_SOURCE_DIR}/include/DataTable.hpp"
             "${CMAKE_SOURCE_DIR}/include/Reader.hpp"
-            "${CMAKE_SOURCE_DIR}/include/SQLite3.hpp"
             "${CMAKE_SOURCE_DIR}/include/Writer.hpp"
+            "${CMAKE_SOURCE_DIR}/include/SQLite3.hpp"
 )
-
-
-add_library(DataManagement::DataManagement ALIAS DataManagement)
 
 target_include_directories(DataManagement 
     PRIVATE
         "${CMAKE_SOURCE_DIR}/include"
-        "${CMAKE_SOURCE_DIR}/lib/sqlite3" 
+        ${SQLite3_INCLUDE_DIRS}
         ${Boost_INCLUDE_DIRS})
-target_link_libraries(DataManagement Boost::filesystem)
+target_link_libraries(DataManagement Boost::filesystem sqlite3)
+
+add_library(DataManagement::DataManagement ALIAS DataManagement)
 
 option(BUILD_DATA_TESTS "enable Data tests" OFF)
 
@@ -48,36 +47,31 @@ if(BUILD_DATA_TESTS STREQUAL ON)
     add_subdirectory(test)
 endif()
 
-include(GNUInstallDirs)
-install(TARGETS ${PROJECT_NAME} 
-    FILE_SET publicheaders
-    CONFIGURATIONS "DataManagementConfig.cmake" "${CMAKE_CURRENT_BINARY_DIR}/DataManagementConfigVersion.cmake")
-
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
     "DataManagementConfigVersion.cmake"
     VERSION ${DataManagement_VERSION}
     COMPATIBILITY AnyNewerVersion)
 
-# install(TARGETS DataManagement 
-#     EXPORT DataManagementTargets
-#     FILE_SET HEADERS
-#     LIBRARY DESTINATION lib
-#     ARCHIVE DESTINATION lib
-#     RUNTIME DESTINATION bin
-#     INCLUDES DESTINATION include)
+set(INSTALL_DIR "lib/DataManagement/cmake")
+set(INCLUDE_DIR "${INSTALL_DIR}/include")
 
-# install(EXPORT DataManagementTargets
-#     FILE DataManagementTargets.cmake
-#     NAMESPACE DataManagement::
-#     DESTINATION lib/cmake/DataManagement)
+configure_package_config_file(
+    DataManagementConfig.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/DataManagementConfig.cmake
+    INSTALL_DESTINATION ${INSTALL_DIR}
+    PATH_VARS INCLUDE_DIR
+)
 
-# include(CMakePackageConfigHelpers)
-# write_basic_package_version_file(
-#     "DataManagementConfigVersion.cmake"
-#     VERSION ${DataManagement_VERSION}
-#     COMPATIBILITY AnyNewerVersion
-# )
+include(GNUInstallDirs)
 
-# install(FILES "DataManagementConfig.cmake" "${CMAKE_CURRENT_BINARY_DIR}/DataManagementConfigVersion.cmake"
-#     DESTINATION lib/cmake/DataManagement)
+install(
+    TARGETS ${PROJECT_NAME} 
+    FILE_SET publicheaders
+    DESTINATION ${INSTALL_DIR}
+)
+
+install(
+    FILES ${CMAKE_CURRENT_BINARY_DIR}/DataManagementConfig.cmake
+    DESTINATION ${INSTALL_DIR}
+)

@@ -10,7 +10,7 @@ on:
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
-  BUILD_TYPE: Release
+  BUILD_TYPE: Debug
 
 jobs:
   build:
@@ -49,7 +49,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: dm-binary
-        path: ${{github.workspace}}/build/libdataManagement.a
+        path: ${{github.workspace}}/build/libdataManagement.so
 
     - name: Archive Headers
       uses: actions/upload-artifact@v3
