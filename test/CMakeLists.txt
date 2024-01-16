@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.20)
 
 project(DataManagementTests)
 
+find_package(Boost REQUIRED COMPONENTS filesystem)
+
 include(FetchContent)
 
 FetchContent_Declare(
