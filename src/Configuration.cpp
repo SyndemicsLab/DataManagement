@@ -1,4 +1,4 @@
-#include <DataManagement/Configuration.hpp>
+#include "Configuration.hpp"
 #include <boost/lexical_cast.hpp>
 #include <boost/property_tree/ini_parser.hpp>
 #include <boost/property_tree/ptree.hpp>

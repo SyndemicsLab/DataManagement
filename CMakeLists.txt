@@ -122,6 +122,7 @@ target_include_directories(DataManagement
     PRIVATE
         ${SQLite3_INCLUDE_DIRS}
         ${Boost_INCLUDE_DIRS}
+        "include"
 )
 
 target_link_libraries(DataManagement PUBLIC Boost::filesystem sqlite3)
