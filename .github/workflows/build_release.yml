@@ -42,7 +42,7 @@ jobs:
               run: sudo cmake --install ${{github.workspace}}/build/
 
             - name: Zip DataManagement
-              run: zip -r DataManagement-linux-x64.zip /usr/local/lib/cmake /usr/local/include/DataManagement /usr/local/lib/libDataManagement.so
+              run: zip -r DataManagement-linux-x64.zip /usr/local/lib/cmake/DataManagement /usr/local/include/DataManagement /usr/local/lib/libDataManagement.so
 
             - name: Release and Upload
               run: gh release upload ${{github.event.release.tag_name}} DataManagement-linux-x64.zip
