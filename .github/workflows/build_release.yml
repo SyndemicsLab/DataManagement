@@ -39,13 +39,13 @@ jobs:
               run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
             - name: Install DataManagement
-              run: sudo cmake --install ${{github.workspace}}/build/
+              run: cmake --install ${{github.workspace}}/build/ --prefix "_install"
 
             - name: Zip DataManagement
-              run: zip -r DataManagement-linux-x64.zip /usr/local/lib/cmake /usr/local/include/DataManagement /usr/local/lib/libDataManagement.so
+              run: zip -r dminstall.zip "_install"
 
             - name: Release and Upload
-              run: gh release upload ${{github.event.release.tag_name}} DataManagement-linux-x64.zip
+              run: gh release upload ${{github.event.release.tag_name}} dminstall.zip
               env:
                 GITHUB_TOKEN: ${{ github.TOKEN }}
               shell: bash
