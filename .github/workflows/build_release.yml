@@ -39,10 +39,10 @@ jobs:
               run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
             - name: Install DataManagement
-              run: cmake --install ${{github.workspace}}/build/ --prefix "_install"
+              run: cmake --install ${{github.workspace}}/build/ --prefix "dminstall"
 
             - name: Zip DataManagement
-              run: zip -r dminstall.zip "_install"
+              run: zip -r dminstall.zip "dminstall"
 
             - name: Release and Upload
               run: gh release upload ${{github.event.release.tag_name}} dminstall.zip
