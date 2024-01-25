@@ -36,6 +36,9 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       run: sudo apt-get install libgtest-dev
 
+    - name: Install MSYS2
+      uses: msys2/setup-msys2@v2
+      
     - name: Install GTest Windows
       if: matrix.os == 'windows-latest'
       run: pacman -S mingw-w64-x86_64-gtest
