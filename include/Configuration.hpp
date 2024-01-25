@@ -30,6 +30,8 @@ namespace Data {
         virtual std::vector<int> getIntVector(std::string str) = 0;
     };
 
+    using IConfigurationPtr = std::shared_ptr<Data::IConfiguration>;
+
     /// @brief Class describing a standard configuration file
     class Configuration : public IConfiguration {
     private:

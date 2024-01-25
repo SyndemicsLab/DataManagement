@@ -11,7 +11,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 find_package(Boost REQUIRED COMPONENTS filesystem)
-find_package(SQLite3 REQUIRED)
+# find_package(SQLite3 REQUIRED)
 
 option(BUILD_DATA_TESTS "enable Data tests" OFF)
 if(BUILD_DATA_TESTS STREQUAL ON)
@@ -22,10 +22,10 @@ add_library(
     DataManagement SHARED
     "src/DataTable.cpp"
     "src/Configuration.cpp"
-    "src/SQLite3.cpp"
+    # "src/SQLite3.cpp"
 )
 
-target_link_libraries(DataManagement PRIVATE Boost::filesystem sqlite3)
+target_link_libraries(DataManagement PRIVATE Boost::filesystem) #sqlite3
 
 target_include_directories(
     DataManagement 
@@ -33,7 +33,7 @@ target_include_directories(
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
         "$<INSTALL_INTERFACE:include>"
     PRIVATE
-        ${SQLite3_INCLUDE_DIRS}
+        # ${SQLite3_INCLUDE_DIRS}
         ${Boost_INCLUDE_DIRS}
 )
 
@@ -53,7 +53,7 @@ install(
         "include/DataTable.hpp"
         "include/Reader.hpp"
         "include/Writer.hpp"
-        "include/SQLite3.hpp"
+        # "include/SQLite3.hpp"
     DESTINATION include
 )
 
