@@ -25,7 +25,7 @@ add_library(
     # "src/SQLite3.cpp"
 )
 
-target_link_libraries(DataManagement PRIVATE Boost::filesystem sqlite3)
+target_link_libraries(DataManagement PRIVATE Boost::filesystem) #sqlite3
 
 target_include_directories(
     DataManagement 
@@ -33,7 +33,7 @@ target_include_directories(
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
         "$<INSTALL_INTERFACE:include>"
     PRIVATE
-        ${SQLite3_INCLUDE_DIRS}
+        # ${SQLite3_INCLUDE_DIRS}
         ${Boost_INCLUDE_DIRS}
 )
 
