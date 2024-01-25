@@ -18,11 +18,11 @@ enable_testing()
 
 add_executable(dataTests main.cpp DataTableTest.cpp ConfigurationTest.cpp)
 
-target_include_directories(dataTests PUBLIC 
-    ${CMAKE_SOURCE_DIR}include/
-    ${CMAKE_SOURCE_DIR}lib/sqlite3/
-    ${CMAKE_SOURCE_DIR}lib/boost/include/boost/)
+target_link_libraries(dataTests PUBLIC DataManagement) 
+target_link_libraries(dataTests PUBLIC Boost::filesystem)
+target_link_libraries(dataTests PUBLIC gtest gtest_main)
 
-target_link_libraries(dataTests DataManagement Boost::filesystem gtest gtest_main)
+target_include_directories(dataTests PUBLIC "../include/")
+
 include(GoogleTest)
 gtest_discover_tests(dataTests)
