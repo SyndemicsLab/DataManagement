@@ -94,4 +94,16 @@ namespace Data {
         }
         return result;
     }
+
+    std::vector<std::string>
+    Configuration::getSectionCategories(std::string section) {
+        boost::property_tree::ptree subTree =
+            this->dmTree->ptree.get_child(section);
+        std::vector<std::string> keyList;
+
+        for (auto &key : subTree) {
+            keyList.push_back(key.first);
+        }
+        return keyList;
+    }
 } // namespace Data

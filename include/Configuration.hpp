@@ -28,6 +28,8 @@ namespace Data {
         virtual std::vector<int> parseString2VectorOfInts(std::string st) = 0;
         virtual std::vector<std::string> getStringVector(std::string str) = 0;
         virtual std::vector<int> getIntVector(std::string str) = 0;
+        virtual std::vector<std::string>
+        getSectionCategories(std::string section) = 0;
     };
 
     using IConfigurationPtr = std::shared_ptr<Data::IConfiguration>;
@@ -117,6 +119,9 @@ namespace Data {
                 return {};
             }
         }
+
+        std::vector<std::string>
+        getSectionCategories(std::string section) override;
     };
 } // namespace Data
 #endif

@@ -90,3 +90,11 @@ TEST_F(ConfigurationTest, GetNoVector) {
     std::vector<int> expected = {};
     EXPECT_EQ(expected, config.getIntVector("section.vector"));
 }
+
+TEST_F(ConfigurationTest, GetSectionCategories) {
+    outStream << "[section]\nvector = foo, bar, baz\nvectortwo = aaa, bbb, ccc"
+              << std::endl;
+    Data::Configuration config(tempFilePath.string());
+    std::vector<std::string> expected = {"vector", "vectortwo"};
+    EXPECT_EQ(expected, config.getSectionCategories("section"));
+}
