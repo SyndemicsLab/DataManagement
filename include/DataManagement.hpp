@@ -4,7 +4,7 @@
 #include "Configuration.hpp"
 #include "DataTable.hpp"
 #include "Reader.hpp"
-#include "SQLite3.hpp"
+// #include "SQLite3.hpp"
 #include "Writer.hpp"
 
 #endif
