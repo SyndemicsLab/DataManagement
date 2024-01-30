@@ -86,6 +86,8 @@ namespace Data {
         virtual bool fromSQL(const std::string &dbfile,
                              const std::string &tablename) = 0;
         virtual std::vector<std::vector<std::string>> getData() const = 0;
+        virtual std::map<std::string, std::vector<std::string>>
+        getDataAsMap() const = 0;
         virtual std::shared_ptr<IDataTable> getRow(int idx) const = 0;
         virtual std::vector<std::string>
         getColumn(std::string columnName) const = 0;
@@ -225,6 +227,8 @@ namespace Data {
         /// @brief Default constructor. Sets everything to default
         DataTable(){};
 
+        DataTable(DataTable &dt);
+
         /// @brief Constructor used to load a file to a DataTable
         /// @param filename file path as a string
         /// @param hasHeaders flag to read headers. False if no headers in file
@@ -280,6 +284,11 @@ namespace Data {
                 }
             }
             return dat;
+        }
+
+        std::map<std::string, std::vector<std::string>>
+        getDataAsMap() const override {
+            return this->data;
         }
 
         /// @brief Return a row of data

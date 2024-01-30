@@ -18,7 +18,10 @@ namespace Data {
 
     DataTable::DataTable(const std::string &filename, bool hasHeaders,
                          char delim) {
-        this->fromCSV(filename, hasHeaders, delim);
+        if (!this->fromCSV(filename, hasHeaders, delim)) {
+            throw new std::invalid_argument("File " + filename +
+                                            " could not be found!");
+        }
     }
 
     DataTable::DataTable(const std::string &dbfile,
@@ -38,6 +41,14 @@ namespace Data {
         } else {
             this->headerOrder = headOrder;
         }
+    }
+
+    DataTable::DataTable(DataTable &dt) {
+        std::map<std::string, std::vector<std::string>> data =
+            dt.getDataAsMap();
+        DataTableShape shape = dt.getShape();
+        std::vector<std::string> headOrder = dt.getHeaders();
+        DataTable(data, shape, headOrder);
     }
 
     std::vector<std::string> DataTable::loadRows(std::ifstream &csvStream) {
@@ -401,7 +412,12 @@ namespace Data {
     }
 
     void DataTable::dropColumn(std::string column) {
-        columnErrorCheck(column);
+        try {
+            columnErrorCheck(column);
+        } catch (std::logic_error ex) {
+            throw ex;
+        }
+
         this->data.erase(column);
         for (std::vector<std::string>::iterator it = this->headerOrder.begin();
              it != this->headerOrder.end(); ++it) {
