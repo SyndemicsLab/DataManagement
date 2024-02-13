@@ -19,14 +19,14 @@ namespace Data {
     DataTable::DataTable(const std::string &filename, bool hasHeaders,
                          char delim) {
         if (!this->fromCSV(filename, hasHeaders, delim)) {
-            throw new std::invalid_argument("File " + filename +
-                                            " could not be found!");
+            throw std::invalid_argument("File " + filename +
+                                        " could not be found!");
         }
     }
 
     DataTable::DataTable(const std::string &dbfile,
                          const std::string &tablename) {
-        throw new std::logic_error("Not Implemented Yet");
+        throw std::logic_error("Not Implemented Yet");
     }
 
     DataTable::DataTable(std::map<std::string, std::vector<std::string>> data,
@@ -43,12 +43,20 @@ namespace Data {
         }
     }
 
-    DataTable::DataTable(DataTable &dt) {
+    DataTable::DataTable(const DataTable &dt) {
         std::map<std::string, std::vector<std::string>> data =
             dt.getDataAsMap();
         DataTableShape shape = dt.getShape();
         std::vector<std::string> headOrder = dt.getHeaders();
-        DataTable(data, shape, headOrder);
+        this->data = data;
+        this->shape = shape;
+        if (headOrder.empty() || headOrder.size() != data.size()) {
+            for (auto kv : this->data) {
+                this->headerOrder.push_back(kv.first);
+            }
+        } else {
+            this->headerOrder = headOrder;
+        }
     }
 
     std::vector<std::string> DataTable::loadRows(std::ifstream &csvStream) {
@@ -84,6 +92,8 @@ namespace Data {
             }
         } else {
             for (std::string header : firstLine) {
+                header.erase(std::remove(header.begin(), header.end(), '\"'),
+                             header.end());
                 this->data[header] = {};
                 this->headerOrder.push_back(header);
             }
@@ -104,7 +114,7 @@ namespace Data {
 
     bool DataTable::fromSQL(const std::string &dbfile,
                             const std::string &tablename) {
-        throw new std::logic_error("Not Implemented Yet");
+        throw std::logic_error("Not Implemented Yet");
     }
 
     void DataTable::toCSV(const std::string &filename) const {
@@ -161,6 +171,16 @@ namespace Data {
     DataTable::getColumn(std::string columnName) const {
         columnErrorCheck(columnName);
         return this->data.at(columnName);
+    }
+
+    bool DataTable::checkColumnExists(std::string columnName) const {
+        std::vector<std::string> headers = this->getHeaders();
+        for (std::string header : headers) {
+            if (header.compare(columnName) == 0) {
+                return true;
+            }
+        }
+        return false;
     }
 
     std::shared_ptr<IDataTable>
@@ -306,7 +326,7 @@ namespace Data {
 
         // throw error on invalid 1-1 join columns
         if (tableOneColumnNames.size() != tableTwoColumnNames.size()) {
-            throw new std::logic_error("Joining columns are not one-to-one.");
+            throw std::logic_error("Joining columns are not one-to-one.");
         }
 
         // return nothing if the column names are empty
@@ -327,7 +347,7 @@ namespace Data {
         // Should never be true if the getColumn fails and the ColumnNames
         // Params are not empty
         if (t1Columns.empty() || t2Columns.empty()) {
-            throw new std::logic_error("Joining columns not found in tables.");
+            throw std::logic_error("Joining columns not found in tables.");
         }
 
         std::vector<std::vector<int>> indices;
@@ -388,21 +408,21 @@ namespace Data {
     DataTable::leftJoin(std::shared_ptr<IDataTable> const tableTwo,
                         std::string tableOneColumnName,
                         std::string tableTwoColumnName) const {
-        throw new std::logic_error("Not Implemented Yet");
+        throw std::logic_error("Not Implemented Yet");
     }
 
     std::shared_ptr<IDataTable>
     DataTable::rightJoin(std::shared_ptr<IDataTable> const tableTwo,
                          std::string tableOneColumnName,
                          std::string tableTwoColumnName) const {
-        throw new std::logic_error("Not Implemented Yet");
+        throw std::logic_error("Not Implemented Yet");
     }
 
     std::shared_ptr<IDataTable>
     DataTable::outerJoin(std::shared_ptr<IDataTable> const tableTwo,
                          std::string tableOneColumnName,
                          std::string tableTwoColumnName) const {
-        throw new std::logic_error("Not Implemented Yet");
+        throw std::logic_error("Not Implemented Yet");
     }
 
     void DataTable::dropColumns(std::vector<std::string> columnNames) {

@@ -91,6 +91,7 @@ namespace Data {
         virtual std::shared_ptr<IDataTable> getRow(int idx) const = 0;
         virtual std::vector<std::string>
         getColumn(std::string columnName) const = 0;
+        virtual bool checkColumnExists(std::string columnName) const = 0;
         virtual std::vector<std::string> getColumnNames() const = 0;
         virtual std::shared_ptr<IDataTable>
         selectColumns(std::vector<std::string> columnNames) const = 0;
@@ -190,9 +191,12 @@ namespace Data {
 
         void columnErrorCheck(std::string const columnName) const {
             if (this->data.find(columnName) == this->data.end()) {
-                std::string message =
-                    "Invalid Column Name of " + columnName + " for DataTable.";
-                throw new std::logic_error(message);
+                std::string message = "Invalid Column Name of " + columnName +
+                                      " for DataTable. Columns are: ";
+                for (auto kv : this->data) {
+                    message += (kv.first + " ");
+                }
+                throw std::logic_error(message);
             }
         }
 
@@ -202,7 +206,7 @@ namespace Data {
                                       std::to_string(idx) +
                                       " for DataTable with " +
                                       std::to_string(this->nrows()) + " rows.";
-                throw new std::logic_error(message);
+                throw std::logic_error(message);
             }
         }
 
@@ -227,7 +231,7 @@ namespace Data {
         /// @brief Default constructor. Sets everything to default
         DataTable(){};
 
-        DataTable(DataTable &dt);
+        DataTable(const DataTable &dt);
 
         /// @brief Constructor used to load a file to a DataTable
         /// @param filename file path as a string
@@ -302,6 +306,8 @@ namespace Data {
         /// @return vector representing the column of data
         std::vector<std::string>
         getColumn(std::string columnName) const override;
+
+        bool checkColumnExists(std::string columnName) const override;
 
         std::vector<std::string> getColumnNames() const override;
 
