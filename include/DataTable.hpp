@@ -1,3 +1,21 @@
+//===-- DataTable.hpp --------------------------------------------*- C++-*-===//
+//
+// Part of the Syndemics Lab DataManagement Code Repository, under
+// the AGPLv3 License. See https://www.gnu.org/licenses/
+// for license information.
+// SPDX-License-Identifier: AGPLv3
+//
+//===----------------------------------------------------------------------===//
+///
+/// \file
+/// This file contains the definition of the DataTableShape and DataTable
+/// interface and base class. In addition to the class definitions, a typedef
+/// is provded to utilize a pointer of the DataTable object.
+///
+/// Created Date: Tuesday, June 27th 2023, 10:20:34 am
+/// Contact: Benjamin.Linas@bmc.org
+///
+//===----------------------------------------------------------------------===//
 #ifndef DATATABLE_HPP_
 #define DATATABLE_HPP_
 
@@ -11,13 +29,31 @@
 /// @brief Namespace defining Data Containers
 namespace Data {
 
+    /// @brief Interface describing DataTableShape
     class IDataTableShape {
     public:
+        /// @brief Default Destructor
         virtual ~IDataTableShape() = default;
+
+        /// @brief Getter for the Number of Rows
+        /// @return Number of Rows
         virtual int getNRows() const = 0;
+
+        /// @brief Getter for the Number of Columns
+        /// @return Number of Columns
         virtual int getNCols() const = 0;
+
+        /// @brief Setter for Number of Rows
+        /// @param nrows Number of Rows
         virtual void setNRows(int nrows) = 0;
+
+        /// @brief Setter for Number of Columns
+        /// @param ncols Number of Columns
         virtual void setNCols(int ncols) = 0;
+
+        /// @brief Operator Overload to get number of columns or rows
+        /// @param index 0 for Row, 1 for Column
+        /// @return Number of Rows or Columns depending on parameter
         virtual int operator[](int index) const = 0;
     };
 

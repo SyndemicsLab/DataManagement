@@ -1,0 +1,22 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Doxygen GitHub Pages Deploy Action
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master branch
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+  
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: DenverCoder1/doxygen-github-pages-action@v1.3.0
+        with:
+          github_token: ${{ github.TOKEN }}
+          branch: gh-pages
+          folder: docs/html
+          config_file: Doxyfile
