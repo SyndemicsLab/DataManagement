@@ -1,3 +1,21 @@
+//===-- Configuration.hpp ----------------------------------------*- C++-*-===//
+//
+// Part of the Syndemics Lab DataManagement Code Repository, under
+// the AGPLv3 License. See https://www.gnu.org/licenses/
+// for license information.
+// SPDX-License-Identifier: AGPLv3
+//
+//===----------------------------------------------------------------------===//
+///
+/// \file
+/// This file contains the definition of the Configuration interface and
+/// base class. In addition to the class definitions, a typedef is provded
+/// to utilize a pointer of the Configuration object.
+///
+/// Created Date: Tuesday, June 27th 2023, 10:20:34 am
+/// Contact: Benjamin.Linas@bmc.org
+///
+//===----------------------------------------------------------------------===//
 #ifndef CONFIGURATION_HPP_
 #define CONFIGURATION_HPP_
 
@@ -9,20 +27,13 @@
 /// @brief Namespace defining Data Containers
 namespace Data {
 
+    /// @brief Declaration of wrapper class for property tree parser
     class PTree;
 
+    /// @brief Interface used for Configuration, provides guaranteed methods
     class IConfiguration {
     public:
         virtual ~IConfiguration() = default;
-        // virtual void get(std::string str,
-        //                  std::variant<int, bool, float, double, char,
-        //                               std::string> &value) = 0;
-        // virtual void
-        // optional(std::string str,
-        //          std::variant<std::shared_ptr<int>, std::shared_ptr<bool>,
-        //                       std::shared_ptr<float>,
-        //                       std::shared_ptr<double>, std::shared_ptr<char>,
-        //                       std::shared_ptr<std::string>> &value) = 0;
         virtual std::vector<std::string>
         parseString2VectorOfStrings(std::string st) = 0;
         virtual std::vector<int> parseString2VectorOfInts(std::string st) = 0;
@@ -32,6 +43,8 @@ namespace Data {
         getSectionCategories(std::string section) = 0;
     };
 
+    /// @brief Type definition for an easy to use pointer to a configuration
+    /// interface
     using IConfigurationPtr = std::shared_ptr<Data::IConfiguration>;
 
     /// @brief Class describing a standard configuration file
@@ -40,8 +53,6 @@ namespace Data {
         std::unique_ptr<PTree> dmTree;
 
     public:
-        // CONSTRUCTORS
-
         /// @brief Default constructor with no file
         Configuration();
 
@@ -49,7 +60,7 @@ namespace Data {
         /// @param configFile string path to the config file
         Configuration(std::string configFile);
 
-        /// @brief Default destructor
+        /// @brief Default Destructor
         ~Configuration();
 
         /// @brief Default template for getting parameters from the config
@@ -63,23 +74,6 @@ namespace Data {
         /// @param str String key to search for
         /// @return The optional value searched for of type T
         template <typename T> std::shared_ptr<T> optional(std::string str);
-
-        // /// @brief
-        // /// @param str
-        // /// @param value
-        // void get(std::string str,
-        //          std::variant<int, bool, float, double, char, std::string>
-        //              &value) override;
-
-        // /// @brief An overload of \code{optional} for strings
-        // /// @param str String key to search for
-        // /// @return The optional value searched for of type string
-        // void
-        // optional(std::string str,
-        //          std::variant<std::shared_ptr<int>, std::shared_ptr<bool>,
-        //                       std::shared_ptr<float>,
-        //                       std::shared_ptr<double>, std::shared_ptr<char>,
-        //                       std::shared_ptr<std::string>> &value) override;
 
         /// @brief Helper function to parse a string to a vector of strings
         /// @param st string to parse
@@ -120,6 +114,10 @@ namespace Data {
             }
         }
 
+        /// @brief Helper function to return all the categories belonging to the
+        /// provided section
+        /// @param section String describing the section to search
+        /// @return A vector of the categories avaliable
         std::vector<std::string>
         getSectionCategories(std::string section) override;
     };

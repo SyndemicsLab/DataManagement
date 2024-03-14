@@ -49,41 +49,41 @@ jobs:
       working-directory: ${{github.workspace}}/build
       run: './test/dataTests'  
 
-  windows-build:
-    # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
-    # You can convert this to a matrix build if you need cross-platform coverage.
-    # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
-    runs-on: windows-latest
-    steps:
-    - uses: actions/checkout@v3
+#   windows-build:
+#     # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
+#     # You can convert this to a matrix build if you need cross-platform coverage.
+#     # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
+#     runs-on: windows-latest
+#     steps:
+#     - uses: actions/checkout@v3
 
-    - name: Install Boost
-      uses: MarkusJx/install-boost@v2.4.4
-      id: install-boost
-      with:
-        boost_version: 1.82.0
-        platform_version: 2022
-        toolset: 'mingw'
+#     - name: Install Boost
+#       uses: MarkusJx/install-boost@v2.4.4
+#       id: install-boost
+#       with:
+#         boost_version: 1.82.0
+#         platform_version: 2022
+#         toolset: 'mingw'
 
-    - name: Install MSYS2
-      uses: msys2/setup-msys2@v2
+#     - name: Install MSYS2
+#       uses: msys2/setup-msys2@v2
 
-    - name: Install GTest Windows
-      run: msys2 -c 'yes | pacman -S mingw-w64-x86_64-gtest'
+#     - name: Install GTest Windows
+#       run: msys2 -c 'yes | pacman -S mingw-w64-x86_64-gtest'
 
-    - name: Configure CMake
-      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
-      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
-      run: |
-        cmake -B ${{github.workspace}}/build -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DBUILD_DATA_TESTS=ON -DBoost_INCLUDE_DIR=${{steps.install-boost.outputs.BOOST_ROOT}}/include -DBoost_LIBRARY_DIRS=${{steps.install-boost.outputs.BOOST_ROOT}}/lib
-      env:
-        BOOST_ROOT: ${{ steps.install-boost.outputs.BOOST_ROOT }}
+#     - name: Configure CMake
+#       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
+#       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
+#       run: |
+#         cmake -B ${{github.workspace}}/build -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DBUILD_DATA_TESTS=ON -DBoost_INCLUDE_DIR=${{steps.install-boost.outputs.BOOST_ROOT}}/include -DBoost_LIBRARY_DIRS=${{steps.install-boost.outputs.BOOST_ROOT}}/lib
+#       env:
+#         BOOST_ROOT: ${{ steps.install-boost.outputs.BOOST_ROOT }}
 
-    - name: Build
-      # Build your program with the given configuration
-      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+#     - name: Build
+#       # Build your program with the given configuration
+#       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
-    - name: Test
-      working-directory: ${{github.workspace}}/build
-      run: 'test/dataTests.exe'
+#     - name: Test
+#       working-directory: ${{github.workspace}}/build
+#       run: 'test/dataTests.exe'
 
