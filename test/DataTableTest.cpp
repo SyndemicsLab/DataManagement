@@ -70,6 +70,54 @@ TEST_F(DataTableTest, ReadFromCSVNoHeader) {
     }
 }
 
+TEST_F(DataTableTest, ReadFromCSVQuotedContents) {
+    try {
+        std::vector<std::string> expectedHeaders = {"Test", "Test1", "Test2"};
+        std::vector<std::vector<std::string>> expectedData = {{"1", "2", "3"}};
+        std::string csvData =
+            "\"Test\",\"Test1\",\"Test2\"\n\"1\",\"2\",\"3\"\n";
+        outStream << csvData;
+        outStream.close();
+
+        Data::DataTable dt;
+        std::string tFilePath = mTempFileAbsolute.string();
+        bool res = dt.fromCSV(tFilePath, true);
+        std::vector<std::string> headers = dt.getHeaders();
+        std::vector<std::vector<std::string>> data = dt.getData();
+
+        EXPECT_TRUE(res);
+        EXPECT_EQ(expectedHeaders, headers);
+        EXPECT_EQ(expectedData, data);
+    } catch (const std::exception &e_) {
+        FAIL() << "Caught an exception in " << typeid(*this).name() << ": "
+               << e_.what();
+    }
+}
+
+TEST_F(DataTableTest, ReadFromCSVSpacesInContents) {
+    try {
+        std::vector<std::string> expectedHeaders = {"0", "1", "2"};
+        std::vector<std::vector<std::string>> expectedData = {
+            {"1 ", "2 ", "3 "}};
+        std::string csvData = "1 ,2 ,3 \n";
+        outStream << csvData;
+        outStream.close();
+
+        Data::DataTable dt;
+        std::string tFilePath = mTempFileAbsolute.string();
+        bool res = dt.fromCSV(tFilePath, false);
+        std::vector<std::string> headers = dt.getHeaders();
+        std::vector<std::vector<std::string>> data = dt.getData();
+
+        EXPECT_TRUE(res);
+        EXPECT_EQ(expectedHeaders, headers);
+        EXPECT_EQ(expectedData, data);
+    } catch (const std::exception &e_) {
+        FAIL() << "Caught an exception in " << typeid(*this).name() << ": "
+               << e_.what();
+    }
+}
+
 TEST_F(DataTableTest, ReadFromCSVHeaderDelimiter) {
     try {
         std::vector<std::string> expectedHeaders = {"Test", "Test1", "Test2"};
