@@ -104,7 +104,10 @@ namespace Data {
         for (std::string line : contents) {
             std::vector<std::string> rowData = this->split(line, delim);
             for (int i = 0; i < rowData.size(); ++i) {
-                this->data[this->headerOrder[i]].push_back(rowData[i]);
+                std::string &element = rowData[i];
+                element.erase(std::remove(element.begin(), element.end(), '\"'),
+                              element.end());
+                this->data[this->headerOrder[i]].push_back(element);
             }
             this->shape.setNRows(this->shape.getNRows() + 1);
         }
