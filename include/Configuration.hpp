@@ -20,6 +20,7 @@
 #define CONFIGURATION_HPP_
 
 #include <memory>
+#include <optional>
 #include <string>
 #include <variant>
 #include <vector>
@@ -27,30 +28,48 @@
 /// @brief Namespace defining Data Containers
 namespace Data {
 
+    using ReturnType =
+        std::variant<int, double, float, std::string, bool, char>;
+
     /// @brief Declaration of wrapper class for property tree parser
     class PTree;
 
-    /// @brief Interface used for Configuration, provides guaranteed methods
-    class IConfiguration {
+    class IGettable {
     public:
-        virtual ~IConfiguration() = default;
-        virtual std::vector<std::string>
-        parseString2VectorOfStrings(std::string st) = 0;
-        virtual std::vector<int> parseString2VectorOfInts(std::string st) = 0;
-        virtual std::vector<std::string> getStringVector(std::string str) = 0;
-        virtual std::vector<int> getIntVector(std::string str) = 0;
+        /// @brief Default template for getting parameters from the config
+        /// @param str String key to search for
+        /// @return The value searched for
+        virtual ReturnType get(std::string, ReturnType) = 0;
+
+        /// @brief Template for the optional parameters
+        /// @param str String key to search for
+        /// @return The optional value searched for
+        virtual std::shared_ptr<ReturnType> get_optional(std::string,
+                                                         ReturnType) = 0;
+        virtual std::vector<ReturnType> getVector(std::string) = 0;
+    };
+
+    class IParseable {
+    public:
+        virtual std::vector<ReturnType> parse(std::string, std::string) = 0;
+    };
+
+    /// @brief Interface used for Configuration, provides guaranteed methods
+    class IConfigurable : public virtual IGettable, public virtual IParseable {
+    public:
         virtual std::vector<std::string>
         getSectionCategories(std::string section) = 0;
     };
 
     /// @brief Type definition for an easy to use pointer to a configuration
     /// interface
-    using IConfigurationPtr = std::shared_ptr<Data::IConfiguration>;
+    using IConfigurationPtr = std::shared_ptr<Data::IConfigurable>;
 
     /// @brief Class describing a standard configuration file
-    class Configuration : public IConfiguration {
+    class Configuration : public IConfigurable {
     private:
         std::unique_ptr<PTree> dmTree;
+        ReturnType convert_type(std::string);
 
     public:
         /// @brief Default constructor with no file
@@ -63,56 +82,18 @@ namespace Data {
         /// @brief Default Destructor
         ~Configuration();
 
-        /// @brief Default template for getting parameters from the config
-        /// @param T Type to return
-        /// @param str String key to search for
-        /// @return The value searched for of type T
-        template <typename T> T get(std::string str);
+        ReturnType get(std::string str, ReturnType default_value) override;
 
-        /// @brief Template for the optional parameters
-        /// @param T Type to return
-        /// @param str String key to search for
-        /// @return The optional value searched for of type T
-        template <typename T> std::shared_ptr<T> optional(std::string str);
+        std::vector<ReturnType> getVector(std::string str) override;
+
+        std::shared_ptr<ReturnType>
+        get_optional(std::string str, ReturnType default_value) override;
 
         /// @brief Helper function to parse a string to a vector of strings
         /// @param st string to parse
         /// @return vector of parsed strings
-        std::vector<std::string>
-        parseString2VectorOfStrings(std::string st) override;
-
-        /// @brief Helper function to parse a string to a vector of ints
-        /// @param st string to parse
-        /// @return vector of parsed ints
-        std::vector<int> parseString2VectorOfInts(std::string st) override;
-
-        /// @brief Wrapper function around `optional` and
-        /// `parseString2VectorofStrings`.
-        /// @param str string to parse
-        /// @return vector of parsed strings
-        std::vector<std::string> getStringVector(std::string str) override {
-            std::shared_ptr<std::string> value =
-                this->optional<std::string>(str);
-            if (value) {
-                return this->parseString2VectorOfStrings(*value);
-            } else {
-                return {};
-            }
-        }
-
-        /// @brief Wrapper function around `optional` and
-        /// `parseString2VectorofInts`.
-        /// @param str string to parse
-        /// @return vector of parsed ints
-        std::vector<int> getIntVector(std::string str) override {
-            std::shared_ptr<std::string> value =
-                this->optional<std::string>(str);
-            if (value) {
-                return this->parseString2VectorOfInts(*value);
-            } else {
-                return {};
-            }
-        }
+        std::vector<ReturnType> parse(std::string str,
+                                      std::string delimiter = ", ") override;
 
         /// @brief Helper function to return all the categories belonging to the
         /// provided section

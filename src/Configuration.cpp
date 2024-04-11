@@ -4,6 +4,9 @@
 #include <boost/property_tree/ptree.hpp>
 
 #include <cassert>
+#include <limits>
+#include <type_traits>
+#include <typeinfo>
 
 namespace Data {
     class PTree {
@@ -23,76 +26,68 @@ namespace Data {
 
     Configuration::~Configuration(){};
 
-    /// @brief Default template for getting parameters from the config
-    /// @param T Type to return
-    /// @param str String key to search for
-    /// @return The value searched for of type T
-    template <typename T> T Configuration::get(std::string str) {
-        return this->dmTree->ptree.get<T>(str);
-    }
-
-    template int Configuration::get<int>(std::string str);
-    template bool Configuration::get<bool>(std::string str);
-    template float Configuration::get<float>(std::string str);
-    template double Configuration::get<double>(std::string str);
-    template char Configuration::get<char>(std::string str);
-    template std::string Configuration::get<std::string>(std::string str);
-
-    /// @brief Template for the optional parameters
-    /// @param T Type to return
-    /// @param str String key to search for
-    /// @return The optional value searched for of type T
-    template <typename T>
-    std::shared_ptr<T> Configuration::optional(std::string str) {
-        boost::optional<T> result = this->dmTree->ptree.get_optional<T>(str);
-        if (result) {
-            return std::make_shared<T>(*result);
+    ReturnType Configuration::get(std::string str, ReturnType default_value) {
+        // std::variant<int, double, float, std::string, bool, char>;
+        if (std::holds_alternative<int>(default_value)) {
+            return this->dmTree->ptree.get<int>(str);
+        } else if (std::holds_alternative<double>(default_value)) {
+            return this->dmTree->ptree.get<double>(str);
+        } else if (std::holds_alternative<float>(default_value)) {
+            return this->dmTree->ptree.get<float>(str);
+        } else if (std::holds_alternative<bool>(default_value)) {
+            return this->dmTree->ptree.get<bool>(str);
+        } else if (std::holds_alternative<char>(default_value)) {
+            return this->dmTree->ptree.get<char>(str);
+        } else {
+            return this->dmTree->ptree.get<std::string>(str);
         }
-        return nullptr;
     }
 
-    template std::shared_ptr<int> Configuration::optional<int>(std::string str);
-    template std::shared_ptr<bool>
-    Configuration::optional<bool>(std::string str);
-    template std::shared_ptr<float>
-    Configuration::optional<float>(std::string str);
-    template std::shared_ptr<double>
-    Configuration::optional<double>(std::string str);
-    template std::shared_ptr<char>
-    Configuration::optional<char>(std::string str);
-    template std::shared_ptr<std::string>
-    Configuration::optional<std::string>(std::string str);
+    // helper constant for the visitor #3
+    template <class> inline constexpr bool always_false_v = false;
 
-    std::vector<std::string>
-    Configuration::parseString2VectorOfStrings(std::string st) {
-        std::stringstream ss(st);
-        std::vector<std::string> result = {};
+    std::vector<ReturnType> Configuration::getVector(std::string str) {
 
-        while (ss.good()) {
-            std::string substr;
-            getline(ss, substr, ',');
-            // remove leading whitespace
-            int first = substr.find_first_not_of(' ');
-            // break and return if the string is empty
-            // TODO log warning when this happens
-            if (std::string::npos == first) {
-                break;
+        try {
+            std::string result =
+                std::get<std::string>(this->get(str, std::string("")));
+
+            return this->parse(result);
+        } catch (const std::exception &e) {
+            return {};
+        }
+    }
+
+    std::shared_ptr<ReturnType>
+    Configuration::get_optional(std::string str, ReturnType default_value) {
+        try {
+            ReturnType val = this->get(str, default_value);
+            // This is the string error check
+            if (std::holds_alternative<std::string>(val) &&
+                std::get<std::string>(val).empty()) {
+                return nullptr;
             }
-            int last = substr.find_last_not_of(' ');
-            result.push_back(substr.substr(first, (last - first + 1)));
+            return std::make_shared<ReturnType>(val);
+        } catch (const boost::property_tree::ptree_error &e) {
+            return nullptr;
         }
-        return result;
     }
 
-    std::vector<int> Configuration::parseString2VectorOfInts(std::string st) {
-        std::vector<int> result = {};
-
-        std::istringstream iss(st);
+    std::vector<ReturnType> Configuration::parse(std::string str,
+                                                 std::string delimiter) {
+        std::vector<ReturnType> ret_vec;
+        size_t pos = 0;
         std::string token;
-        while (std::getline(iss, token, ',')) {
-            result.push_back(std::stoi(token));
+        while ((pos = str.find(delimiter)) != std::string::npos) {
+            token = str.substr(0, pos);
+            ret_vec.push_back(this->convert_type(token));
+            str.erase(0, pos + delimiter.length());
         }
-        return result;
+        if (!str.empty()) {
+            ret_vec.push_back(this->convert_type(str));
+        }
+
+        return ret_vec;
     }
 
     std::vector<std::string>
@@ -105,5 +100,25 @@ namespace Data {
             keyList.push_back(key.first);
         }
         return keyList;
+    }
+
+    ReturnType Configuration::convert_type(std::string str) {
+        char *endptr;
+
+        int i_res = std::strtol(str.c_str(), &endptr, 10);
+        if (endptr != str.c_str() && *endptr == '\0') {
+            return i_res;
+        }
+
+        double d_res = std::strtod(str.c_str(), &endptr);
+        if (endptr != str.c_str() && *endptr == '\0') {
+            return d_res;
+        }
+
+        float f_res = std::strtof(str.c_str(), &endptr);
+        if (endptr != str.c_str() && *endptr == '\0') {
+            return f_res;
+        }
+        return str;
     }
 } // namespace Data
