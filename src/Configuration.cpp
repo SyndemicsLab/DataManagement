@@ -14,9 +14,9 @@ namespace Data {
         boost::property_tree::ptree ptree;
     };
 
-    Configuration::Configuration() { dmTree = std::make_unique<PTree>(); }
+    Config::Config() { dmTree = std::make_unique<PTree>(); }
 
-    Configuration::Configuration(std::string configFile) {
+    Config::Config(std::string configFile) {
         dmTree = std::make_unique<PTree>();
         std::ifstream f(configFile.c_str());
         assert((f.good(), "Valid Config File Provided"));
@@ -24,9 +24,9 @@ namespace Data {
         read_ini(configFile, this->dmTree->ptree);
     }
 
-    Configuration::~Configuration(){};
+    Config::~Config(){};
 
-    ReturnType Configuration::get(std::string str, ReturnType default_value) {
+    ReturnType Config::get(std::string str, ReturnType default_value) {
         // std::variant<int, double, float, std::string, bool, char>;
         if (std::holds_alternative<int>(default_value)) {
             return this->dmTree->ptree.get<int>(str);
@@ -46,7 +46,7 @@ namespace Data {
     // helper constant for the visitor #3
     template <class> inline constexpr bool always_false_v = false;
 
-    std::vector<ReturnType> Configuration::getVector(std::string str) {
+    std::vector<ReturnType> Config::getVector(std::string str) {
 
         try {
             std::string result =
@@ -58,8 +58,8 @@ namespace Data {
         }
     }
 
-    std::shared_ptr<ReturnType>
-    Configuration::get_optional(std::string str, ReturnType default_value) {
+    std::shared_ptr<ReturnType> Config::get_optional(std::string str,
+                                                     ReturnType default_value) {
         try {
             ReturnType val = this->get(str, default_value);
             // This is the string error check
@@ -73,8 +73,8 @@ namespace Data {
         }
     }
 
-    std::vector<ReturnType> Configuration::parse(std::string str,
-                                                 std::string delimiter) {
+    std::vector<ReturnType> Config::parse(std::string str,
+                                          std::string delimiter) {
         std::vector<ReturnType> ret_vec;
         size_t pos = 0;
         std::string token;
@@ -90,8 +90,7 @@ namespace Data {
         return ret_vec;
     }
 
-    std::vector<std::string>
-    Configuration::getSectionCategories(std::string section) {
+    std::vector<std::string> Config::getSectionCategories(std::string section) {
         boost::property_tree::ptree subTree =
             this->dmTree->ptree.get_child(section);
         std::vector<std::string> keyList;
@@ -102,7 +101,7 @@ namespace Data {
         return keyList;
     }
 
-    ReturnType Configuration::convert_type(std::string str) {
+    ReturnType Config::convert_type(std::string str) {
         char *endptr;
 
         int i_res = std::strtol(str.c_str(), &endptr, 10);

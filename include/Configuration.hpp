@@ -51,11 +51,12 @@ namespace Data {
 
     class IParseable {
     public:
+        virtual std::vector<ReturnType> parse(std::string) = 0;
         virtual std::vector<ReturnType> parse(std::string, std::string) = 0;
     };
 
     /// @brief Interface used for Configuration, provides guaranteed methods
-    class IConfigurable : public virtual IGettable, public virtual IParseable {
+    class IConfigable : public virtual IGettable, public virtual IParseable {
     public:
         virtual std::vector<std::string>
         getSectionCategories(std::string section) = 0;
@@ -63,24 +64,24 @@ namespace Data {
 
     /// @brief Type definition for an easy to use pointer to a configuration
     /// interface
-    using IConfigurationPtr = std::shared_ptr<Data::IConfigurable>;
+    using IConfigablePtr = std::shared_ptr<Data::IConfigable>;
 
     /// @brief Class describing a standard configuration file
-    class Configuration : public IConfigurable {
+    class Config : public IConfigable {
     private:
         std::unique_ptr<PTree> dmTree;
         ReturnType convert_type(std::string);
 
     public:
         /// @brief Default constructor with no file
-        Configuration();
+        Config();
 
         /// @brief Primary Constructor used with a file
         /// @param configFile string path to the config file
-        Configuration(std::string configFile);
+        Config(std::string configFile);
 
         /// @brief Default Destructor
-        ~Configuration();
+        ~Config();
 
         ReturnType get(std::string str, ReturnType default_value) override;
 
@@ -89,11 +90,15 @@ namespace Data {
         std::shared_ptr<ReturnType>
         get_optional(std::string str, ReturnType default_value) override;
 
+        std::vector<ReturnType> parse(std::string str) override {
+            return this->parse(str, ", ");
+        }
+
         /// @brief Helper function to parse a string to a vector of strings
         /// @param st string to parse
         /// @return vector of parsed strings
         std::vector<ReturnType> parse(std::string str,
-                                      std::string delimiter = ", ") override;
+                                      std::string delimiter) override;
 
         /// @brief Helper function to return all the categories belonging to the
         /// provided section
