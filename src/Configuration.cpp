@@ -27,7 +27,6 @@ namespace Data {
     Config::~Config(){};
 
     ReturnType Config::get(std::string str, ReturnType default_value) {
-        // std::variant<int, double, float, std::string, bool, char>;
         if (std::holds_alternative<int>(default_value)) {
             return this->dmTree->ptree.get<int>(str);
         } else if (std::holds_alternative<double>(default_value)) {
@@ -42,9 +41,6 @@ namespace Data {
             return this->dmTree->ptree.get<std::string>(str);
         }
     }
-
-    // helper constant for the visitor #3
-    template <class> inline constexpr bool always_false_v = false;
 
     std::vector<ReturnType> Config::getVector(std::string str) {
 
