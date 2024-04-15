@@ -108,6 +108,20 @@ TEST_F(ConfigurationTest, GetStringVector) {
     EXPECT_EQ(expected, casted_returned);
 }
 
+TEST_F(ConfigurationTest, GetStringVectorSpaces) {
+    outStream << "[section]\nvector = foo , bar , baz" << std::endl;
+    config_ptr = std::make_shared<Data::Config>(tempFilePath.string());
+    std::vector<Data::ReturnType> returned =
+        config_ptr->getVector("section.vector");
+    std::vector<std::string> casted_returned;
+    std::for_each(returned.begin(), returned.end(), [&](Data::ReturnType &n) {
+        casted_returned.push_back(std::get<std::string>(n));
+    });
+
+    std::vector<std::string> expected = {"foo", "bar", "baz"};
+    EXPECT_EQ(expected, casted_returned);
+}
+
 TEST_F(ConfigurationTest, GetIntVector) {
     outStream << "[section]\nvector = 1, 2, 3" << std::endl;
     config_ptr = std::make_shared<Data::Config>(tempFilePath.string());

@@ -92,6 +92,7 @@ namespace Data {
     private:
         std::unique_ptr<PTree> dmTree;
         ReturnType convert_type(std::string);
+        std::string trim(const std::string &str);
 
     public:
         /// @brief Default constructor with no file

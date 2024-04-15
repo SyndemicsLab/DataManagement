@@ -76,7 +76,8 @@ namespace Data {
         std::string token;
         while ((pos = str.find(delimiter)) != std::string::npos) {
             token = str.substr(0, pos);
-            ret_vec.push_back(this->convert_type(token));
+            std::string trimmed_token = trim(token);
+            ret_vec.push_back(this->convert_type(trimmed_token));
             str.erase(0, pos + delimiter.length());
             while (!str.empty() && str.at(0) == ' ') {
                 str.erase(0, 1);
@@ -118,5 +119,14 @@ namespace Data {
             return f_res;
         }
         return str;
+    }
+
+    std::string Config::trim(const std::string &str) {
+        size_t first = str.find_first_not_of(' ');
+        if (std::string::npos == first) {
+            return str;
+        }
+        size_t last = str.find_last_not_of(' ');
+        return str.substr(first, (last - first + 1));
     }
 } // namespace Data
