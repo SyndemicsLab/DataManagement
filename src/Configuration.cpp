@@ -78,6 +78,9 @@ namespace Data {
             token = str.substr(0, pos);
             ret_vec.push_back(this->convert_type(token));
             str.erase(0, pos + delimiter.length());
+            while (!str.empty() && str.at(0) == ' ') {
+                str.erase(0, 1);
+            }
         }
         if (!str.empty()) {
             ret_vec.push_back(this->convert_type(str));

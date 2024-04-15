@@ -64,7 +64,15 @@ namespace Data {
 
     class IParseable {
     public:
+        /// @brief Parse a single string to a vector
+        /// @param  string to parse
+        /// @return vector containing parsed string
         virtual std::vector<ReturnType> parse(std::string) = 0;
+
+        /// @brief Parse a single string to a vector
+        /// @param  string to parse
+        /// @param delimiter string is being parsed with
+        /// @return vector containing parsed string
         virtual std::vector<ReturnType> parse(std::string, std::string) = 0;
     };
 
@@ -104,7 +112,7 @@ namespace Data {
         get_optional(std::string str, ReturnType default_value) override;
 
         std::vector<ReturnType> parse(std::string str) override {
-            return this->parse(str, ", ");
+            return this->parse(str, ",");
         }
 
         /// @brief Helper function to parse a string to a vector of strings
