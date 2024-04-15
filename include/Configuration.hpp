@@ -19,6 +19,8 @@
 #ifndef CONFIGURATION_HPP_
 #define CONFIGURATION_HPP_
 
+#include <algorithm>
+#include <iostream>
 #include <memory>
 #include <optional>
 #include <string>
@@ -47,6 +49,17 @@ namespace Data {
         virtual std::shared_ptr<ReturnType> get_optional(std::string,
                                                          ReturnType) = 0;
         virtual std::vector<ReturnType> getVector(std::string) = 0;
+
+        [[deprecated("This function is not intended to be permanent. getVector "
+                     "will recieve future focus.")]] virtual std::vector<int>
+            getIntVector(std::string) = 0;
+        [[deprecated("This function is not intended to be permanent. getVector "
+                     "will recieve future focus.")]] virtual std::vector<double>
+            getDoubleVector(std::string) = 0;
+        [[deprecated(
+            "This function is not intended to be permanent. getVector will "
+            "recieve future focus.")]] virtual std::vector<std::string>
+            getStringVector(std::string) = 0;
     };
 
     class IParseable {
@@ -106,6 +119,40 @@ namespace Data {
         /// @return A vector of the categories avaliable
         std::vector<std::string>
         getSectionCategories(std::string section) override;
+
+        std::vector<int> getIntVector(std::string str) override {
+            std::string numbers = "";
+            numbers = std::get<std::string>(this->get(str, numbers));
+            std::vector<ReturnType> returned = this->parse(numbers);
+            std::vector<int> casted_returned = {};
+            std::for_each(returned.begin(), returned.end(), [&](ReturnType &n) {
+                casted_returned.push_back(std::get<int>(n));
+            });
+            return casted_returned;
+        }
+
+        std::vector<double> getDoubleVector(std::string str) override {
+            std::string numbers = "";
+            numbers = std::get<std::string>(this->get(str, numbers));
+            std::vector<ReturnType> returned = this->parse(numbers);
+            std::vector<double> casted_returned = {};
+            std::for_each(returned.begin(), returned.end(), [&](ReturnType &n) {
+                casted_returned.push_back(std::get<double>(n));
+            });
+            return casted_returned;
+        }
+
+        std::vector<std::string> getStringVector(std::string str) override {
+            std::string strings = "";
+            strings = std::get<std::string>(this->get(str, strings));
+            std::vector<ReturnType> returned = this->parse(strings);
+            std::vector<std::string> casted_returned;
+            std::for_each(
+                returned.begin(), returned.end(), [&](Data::ReturnType &n) {
+                    casted_returned.push_back(std::get<std::string>(n));
+                });
+            return casted_returned;
+        }
     };
 } // namespace Data
 #endif
