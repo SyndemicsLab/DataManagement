@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['parsestring2vectorofints_44',['parseString2VectorOfInts',['../classData_1_1Configuration.html#a32668f9236fa7917ccba4bc6a3e226e1',1,'Data::Configuration']]],
-  ['parsestring2vectorofstrings_45',['parseString2VectorOfStrings',['../classData_1_1Configuration.html#aedc9596e1d9517c13c898c9488732f1c',1,'Data::Configuration']]],
-  ['ptree_46',['PTree',['../classData_1_1PTree.html',1,'Data']]]
+  ['parse_44',['parse',['../classData_1_1IParseable.html#a31fd9e1bafb8a3b318ce3a97339e01af',1,'Data::IParseable::parse(std::string)=0'],['../classData_1_1IParseable.html#aa4fef9099a949ae1c502a29d9de23d35',1,'Data::IParseable::parse(std::string, std::string)=0'],['../classData_1_1Config.html#afa863c1084675ab94a79c7a854588214',1,'Data::Config::parse(std::string str) override'],['../classData_1_1Config.html#a8da27c68807fb59610a9a6a4c0433102',1,'Data::Config::parse(std::string str, std::string delimiter) override']]],
+  ['ptree_45',['PTree',['../classData_1_1PTree.html',1,'Data']]]
 ];

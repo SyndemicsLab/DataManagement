@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['iconfigurationptr_133',['IConfigurationPtr',['../namespaceData.html#a37b82a23a8a453be22d5ac4e1143a9aa',1,'Data']]]
+  ['iconfigableptr_131',['IConfigablePtr',['../namespaceData.html#abdcf24ed72cb0806a0bf49b992f7c10c',1,'Data']]]
 ];

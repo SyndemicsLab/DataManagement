@@ -1,0 +1,5 @@
+<map id="Data::IGettable" name="Data::IGettable">
+<area shape="rect" id="node1" title=" " alt="" coords="12,5,133,32"/>
+<area shape="rect" id="node2" href="$classData_1_1IConfigable.html" title="Interface used for Configuration, provides guaranteed methods." alt="" coords="5,80,140,107"/>
+<area shape="rect" id="node3" href="$classData_1_1Config.html" title="Class describing a standard configuration file." alt="" coords="21,155,124,181"/>
+</map>

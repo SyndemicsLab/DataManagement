@@ -82,7 +82,10 @@ $(function() {
 <div class="title">Configuration.hpp File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;memory&gt;</code><br />
+<div class="textblock"><code>#include &lt;algorithm&gt;</code><br />
+<code>#include &lt;iostream&gt;</code><br />
+<code>#include &lt;memory&gt;</code><br />
+<code>#include &lt;optional&gt;</code><br />
 <code>#include &lt;string&gt;</code><br />
 <code>#include &lt;variant&gt;</code><br />
 <code>#include &lt;vector&gt;</code><br />
@@ -91,11 +94,14 @@ Include dependency graph for Configuration.hpp:</div>
 <div class="dyncontent">
 <div class="center"><img src="Configuration_8hpp__incl.png" border="0" usemap="#aConfiguration_8hpp" alt=""/></div>
 <map name="aConfiguration_8hpp" id="aConfiguration_8hpp">
-<area shape="rect" title=" " alt="" coords="111,5,249,32"/>
-<area shape="rect" title=" " alt="" coords="5,80,83,107"/>
-<area shape="rect" title=" " alt="" coords="107,80,165,107"/>
-<area shape="rect" title=" " alt="" coords="190,80,258,107"/>
-<area shape="rect" title=" " alt="" coords="282,80,345,107"/>
+<area shape="rect" title=" " alt="" coords="289,5,426,32"/>
+<area shape="rect" title=" " alt="" coords="5,80,91,107"/>
+<area shape="rect" title=" " alt="" coords="115,80,195,107"/>
+<area shape="rect" title=" " alt="" coords="219,80,296,107"/>
+<area shape="rect" title=" " alt="" coords="320,80,395,107"/>
+<area shape="rect" title=" " alt="" coords="419,80,477,107"/>
+<area shape="rect" title=" " alt="" coords="502,80,570,107"/>
+<area shape="rect" title=" " alt="" coords="594,80,657,107"/>
 </map>
 </div>
 </div><div class="textblock"><div class="dynheader">
@@ -112,11 +118,15 @@ This graph shows which files directly or indirectly include this file:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classData_1_1IConfiguration.html">Data::IConfiguration</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Interface used for <a class="el" href="classData_1_1Configuration.html" title="Class describing a standard configuration file.">Configuration</a>, provides guaranteed methods.  <a href="classData_1_1IConfiguration.html#details">More...</a><br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classData_1_1IGettable.html">Data::IGettable</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classData_1_1Configuration.html">Data::Configuration</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Class describing a standard configuration file.  <a href="classData_1_1Configuration.html#details">More...</a><br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classData_1_1IParseable.html">Data::IParseable</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classData_1_1IConfigable.html">Data::IConfigable</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Interface used for Configuration, provides guaranteed methods.  <a href="classData_1_1IConfigable.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classData_1_1Config.html">Data::Config</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Class describing a standard configuration file.  <a href="classData_1_1Config.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
@@ -127,10 +137,13 @@ Namespaces</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
-<tr class="memitem:a37b82a23a8a453be22d5ac4e1143a9aa"><td class="memItemLeft" align="right" valign="top"><a id="a37b82a23a8a453be22d5ac4e1143a9aa"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceData.html#a37b82a23a8a453be22d5ac4e1143a9aa">Data::IConfigurationPtr</a> = std::shared_ptr&lt; <a class="el" href="classData_1_1IConfiguration.html">Data::IConfiguration</a> &gt;</td></tr>
-<tr class="memdesc:a37b82a23a8a453be22d5ac4e1143a9aa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Type definition for an easy to use pointer to a configuration interface. <br /></td></tr>
-<tr class="separator:a37b82a23a8a453be22d5ac4e1143a9aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a562fb753ced0c2b2399aa2dcdd5493f6"><td class="memItemLeft" align="right" valign="top"><a id="a562fb753ced0c2b2399aa2dcdd5493f6"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>Data::ReturnType</b> = std::variant&lt; int, double, float, std::string, bool, char &gt;</td></tr>
+<tr class="separator:a562fb753ced0c2b2399aa2dcdd5493f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abdcf24ed72cb0806a0bf49b992f7c10c"><td class="memItemLeft" align="right" valign="top"><a id="abdcf24ed72cb0806a0bf49b992f7c10c"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceData.html#abdcf24ed72cb0806a0bf49b992f7c10c">Data::IConfigablePtr</a> = std::shared_ptr&lt; <a class="el" href="classData_1_1IConfigable.html">Data::IConfigable</a> &gt;</td></tr>
+<tr class="memdesc:abdcf24ed72cb0806a0bf49b992f7c10c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Type definition for an easy to use pointer to a configuration interface. <br /></td></tr>
+<tr class="separator:abdcf24ed72cb0806a0bf49b992f7c10c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>This file contains the definition of the Configuration interface and base class. In addition to the class definitions, a typedef is provded to utilize a pointer of the Configuration object.</p>

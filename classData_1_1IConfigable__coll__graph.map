@@ -1,0 +1,5 @@
+<map id="Data::IConfigable" name="Data::IConfigable">
+<area shape="rect" id="node1" title="Interface used for Configuration, provides guaranteed methods." alt="" coords="73,80,208,107"/>
+<area shape="rect" id="node2" href="$classData_1_1IGettable.html" title=" " alt="" coords="5,5,127,32"/>
+<area shape="rect" id="node3" href="$classData_1_1IParseable.html" title=" " alt="" coords="151,5,279,32"/>
+</map>

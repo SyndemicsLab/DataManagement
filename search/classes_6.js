@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['writer_78',['Writer',['../classData_1_1Writer.html',1,'Data']]]
+  ['writer_79',['Writer',['../classData_1_1Writer.html',1,'Data']]]
 ];
