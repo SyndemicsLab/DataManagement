@@ -732,6 +732,54 @@ TEST_F(DataTableTest, selectWhereMultiSelect) {
     }
 }
 
+TEST_F(DataTableTest, TableEmpty) {
+    std::map<std::string, std::vector<std::string>> test;
+    test["foo"] = {};
+    test["bar"] = {};
+    test["baz"] = {};
+
+    Data::DataTableShape shape;
+    shape.setNCols(3);
+    shape.setNRows(0);
+
+    std::vector<std::string> headerOrder = {"foo", "bar", "baz"};
+
+    Data::DataTable dt(test, shape, headerOrder);
+    EXPECT_TRUE(dt.empty());
+}
+
+TEST_F(DataTableTest, TableEmptyAfterJoin) {
+    std::vector<std::string> headerOrder1 = {"id", "test1", "test2", "test3"};
+    std::map<std::string, std::vector<std::string>> d1;
+    d1["id"] = {"1", "2", "2"};
+    d1["test1"] = {"hi1.1", "hi2.1", "hi3.1"};
+    d1["test2"] = {"hi1.2", "hi2.2", "hi3.2"};
+    d1["test3"] = {"hi1.3", "hi2.3", "hi3.3"};
+
+    Data::DataTableShape shape1;
+    shape1.setNCols(4);
+    shape1.setNRows(3);
+
+    std::vector<std::string> headerOrder2 = {"id", "test4", "test5", "test6"};
+    std::map<std::string, std::vector<std::string>> d2;
+    d2["id"] = {"1", "2", "3"};
+    d2["test4"] = {"hi1.4", "hi2.4", "hi3.4"};
+    d2["test5"] = {"hi1.5", "hi2.5", "hi3.5"};
+    d2["test6"] = {"hi1.6", "hi2.6", "hi3.6"};
+
+    Data::DataTableShape shape2;
+    shape2.setNCols(4);
+    shape2.setNRows(3);
+
+    Data::DataTable dt1(d1, shape1, headerOrder1);
+    Data::IDataTablePtr dt2 =
+        std::make_shared<Data::DataTable>(d2, shape2, headerOrder2);
+
+    Data::IDataTablePtr resultTable = dt1.innerJoin(dt2, "test1", "test4");
+
+    EXPECT_TRUE(resultTable->empty());
+}
+
 TEST_F(DataTableTest, innerJoin) {
     std::vector<std::string> headerOrder1 = {"id", "test1", "test2", "test3"};
     std::map<std::string, std::vector<std::string>> d1;
