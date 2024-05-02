@@ -566,8 +566,8 @@ namespace Data {
         DataTableShape getShape() const override { return shape; }
 
         /// @brief Test if the table is empty
-        /// @return true if empty, false if contains data
-        bool empty() const override { return this->data.empty(); }
+        /// @return true if no rows, false if contains data
+        bool empty() const override { return (this->nrows() == 0); }
     };
 } // namespace Data
 
