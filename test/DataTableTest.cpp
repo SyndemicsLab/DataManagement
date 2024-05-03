@@ -780,6 +780,11 @@ TEST_F(DataTableTest, TableEmptyAfterJoin) {
     EXPECT_TRUE(resultTable->empty());
 }
 
+TEST_F(DataTableTest, TableNull) {
+    Data::DataTable dt;
+    EXPECT_TRUE(dt.isNull());
+}
+
 TEST_F(DataTableTest, innerJoin) {
     std::vector<std::string> headerOrder1 = {"id", "test1", "test2", "test3"};
     std::map<std::string, std::vector<std::string>> d1;

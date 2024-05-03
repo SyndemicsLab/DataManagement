@@ -212,6 +212,8 @@ namespace Data {
         virtual DataTableShape getShape() const = 0;
 
         virtual bool empty() const = 0;
+
+        virtual bool isNull() const = 0;
     };
 
     using IDataTablePtr = std::shared_ptr<Data::IDataTable>;
@@ -568,6 +570,10 @@ namespace Data {
         /// @brief Test if the table is empty
         /// @return true if no rows, false if contains data
         bool empty() const override { return (this->nrows() == 0); }
+
+        /// @brief Test if the table contains no data at all
+        /// @return true if `this->data` is empty, false otherwise
+        bool isNull() const override { return this->data.empty(); }
     };
 } // namespace Data
 
