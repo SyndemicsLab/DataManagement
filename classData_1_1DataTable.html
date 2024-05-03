@@ -254,6 +254,9 @@ std::shared_ptr&lt; <a class="el" href="classData_1_1IDataTable.html">IDataTable
 <tr class="memitem:a6b63e7bd4d0990ec5fbc3585a044da56"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classData_1_1DataTable.html#a6b63e7bd4d0990ec5fbc3585a044da56">empty</a> () const override</td></tr>
 <tr class="memdesc:a6b63e7bd4d0990ec5fbc3585a044da56"><td class="mdescLeft">&#160;</td><td class="mdescRight">Test if the table is empty.  <a href="classData_1_1DataTable.html#a6b63e7bd4d0990ec5fbc3585a044da56">More...</a><br /></td></tr>
 <tr class="separator:a6b63e7bd4d0990ec5fbc3585a044da56"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae9c70a9a237e1f91ca04ed0b02e584bd"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classData_1_1DataTable.html#ae9c70a9a237e1f91ca04ed0b02e584bd">isNull</a> () const override</td></tr>
+<tr class="memdesc:ae9c70a9a237e1f91ca04ed0b02e584bd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Test if the table contains no data at all.  <a href="classData_1_1DataTable.html#ae9c70a9a237e1f91ca04ed0b02e584bd">More...</a><br /></td></tr>
+<tr class="separator:ae9c70a9a237e1f91ca04ed0b02e584bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
 Friends</h2></td></tr>
@@ -931,6 +934,36 @@ Friends</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Copy of the joined DataTables </dd></dl>
+
+<p>Implements <a class="el" href="classData_1_1IDataTable.html">Data::IDataTable</a>.</p>
+
+</div>
+</div>
+<a id="ae9c70a9a237e1f91ca04ed0b02e584bd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae9c70a9a237e1f91ca04ed0b02e584bd">&#9670;&nbsp;</a></span>isNull()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool Data::DataTable::isNull </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Test if the table contains no data at all. </p>
+<dl class="section return"><dt>Returns</dt><dd>true if <code>this-&gt;data</code> is empty, false otherwise </dd></dl>
 
 <p>Implements <a class="el" href="classData_1_1IDataTable.html">Data::IDataTable</a>.</p>
 
