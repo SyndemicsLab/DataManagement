@@ -123,18 +123,24 @@ namespace Data {
     void DataTable::toCSV(const std::string &filename) const {
         std::ofstream csvFile(filename);
         if (!csvFile) {
-            throw std::runtime_error("Error: Could notopen file '" + filename +
+            throw std::runtime_error("Error: Could not open file '" + filename +
                                      "'.");
         }
 
         for (std::string head : this->headerOrder) {
-            csvFile << head << ",";
+            csvFile << head;
+            if (head != this->headerOrder.back()) {
+                csvFile << ",";
+            }
         }
         csvFile << std::endl;
 
         for (int rowIdx = 0; rowIdx < this->shape.getNRows(); ++rowIdx) {
             for (std::string head : this->headerOrder) {
-                csvFile << this->data.at(head)[rowIdx] << ",";
+                csvFile << this->data.at(head)[rowIdx];
+                if (head != this->headerOrder.back()) {
+                    csvFile << ",";
+                }
             }
             csvFile << std::endl;
         }
