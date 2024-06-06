@@ -13,10 +13,13 @@ env:
 
 jobs:
     build:
+        strategy:
+            matrix:
+                os: [ubuntu-latest, macos-latest]
         name: Build Release
-        runs-on: ubuntu-latest
+        runs-on: ${{ matrix.os }}
         steps:
-            - name: Ubuntu Checkout
+            - name: Checkout
               uses: actions/checkout@v3
             
             - name: Install Boost
@@ -39,13 +42,13 @@ jobs:
               run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
             - name: Install DataManagement
-              run: cmake --install ${{github.workspace}}/build/ --prefix "dminstall"
+              run: cmake --install ${{github.workspace}}/build/ --prefix "dminstall-${{ matrix.os }}"
 
             - name: Zip DataManagement
               run: zip -r dminstall.zip "dminstall"
 
             - name: Release and Upload
-              run: gh release upload ${{github.event.release.tag_name}} dminstall.zip
+              run: gh release upload ${{github.event.release.tag_name}} dminstall-${{ matrix.os }}.zip
               env:
                 GITHUB_TOKEN: ${{ github.TOKEN }}
               shell: bash
