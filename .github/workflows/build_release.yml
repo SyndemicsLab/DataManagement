@@ -47,7 +47,7 @@ jobs:
               run: cmake --install ${{github.workspace}}/build/ --prefix "dminstall-${{ matrix.os }}"
 
             - name: Zip DataManagement
-              run: zip -r dminstall.zip "dminstall-${{ matrix.os }}"
+              run: zip -r dminstall-${{ matrix.os }}.zip "dminstall-${{ matrix.os }}"
 
             - name: Fetch Latest Release Version
               id: fetch-latest-release
