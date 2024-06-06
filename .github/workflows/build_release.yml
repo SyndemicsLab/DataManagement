@@ -1,6 +1,9 @@
 name: Build and Upload Release
 
 on:
+    workflow_dispatch:
+        branches: 
+            - main
     release:
         types: [published]
 
