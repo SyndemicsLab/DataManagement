@@ -47,10 +47,14 @@ jobs:
               run: cmake --install ${{github.workspace}}/build/ --prefix "dminstall-${{ matrix.os }}"
 
             - name: Zip DataManagement
-              run: zip -r dminstall.zip "dminstall"
+              run: zip -r dminstall.zip "dminstall-${{ matrix.os }}"
+
+            - name: Fetch Latest Release Version
+              id: fetch-latest-release
+              uses: reloc8/action-latest-release-version@1.0.0
 
             - name: Release and Upload
-              run: gh release upload ${{github.event.release.tag_name}} dminstall-${{ matrix.os }}.zip
+              run: gh release upload ${{ steps.fetch-latest-release.outputs.latest-release }} dminstall-${{ matrix.os }}.zip
               env:
                 GITHUB_TOKEN: ${{ github.TOKEN }}
               shell: bash
