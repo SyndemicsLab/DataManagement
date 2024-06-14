@@ -221,6 +221,8 @@ namespace Data {
     /// @brief Class for Containing data in a row by column table format
     class DataTable : public IDataTable {
     private:
+        bool loaded = false;
+        std::string filename = "";
         std::vector<std::string> headerOrder;
         std::map<std::string, std::vector<std::string>> data;
         DataTableShape shape;
@@ -250,6 +252,8 @@ namespace Data {
 
         std::vector<std::string> loadRows(std::ifstream &csvStream);
 
+        std::string loadRow(unsigned int lineNum) const;
+
         template <typename T>
         void split(const std::string &s, char delim, T result) {
             std::istringstream iss(s);
@@ -276,7 +280,10 @@ namespace Data {
         /// @param hasHeaders flag to read headers. False if no headers in file
         /// @param delim Signal character that separates the data
         DataTable(const std::string &filename, bool hasHeaders = true,
-                  char delim = ',');
+                  char delim = ',', bool lazyLoad = false);
+
+        DataTable(const std::string &filename, bool lazyLoad = false)
+            : DataTable(filename, false, ',', lazyLoad) {}
 
         /// @brief Constructor used to load an SQL Table to a DataTable
         /// @param dbfile file path to the database file
