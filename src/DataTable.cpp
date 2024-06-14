@@ -17,11 +17,16 @@ namespace Data {
     }
 
     DataTable::DataTable(const std::string &filename, bool hasHeaders,
-                         char delim) {
+                         char delim, bool lazyLoad) {
+        this->filename = filename;
+        if (lazyLoad) {
+            return;
+        }
         if (!this->fromCSV(filename, hasHeaders, delim)) {
             throw std::invalid_argument("File " + filename +
                                         " could not be found!");
         }
+        this->loaded = true;
     }
 
     DataTable::DataTable(const std::string &dbfile,
@@ -66,6 +71,20 @@ namespace Data {
             contents.push_back(line);
         }
         return contents;
+    }
+
+    std::string DataTable::loadRow(unsigned int lineNum) const {
+        std::ifstream file(this->filename);
+        if (!file) {
+            return "";
+        }
+        file.seekg(std::ios::beg);
+        for (int i = 0; i < lineNum - 1; ++i) {
+            file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        }
+        std::string result;
+        std::getline(file, result);
+        return result;
     }
 
     bool DataTable::fromCSV(const std::string &filename, bool hasHeaders,
@@ -148,6 +167,9 @@ namespace Data {
     }
 
     std::shared_ptr<IDataTable> DataTable::getRow(int row) const {
+        if (!this->loaded) {
+            this->loadRow(row);
+        }
         rowErrorCheck(row);
         std::map<std::string, std::vector<std::string>> newData;
         for (auto kv : this->data) {
