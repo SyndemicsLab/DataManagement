@@ -59,7 +59,7 @@ done
     $BUILDCOMMAND
     cmake --build build
     cmake --install build --prefix "$PREFIX"
-    if [[ -n "$BUILD_TESTS" ]]; then
-	build/test/dataTests
+    if [[ -n "$BUILD_TESTS" && -f "bin/dataTests" ]]; then
+	bin/dataTests
     fi
 )
