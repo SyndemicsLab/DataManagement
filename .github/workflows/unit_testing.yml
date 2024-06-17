@@ -46,7 +46,7 @@ jobs:
 
     - name: Test
       working-directory: ${{github.workspace}}/build
-      run: './test/dataTests'
+      run: './bin/dataTests'
 
 #   windows-build:
 #     # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
