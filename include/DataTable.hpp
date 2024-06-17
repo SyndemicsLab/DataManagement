@@ -282,10 +282,6 @@ namespace Data {
         DataTable(const std::string &filename, bool hasHeaders = true,
                   char delim = ',', bool lazyLoad = false);
 
-        DataTable(const std::string &filename, bool hasHeaders = true,
-                  bool lazyLoad = false)
-            : DataTable(filename, hasHeaders, ',', lazyLoad) {}
-
         /// @brief Constructor used to load an SQL Table to a DataTable
         /// @param dbfile file path to the database file
         /// @param tablename Table name to search for in the database
