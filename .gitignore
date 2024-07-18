@@ -15,4 +15,7 @@ docs/
 build/*
 !build/.gitkeep
 _install/
-bin/
+
+!.gitkeep
+lib/*
+bin/*
