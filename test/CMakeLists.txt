@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
+cmake_policy(SET CMP0144 NEW)
 project(dataTests)
 
 set(BOOST_ROOT "$ENV{BOOST_ROOT}")
