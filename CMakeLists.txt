@@ -27,10 +27,7 @@ endif()
 add_library(${PROJECT_NAME} ${LIB_TYPE}
 )
 
-set(BOOST_ROOT "$ENV{BOOST_ROOT}")
-set(BOOST_INCLUDEDIR "$ENV{BOOST_ROOT}/include")
-set(BOOST_LIBRARYDIR "$ENV{BOOST_ROOT}/lib")
-set(Boost_NO_SYSTEM_PATHS ON)
+set(Boost_DIR "$ENV{BOOST_ROOT}")
 find_package(Boost CONFIG REQUIRED COMPONENTS filesystem)
 
 set(PRIVATE_SOURCE_LIST
