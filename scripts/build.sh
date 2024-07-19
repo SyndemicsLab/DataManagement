@@ -96,6 +96,7 @@ done
 
         # run the full build command as specified
 	$CMAKE_COMMAND
+	# catch the error if build fails
 	ERROR_CODE="$?"
         if [[ "$ERROR_CODE" -ne "0" ]]; then
 	    echo "Build failed. Exiting with error code $ERROR_CODE..."
