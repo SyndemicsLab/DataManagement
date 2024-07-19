@@ -34,7 +34,7 @@ jobs:
 
     - name: Build and Test
       working-directory: ${{github.workspace}}
-      run: BOOST_INCLUDE_DIR="$BOOST_ROOT" ./scripts/build.sh -p
+      run: Boost_INCLUDE_DIR="$BOOST_ROOT" ./scripts/build.sh -p
 
 #   windows-build:
 #     # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
