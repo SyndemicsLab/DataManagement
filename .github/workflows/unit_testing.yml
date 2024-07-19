@@ -19,10 +19,10 @@ jobs:
     # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Install Boost
-      uses: MarkusJx/install-boost@v2.4.4
+      uses: MarkusJx/install-boost@v2.4.5
       id: install-boost
       with:
         boost_version: 1.82.0
@@ -34,7 +34,8 @@ jobs:
 
     - name: Build and Test
       working-directory: ${{github.workspace}}
-      run: ./scripts/build.sh -p
+      shell: bash {0}
+      run: BOOST_ROOT="${{ steps.install-boost.outputs.BOOST_ROOT }}" ./scripts/build.sh -p
 
 #   windows-build:
 #     # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.

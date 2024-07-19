@@ -31,7 +31,7 @@ BUILD_SHARED_LIBRARY=""
 BUILD_STATIC_LIBRARY="ON"
 
 # process optional command line flags
-while getopts ":hnptal:" option; do
+while getopts ":hnptl:" option; do
     case $option in
         h)
             showhelp
@@ -95,7 +95,13 @@ done
         fi
 
         # run the full build command as specified
-        $CMAKE_COMMAND
+	$CMAKE_COMMAND
+	# catch the error if build fails
+	ERROR_CODE="$?"
+        if [[ "$ERROR_CODE" -ne "0" ]]; then
+	    echo "Build failed. Exiting with error code $ERROR_CODE..."
+	    exit "$ERROR_CODE"
+	fi
         (
             # determine the number of processing units available
             CORES="$(nproc --all)"
