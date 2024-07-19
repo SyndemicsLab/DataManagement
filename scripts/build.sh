@@ -100,7 +100,7 @@ done
             # determine the number of processing units available
             CORES="$(nproc --all)"
             # if CORES > 1 compile in parallel where possible
-            ([[ -n "$CORES" ]] && cmake --build . -j"$CORES" --target install) || cmake --build .  --target install
+            ([[ -n "$CORES" ]] && cmake --build . -j"$CORES") || cmake --build .
         )
         # run tests, if they built properly
     )
