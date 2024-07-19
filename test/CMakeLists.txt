@@ -5,7 +5,7 @@ set(BOOST_ROOT "$ENV{BOOST_ROOT}")
 set(BOOST_INCLUDEDIR "$ENV{BOOST_ROOT}/include")
 set(BOOST_LIBRARYDIR "$ENV{BOOST_ROOT}/lib")
 
-find_package(Boost REQUIRED COMPONENTS filesystem)
+find_package(Boost CONFIG REQUIRED COMPONENTS filesystem)
 find_package(GTest REQUIRED)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../bin)
