@@ -17,7 +17,7 @@ if(BUILD_TESTS STREQUAL ON)
     add_subdirectory(test)
 endif()
 
-option(BUILD_STATIC_LIBRARY "build static library" OFF)
+option(BUILD_STATIC_LIBRARY "build static library" ON)
 if(BUILD_STATIC_LIBRARY STREQUAL ON)
     set(LIB_TYPE STATIC)
 else()
@@ -102,50 +102,50 @@ target_include_directories(${PROJECT_NAME}
 # install(TARGETS ${PROJECT_NAME} FILE_SET HEADERS EXPORT ${PROJECT_NAME}Targets)
 
 # Add a suffix for debug versions
-set_target_properties(${PROJECT_NAME} PROPERTIES DEBUG_POSTFIX "d")
+# set_target_properties(${PROJECT_NAME} PROPERTIES DEBUG_POSTFIX "d")
 
-install(TARGETS ${PROJECT_NAME}
-    EXPORT "${PROJECT_NAME}Targets"
-    FILE_SET headers
-    # These get default values from GNUInstallDirs, no need to set them
-    # RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} # bin
-    # LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} # lib
-    # ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} # lib
-    # except for public headers, as we want them to be inside a library folder
-    # PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME} # include/MyLibrary
-    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} # include/MyLibrary
-)
+# install(TARGETS ${PROJECT_NAME}
+#     EXPORT "${PROJECT_NAME}Targets"
+#     FILE_SET headers
+#     # These get default values from GNUInstallDirs, no need to set them
+#     # RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} # bin
+#     # LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} # lib
+#     # ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} # lib
+#     # except for public headers, as we want them to be inside a library folder
+#     # PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME} # include/MyLibrary
+#     INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} # include/MyLibrary
+# )
 
-install(EXPORT "${PROJECT_NAME}Targets"
-    FILE "${PROJECT_NAME}Targets.cmake"
-    NAMESPACE ${namespace}::
-    DESTINATION cmake)
+# install(EXPORT "${PROJECT_NAME}Targets"
+#     FILE "${PROJECT_NAME}Targets.cmake"
+#     NAMESPACE ${namespace}::
+#     DESTINATION cmake)
 
-include(CMakePackageConfigHelpers)
+# include(CMakePackageConfigHelpers)
 
-set(INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_INCLUDEDIR}/dminstall/include
-    CACHE PATH "Location of header files" )
-set(LIB_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR}/dminstall/lib
-    CACHE PATH "Location of library files" )
+# set(INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_INCLUDEDIR}/dminstall/include
+#     CACHE PATH "Location of header files" )
+# set(LIB_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR}/dminstall/lib
+#     CACHE PATH "Location of library files" )
 
-configure_package_config_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
-    ${PROJECT_NAME}Config.cmake
-    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake
-    PATH_VARS INCLUDE_INSTALL_DIR LIB_INSTALL_DIR
-)
+# configure_package_config_file(
+#     ${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
+#     ${PROJECT_NAME}Config.cmake
+#     INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake
+#     PATH_VARS INCLUDE_INSTALL_DIR LIB_INSTALL_DIR
+# )
 
-write_basic_package_version_file(
-    ${PROJECT_NAME}Config-version.cmake
-    VERSION ${PROJECT_VERSION}
-    COMPATIBILITY AnyNewerVersion
-)
+# write_basic_package_version_file(
+#     ${PROJECT_NAME}Config-version.cmake
+#     VERSION ${PROJECT_VERSION}
+#     COMPATIBILITY AnyNewerVersion
+# )
 
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
-                ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config-version.cmake
-    DESTINATION cmake)
+# install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+#                 ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config-version.cmake
+#     DESTINATION cmake)
 
-message(STATUS "CMAKE_CURRENT_LIST_DIR : ${CMAKE_CURRENT_LIST_DIR}")
+# message(STATUS "CMAKE_CURRENT_LIST_DIR : ${CMAKE_CURRENT_LIST_DIR}")
 
 
 
