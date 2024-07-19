@@ -96,8 +96,9 @@ done
 
         # run the full build command as specified
         if ! $CMAKE_COMMAND; then
+	    ERROR_CODE="$?"
 	    echo "Build failed. Exiting..."
-	    exit "$?"
+	    exit "$ERROR_CODE"
 	fi
         (
             # determine the number of processing units available
