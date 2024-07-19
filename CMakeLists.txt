@@ -28,6 +28,7 @@ add_library(${PROJECT_NAME} ${LIB_TYPE}
 )
 
 set(Boost_DIR "$ENV{BOOST_ROOT}")
+message("The value of BOOST_ROOT is $ENV{BOOST_ROOT}")
 find_package(Boost CONFIG REQUIRED COMPONENTS filesystem)
 
 set(PRIVATE_SOURCE_LIST
