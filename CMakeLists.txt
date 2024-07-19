@@ -27,7 +27,7 @@ endif()
 add_library(${PROJECT_NAME} ${LIB_TYPE}
 )
 
-find_package(Boost REQUIRED COMPONENTS filesystem)
+find_package(Boost CONFIG REQUIRED COMPONENTS filesystem)
 
 set(PRIVATE_SOURCE_LIST
     ${PROJECT_SOURCE_DIR}/src/DataTable.cpp
@@ -150,5 +150,3 @@ target_include_directories(${PROJECT_NAME}
 
 
 ##################################################################################
-
-
