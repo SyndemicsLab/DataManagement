@@ -3,7 +3,6 @@ cmake_policy(SET CMP0144 NEW)
 project(dataTests)
 
 set(BOOST_ROOT "$ENV{BOOST_ROOT}")
-message("The value of BOOST_ROOT is $ENV{BOOST_ROOT}")
 find_package(Boost CONFIG REQUIRED COMPONENTS filesystem)
 find_package(GTest REQUIRED)
 
