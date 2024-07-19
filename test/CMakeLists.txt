@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.20)
 project(dataTests)
 
+set(BOOST_ROOT "$ENV{BOOST_ROOT}")
+set(BOOST_INCLUDEDIR "$ENV{BOOST_ROOT}/include")
+set(BOOST_LIBRARYDIR "$ENV{BOOST_ROOT}/lib")
+
 find_package(Boost REQUIRED COMPONENTS filesystem)
 find_package(GTest REQUIRED)
 
