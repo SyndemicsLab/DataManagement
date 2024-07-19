@@ -31,7 +31,7 @@ BUILD_SHARED_LIBRARY=""
 BUILD_STATIC_LIBRARY="ON"
 
 # process optional command line flags
-while getopts ":hnptal:" option; do
+while getopts ":hnptl:" option; do
     case $option in
         h)
             showhelp
@@ -97,7 +97,7 @@ done
         # run the full build command as specified
         if ! $CMAKE_COMMAND; then
 	    echo "Build failed. Exiting..."
-	    exit 1
+	    exit "$?"
 	fi
         (
             # determine the number of processing units available
