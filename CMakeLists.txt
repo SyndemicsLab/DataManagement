@@ -24,7 +24,8 @@ else()
     set(LIB_TYPE SHARED)
 endif()
 
-add_library(${PROJECT_NAME} ${LIB_TYPE})
+add_library(${PROJECT_NAME} ${LIB_TYPE}
+)
 
 find_package(Boost REQUIRED COMPONENTS filesystem)
 
@@ -68,7 +69,7 @@ if(DEFINED CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
         "Will set it to ${CMAKE_SOURCE_DIR}/install"
     )
     set(CMAKE_INSTALL_PREFIX
-        "${CMAKE_SOURCE_DIR}/install"
+        "${CMAKE_SOURCE_DIR}/../RESPONDSimulationv2/lib/dminstall"
         CACHE PATH "Where the library will be installed to" FORCE
     )
 else()
@@ -118,6 +119,30 @@ install(TARGETS ${PROJECT_NAME}
 install(EXPORT "${PROJECT_NAME}Targets"
     FILE "${PROJECT_NAME}Targets.cmake"
     NAMESPACE ${namespace}::
+    DESTINATION cmake)
+
+include(CMakePackageConfigHelpers)
+
+set(INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_INCLUDEDIR}/dminstall/include
+    CACHE PATH "Location of header files" )
+set(LIB_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR}/dminstall/lib
+    CACHE PATH "Location of library files" )
+
+configure_package_config_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
+    ${PROJECT_NAME}Config.cmake
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake
+    PATH_VARS INCLUDE_INSTALL_DIR LIB_INSTALL_DIR
+)
+
+write_basic_package_version_file(
+    ${PROJECT_NAME}Config-version.cmake
+    VERSION ${PROJECT_VERSION}
+    COMPATIBILITY AnyNewerVersion
+)
+
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+                ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config-version.cmake
     DESTINATION cmake)
 
 message(STATUS "CMAKE_CURRENT_LIST_DIR : ${CMAKE_CURRENT_LIST_DIR}")

@@ -24,7 +24,7 @@ showhelp () {
 }
 
 # set default build type
-BUILDTYPE="Debug"
+BUILDTYPE="Release"
 BUILD_TESTS=""
 BUILD_BENCHMARK=""
 BUILD_SHARED_LIBRARY=""
