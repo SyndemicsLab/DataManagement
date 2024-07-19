@@ -95,7 +95,10 @@ done
         fi
 
         # run the full build command as specified
-        $CMAKE_COMMAND
+        if ! $CMAKE_COMMAND; then
+	    echo "Build failed. Exiting..."
+	    exit 1
+	fi
         (
             # determine the number of processing units available
             CORES="$(nproc --all)"
