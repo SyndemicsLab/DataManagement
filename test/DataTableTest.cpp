@@ -1,5 +1,5 @@
 #include "../include/DataTable.hpp"
-#include <boost/filesystem.hpp>
+#include <filesystem>
 #include <fstream>
 #include <gtest/gtest.h>
 #include <memory>
@@ -8,16 +8,12 @@
 
 class DataTableTest : public ::testing::Test {
 protected:
-    boost::filesystem::path mTempFileRelative;
-    boost::filesystem::path mTempFileAbsolute;
+    std::filesystem::path tempFilePath = std::filesystem::temp_directory_path();
     std::ofstream outStream;
 
     void SetUp() override {
-        mTempFileRelative =
-            boost::filesystem::unique_path("%%%%_%%%%_%%%%_%%%%.csv");
-        mTempFileAbsolute =
-            boost::filesystem::temp_directory_path() / mTempFileRelative;
-        outStream.open(mTempFileAbsolute);
+        tempFilePath /= std::tmpnam(nullptr) + std::string(".conf");
+        outStream.open(tempFilePath);
     }
 
     void TearDown() override {
@@ -35,7 +31,7 @@ TEST_F(DataTableTest, ReadFromCSVHeader) {
         outStream.close();
 
         Data::DataTable dt;
-        std::string tFilePath = mTempFileAbsolute.string();
+        std::string tFilePath = tempFilePath.string();
         bool res = dt.fromCSV(tFilePath, true);
         std::vector<std::string> headers = dt.getHeaders();
 
@@ -56,7 +52,7 @@ TEST_F(DataTableTest, ReadFromCSVNoHeader) {
         outStream.close();
 
         Data::DataTable dt;
-        std::string tFilePath = mTempFileAbsolute.string();
+        std::string tFilePath = tempFilePath.string();
         bool res = dt.fromCSV(tFilePath, false);
         std::vector<std::string> headers = dt.getHeaders();
         std::vector<std::vector<std::string>> data = dt.getData();
@@ -80,7 +76,7 @@ TEST_F(DataTableTest, ReadFromCSVQuotedContents) {
         outStream.close();
 
         Data::DataTable dt;
-        std::string tFilePath = mTempFileAbsolute.string();
+        std::string tFilePath = tempFilePath.string();
         bool res = dt.fromCSV(tFilePath, true);
         std::vector<std::string> headers = dt.getHeaders();
         std::vector<std::vector<std::string>> data = dt.getData();
@@ -104,7 +100,7 @@ TEST_F(DataTableTest, ReadFromCSVSpacesInContents) {
         outStream.close();
 
         Data::DataTable dt;
-        std::string tFilePath = mTempFileAbsolute.string();
+        std::string tFilePath = tempFilePath.string();
         bool res = dt.fromCSV(tFilePath, false);
         std::vector<std::string> headers = dt.getHeaders();
         std::vector<std::vector<std::string>> data = dt.getData();
@@ -127,7 +123,7 @@ TEST_F(DataTableTest, ReadFromCSVHeaderDelimiter) {
         outStream.close();
 
         Data::DataTable dt;
-        std::string tFilePath = mTempFileAbsolute.string();
+        std::string tFilePath = tempFilePath.string();
         bool res = dt.fromCSV(tFilePath, true, ';');
         std::vector<std::string> headers = dt.getHeaders();
         std::vector<std::vector<std::string>> data = dt.getData();
@@ -149,7 +145,7 @@ TEST_F(DataTableTest, GetRow) {
         outStream.close();
 
         Data::DataTable dt;
-        std::string tFilePath = mTempFileAbsolute.string();
+        std::string tFilePath = tempFilePath.string();
         dt.fromCSV(tFilePath, true);
         Data::IDataTablePtr data = dt.getRow(1);
 
@@ -170,7 +166,7 @@ TEST_F(DataTableTest, GetColumnString) {
         outStream.close();
 
         Data::DataTable dt;
-        std::string tFilePath = mTempFileAbsolute.string();
+        std::string tFilePath = tempFilePath.string();
         dt.fromCSV(tFilePath, true);
         std::vector<std::string> data = dt.getColumn("Test2");
 
@@ -191,7 +187,7 @@ TEST_F(DataTableTest, selectColumnsStrings) {
         outStream.close();
 
         Data::DataTable dt;
-        std::string tFilePath = mTempFileAbsolute.string();
+        std::string tFilePath = tempFilePath.string();
         dt.fromCSV(tFilePath, true);
         std::vector<std::string> columnNames = {"Test1", "Test2"};
         Data::IDataTablePtr resultDT = dt.selectColumns(columnNames);
@@ -214,7 +210,7 @@ TEST_F(DataTableTest, selectRowsInt) {
         outStream.close();
 
         Data::DataTable dt;
-        std::string tFilePath = mTempFileAbsolute.string();
+        std::string tFilePath = tempFilePath.string();
         dt.fromCSV(tFilePath, true);
         Data::IDataTablePtr resultDT = dt.selectRows({0, 2});
 
@@ -237,7 +233,7 @@ TEST_F(DataTableTest, selectRowRange) {
         outStream.close();
 
         Data::DataTable dt;
-        std::string tFilePath = mTempFileAbsolute.string();
+        std::string tFilePath = tempFilePath.string();
         dt.fromCSV(tFilePath, true);
         Data::IDataTablePtr resultDT = dt.selectRowRange(1, 3);
 
@@ -260,7 +256,7 @@ TEST_F(DataTableTest, selectTopNRows) {
         outStream.close();
 
         Data::DataTable dt;
-        std::string tFilePath = mTempFileAbsolute.string();
+        std::string tFilePath = tempFilePath.string();
         dt.fromCSV(tFilePath, true);
         Data::IDataTablePtr resultDT = dt.topNRows(2);
 
@@ -283,7 +279,7 @@ TEST_F(DataTableTest, selectBottomNRows) {
         outStream.close();
 
         Data::DataTable dt;
-        std::string tFilePath = mTempFileAbsolute.string();
+        std::string tFilePath = tempFilePath.string();
         dt.fromCSV(tFilePath, true);
         Data::IDataTablePtr resultDT = dt.bottomNRows(2);
 
@@ -309,7 +305,7 @@ TEST_F(DataTableTest, head) {
         outStream.close();
 
         Data::DataTable dt;
-        std::string tFilePath = mTempFileAbsolute.string();
+        std::string tFilePath = tempFilePath.string();
         dt.fromCSV(tFilePath, true);
         Data::IDataTablePtr resultDT = dt.head();
 
@@ -335,7 +331,7 @@ TEST_F(DataTableTest, tail) {
         outStream.close();
 
         Data::DataTable dt;
-        std::string tFilePath = mTempFileAbsolute.string();
+        std::string tFilePath = tempFilePath.string();
         dt.fromCSV(tFilePath, true);
         Data::IDataTablePtr resultDT = dt.tail();
 
@@ -357,7 +353,7 @@ TEST_F(DataTableTest, dropColumnString) {
         outStream.close();
 
         Data::DataTable dt;
-        std::string tFilePath = mTempFileAbsolute.string();
+        std::string tFilePath = tempFilePath.string();
         dt.fromCSV(tFilePath, true);
         dt.dropColumn("Test");
 
@@ -378,7 +374,7 @@ TEST_F(DataTableTest, dropColumnsString) {
         outStream.close();
 
         Data::DataTable dt;
-        std::string tFilePath = mTempFileAbsolute.string();
+        std::string tFilePath = tempFilePath.string();
         dt.fromCSV(tFilePath, true);
         std::vector<std::string> columnsDropped = {"Test", "Test2"};
         dt.dropColumns(columnsDropped);
@@ -404,7 +400,7 @@ TEST_F(DataTableTest, shuffle) {
     outStream.close();
 
     Data::DataTable dt;
-    std::string tFilePath = mTempFileAbsolute.string();
+    std::string tFilePath = tempFilePath.string();
     dt.fromCSV(tFilePath, true);
     EXPECT_THROW(dt.shuffleRows(), std::logic_error);
 
@@ -424,7 +420,7 @@ TEST_F(DataTableTest, minIdx) {
         outStream.close();
 
         Data::DataTable dt;
-        std::string tFilePath = mTempFileAbsolute.string();
+        std::string tFilePath = tempFilePath.string();
         dt.fromCSV(tFilePath, true);
         std::string result = dt.min("Test1");
         EXPECT_EQ("2", result);
@@ -442,7 +438,7 @@ TEST_F(DataTableTest, minOverall) {
         outStream.close();
 
         Data::DataTable dt;
-        std::string tFilePath = mTempFileAbsolute.string();
+        std::string tFilePath = tempFilePath.string();
         dt.fromCSV(tFilePath, true);
         std::string result = dt.min();
         EXPECT_EQ("1", result);
@@ -460,7 +456,7 @@ TEST_F(DataTableTest, maxIdx) {
         outStream.close();
 
         Data::DataTable dt;
-        std::string tFilePath = mTempFileAbsolute.string();
+        std::string tFilePath = tempFilePath.string();
         dt.fromCSV(tFilePath, true);
         std::string result = dt.max("Test1");
         EXPECT_EQ("11", result);
@@ -478,7 +474,7 @@ TEST_F(DataTableTest, maxOverall) {
         outStream.close();
 
         Data::DataTable dt;
-        std::string tFilePath = mTempFileAbsolute.string();
+        std::string tFilePath = tempFilePath.string();
         dt.fromCSV(tFilePath, true);
         std::string result = dt.max();
         EXPECT_EQ("12", result);
@@ -496,7 +492,7 @@ TEST_F(DataTableTest, sumIdx) {
         outStream.close();
 
         Data::DataTable dt;
-        std::string tFilePath = mTempFileAbsolute.string();
+        std::string tFilePath = tempFilePath.string();
         dt.fromCSV(tFilePath, true);
         double result = dt.sum("Test1");
         EXPECT_EQ(26.0, result);
@@ -514,7 +510,7 @@ TEST_F(DataTableTest, sumOverall) {
         outStream.close();
 
         Data::DataTable dt;
-        std::string tFilePath = mTempFileAbsolute.string();
+        std::string tFilePath = tempFilePath.string();
         dt.fromCSV(tFilePath, true);
         double result = dt.sum();
         EXPECT_EQ(78.0, result);
@@ -532,7 +528,7 @@ TEST_F(DataTableTest, meanIdx) {
         outStream.close();
 
         Data::DataTable dt;
-        std::string tFilePath = mTempFileAbsolute.string();
+        std::string tFilePath = tempFilePath.string();
         dt.fromCSV(tFilePath, true);
         double result = dt.mean("Test1");
         EXPECT_EQ(26.0 / 4.0, result);
@@ -550,7 +546,7 @@ TEST_F(DataTableTest, meanOverall) {
         outStream.close();
 
         Data::DataTable dt;
-        std::string tFilePath = mTempFileAbsolute.string();
+        std::string tFilePath = tempFilePath.string();
         dt.fromCSV(tFilePath, true);
         double result = dt.mean();
         EXPECT_EQ(78.0 / 12.0, result);
@@ -569,7 +565,7 @@ TEST_F(DataTableTest, operationalRowIndexing) {
         std::vector<std::string> expected = {"4", "5", "6"};
 
         Data::DataTable dt;
-        std::string tFilePath = mTempFileAbsolute.string();
+        std::string tFilePath = tempFilePath.string();
         dt.fromCSV(tFilePath, true);
         Data::IDataTablePtr result = dt[1];
         EXPECT_EQ(expected[0], (*result)["Test"][0]);
@@ -590,7 +586,7 @@ TEST_F(DataTableTest, operationalColumnIndexing) {
         std::vector<std::string> expected = {"2", "5", "8", "11"};
 
         Data::DataTable dt;
-        std::string tFilePath = mTempFileAbsolute.string();
+        std::string tFilePath = tempFilePath.string();
         dt.fromCSV(tFilePath, true);
         std::vector<std::string> result = dt["Test1"];
         EXPECT_EQ(expected, result);
@@ -608,7 +604,7 @@ TEST_F(DataTableTest, nrows) {
         outStream.close();
 
         Data::DataTable dt;
-        std::string tFilePath = mTempFileAbsolute.string();
+        std::string tFilePath = tempFilePath.string();
         dt.fromCSV(tFilePath, true);
         int result = dt.nrows();
         EXPECT_EQ(4, result);
@@ -626,7 +622,7 @@ TEST_F(DataTableTest, ncols) {
         outStream.close();
 
         Data::DataTable dt;
-        std::string tFilePath = mTempFileAbsolute.string();
+        std::string tFilePath = tempFilePath.string();
         dt.fromCSV(tFilePath, true);
         int result = dt.ncols();
         EXPECT_EQ(3, result);
@@ -647,7 +643,7 @@ TEST_F(DataTableTest, getShape) {
         expected.setNRows(4);
 
         Data::DataTable dt;
-        std::string tFilePath = mTempFileAbsolute.string();
+        std::string tFilePath = tempFilePath.string();
         dt.fromCSV(tFilePath, true);
         Data::DataTableShape result = dt.getShape();
         EXPECT_EQ(expected.getNRows(), result.getNRows());
@@ -670,7 +666,7 @@ TEST_F(DataTableTest, selectWhere) {
         outStream.close();
 
         Data::DataTable dt;
-        std::string tFilePath = mTempFileAbsolute.string();
+        std::string tFilePath = tempFilePath.string();
         dt.fromCSV(tFilePath, true);
         Data::IDataTablePtr resultDT = dt.selectWhere(selectMap);
 
@@ -695,7 +691,7 @@ TEST_F(DataTableTest, selectWhereMultiHit) {
         outStream.close();
 
         Data::DataTable dt;
-        std::string tFilePath = mTempFileAbsolute.string();
+        std::string tFilePath = tempFilePath.string();
         dt.fromCSV(tFilePath, true);
         Data::IDataTablePtr resultDT = dt.selectWhere(selectMap);
 
@@ -720,7 +716,7 @@ TEST_F(DataTableTest, selectWhereMultiSelect) {
         outStream.close();
 
         Data::DataTable dt;
-        std::string tFilePath = mTempFileAbsolute.string();
+        std::string tFilePath = tempFilePath.string();
         dt.fromCSV(tFilePath, true);
         Data::IDataTablePtr resultDT = dt.selectWhere(selectMap);
 

@@ -28,9 +28,6 @@ endif()
 add_library(${PROJECT_NAME} ${LIB_TYPE}
 )
 
-set(BOOST_ROOT "$ENV{BOOST_ROOT}")
-find_package(Boost CONFIG REQUIRED COMPONENTS filesystem)
-
 set(PRIVATE_SOURCE_LIST
     ${PROJECT_SOURCE_DIR}/src/DataTable.cpp
     ${PROJECT_SOURCE_DIR}/src/Configuration.cpp
@@ -55,8 +52,6 @@ target_sources(${PROJECT_NAME}
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} PREFIX Sources FILES ${PRIVATE_SOURCE_LIST})
 source_group(TREE ${PROJECT_SOURCE_DIR}/include/ PREFIX Interface FILES ${PUBLIC_HEADER_LIST})
-
-target_link_libraries(${PROJECT_NAME} PRIVATE Boost::filesystem)
 
 ##################################################################################
 
