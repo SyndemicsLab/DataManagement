@@ -29,7 +29,8 @@ add_library(${PROJECT_NAME} ${LIB_TYPE}
 )
 
 # set(BOOST_ROOT "$ENV{BOOST_ROOT}")
-find_package(Boost CONFIG REQUIRED COMPONENTS filesystem)
+set(Boost_USE_MULTITHREADED TRUE)
+find_package(Boost CONFIG REQUIRED COMPONENTS)
 
 set(PRIVATE_SOURCE_LIST
     ${PROJECT_SOURCE_DIR}/src/DataTable.cpp
