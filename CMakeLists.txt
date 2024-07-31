@@ -1,5 +1,4 @@
 cmake_minimum_required(VERSION 3.23)
-cmake_policy(SET CMP0144 NEW)
 
 project(
     DataManagement
@@ -28,7 +27,6 @@ endif()
 add_library(${PROJECT_NAME} ${LIB_TYPE}
 )
 
-# set(BOOST_ROOT "$ENV{BOOST_ROOT}")
 find_package(Boost CONFIG REQUIRED COMPONENTS filesystem)
 
 set(PRIVATE_SOURCE_LIST
