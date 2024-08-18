@@ -23,11 +23,19 @@ showhelp () {
     echo "n              Build Benchmarking executable"
 }
 
+# red output
+RED='\033[0;31m'
+# no color
+NC='\033[0m'
+
+err () {
+    echo -e "$RED$1$NC"
+}
+
 # set default build type
 BUILDTYPE="Release"
 BUILD_TESTS=""
 BUILD_BENCHMARK=""
-BUILD_SHARED_LIBRARY=""
 BUILD_STATIC_LIBRARY="ON"
 
 # process optional command line flags
@@ -52,14 +60,13 @@ while getopts ":hnptl:" option; do
             BUILD_TESTS="ON"
             ;;
         l)
-            BUILD_SHARED_LIBRARY="ON"
             BUILD_STATIC_LIBRARY="OFF"
             ;;
         n)
             BUILD_BENCHMARK="ON"
             ;;
         \?)
-            echo "Error: Invalid option flag provided!"
+            err "Error: Invalid option flag provided!"
             showhelp
             exit
             ;;
@@ -85,21 +92,17 @@ done
         if [[ -n "$BUILD_BENCHMARK" ]]; then
             CMAKE_COMMAND="$CMAKE_COMMAND -DBUILD_BENCHMARK=$BUILD_BENCHMARK"
         fi
-        # build static libraries
-        if [[ -n "$BUILD_STATIC_LIBRARY" ]]; then
-            CMAKE_COMMAND="$CMAKE_COMMAND -DBUILD_STATIC_LIBRARY=$BUILD_STATIC_LIBRARY"
-        fi
-        # build shared libraries
-        if [[ -n "$BUILD_SHARED_LIBRARY" ]]; then
-            CMAKE_COMMAND="$CMAKE_COMMAND -DBUILD_SHARED_LIBRARY=$BUILD_SHARED_LIBRARY"
-        fi
+	# build static library if BUILD_STATIC_LIBRARY is on, otherwise build
+	# shared library
+        CMAKE_COMMAND="$CMAKE_COMMAND -DBUILD_STATIC_LIBRARY=$BUILD_STATIC_LIBRARY"
 
+	err "[EXECUTE] $CMAKE_COMMAND"
         # run the full build command as specified
 	$CMAKE_COMMAND
 	# catch the error if build fails
 	ERROR_CODE="$?"
         if [[ "$ERROR_CODE" -ne "0" ]]; then
-	    echo "Build failed. Exiting with error code $ERROR_CODE..."
+	    err "Build failed. Exiting with error code $ERROR_CODE..."
 	    exit "$ERROR_CODE"
 	fi
         (
