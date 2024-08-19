@@ -39,7 +39,7 @@ BUILD_BENCHMARK=""
 BUILD_STATIC_LIBRARY="ON"
 
 # process optional command line flags
-while getopts ":hnptl:" option; do
+while getopts ":lhnpt:" option; do
     case $option in
         h)
             showhelp
