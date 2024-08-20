@@ -19,7 +19,7 @@ Homepage = "https://github.com/SyndemicsLab/DataManagement"
 Issues = "https://github.com/SyndemicsLab/DataManagement/issues"
 
 [tool.scikit-build]
-cmake.version = ">=3.15"
+cmake.version = ">=3.27"
 
 [tool.scikit-build.cmake.define]
 BUILD_SHARED_LIBS = "YES"
