@@ -300,26 +300,22 @@ namespace Data {
 
     std::shared_ptr<IDataTable>
     DataTable::innerJoin(std::shared_ptr<IDataTable> const tableTwo,
-                         std::string tableOneColumnName,
-                         std::string tableTwoColumnName) const {
-        std::vector<std::string> columnOne =
-            this->getColumn(tableOneColumnName);
-        std::vector<std::string> columnTwo =
-            tableTwo->getColumn(tableTwoColumnName);
+                         std::string t1JoinCol, std::string t2JoinCol) const {
+        std::vector<std::string> columnOne = this->getColumn(t1JoinCol);
+        std::vector<std::string> columnTwo = tableTwo->getColumn(t2JoinCol);
 
         std::vector<std::vector<int>> indices;
-        for (int colOneIter = 0; colOneIter < columnOne.size(); ++colOneIter) {
-            for (int colTwoIter = 0; colTwoIter < columnTwo.size();
-                 ++colTwoIter) {
-                if (columnOne[colOneIter] == columnTwo[colTwoIter]) {
-                    indices.push_back({colOneIter, colTwoIter});
+        for (int t1Iter = 0; t1Iter < columnOne.size(); ++t1Iter) {
+            for (int t2Iter = 0; t2Iter < columnTwo.size(); ++t2Iter) {
+                if (columnOne[t1Iter] == columnTwo[t2Iter]) {
+                    indices.push_back({t1Iter, t2Iter});
                 }
             }
         }
 
         std::vector<std::string> t1headers = this->getHeaders();
         std::vector<std::string> t2headers = tableTwo->getHeaders();
-        auto it = find(t2headers.begin(), t2headers.end(), tableTwoColumnName);
+        auto it = find(t2headers.begin(), t2headers.end(), t2JoinCol);
         t2headers.erase(it);
 
         // Add the t1 rows column by column
@@ -352,61 +348,57 @@ namespace Data {
 
     std::shared_ptr<IDataTable>
     DataTable::innerJoin(std::shared_ptr<IDataTable> const tableTwo,
-                         std::vector<std::string> tableOneColumnNames,
-                         std::vector<std::string> tableTwoColumnNames) const {
+                         std::vector<std::string> t1JoinCols,
+                         std::vector<std::string> t2JoinCols) const {
 
         // throw error on invalid 1-1 join columns
-        if (tableOneColumnNames.size() != tableTwoColumnNames.size()) {
+        if (t1JoinCols.size() != t2JoinCols.size()) {
             throw std::logic_error("Joining columns are not one-to-one.");
         }
 
         // return nothing if the column names are empty
-        if (tableOneColumnNames.empty() || tableTwoColumnNames.empty()) {
+        if (t1JoinCols.empty() || t2JoinCols.empty()) {
             return {};
         }
 
-        std::vector<std::vector<std::string>> t1Columns = {};
-        for (std::string tableOneColumnName : tableOneColumnNames) {
-            t1Columns.push_back(this->getColumn(tableOneColumnName));
+        std::vector<std::vector<std::string>> t1IDCols = {};
+        for (std::string t1JoinCol : t1JoinCols) {
+            t1IDCols.push_back(this->getColumn(t1JoinCol));
         }
 
-        std::vector<std::vector<std::string>> t2Columns = {};
-        for (std::string tableTwoColumnName : tableTwoColumnNames) {
-            t2Columns.push_back(tableTwo->getColumn(tableTwoColumnName));
+        std::vector<std::vector<std::string>> t2IDCols = {};
+
+        for (std::string t2JoinCol : t2JoinCols) {
+            t2IDCols.push_back(tableTwo->getColumn(t2JoinCol));
         }
 
         // Should never be true if the getColumn fails and the ColumnNames
         // Params are not empty
-        if (t1Columns.empty() || t2Columns.empty()) {
+        if (t1IDCols.empty() || t2IDCols.empty()) {
             throw std::logic_error("Joining columns not found in tables.");
         }
 
         std::vector<std::vector<int>> indices;
-        for (int colOneIter = 0; colOneIter < t1Columns[0].size();
-             ++colOneIter) {
-            for (int colTwoIter = 0; colTwoIter < t2Columns[0].size();
-                 ++colTwoIter) {
+        for (int t1Iter = 0; t1Iter < t1IDCols[0].size(); ++t1Iter) {
+            for (int t2Iter = 0; t2Iter < t2IDCols[0].size(); ++t2Iter) {
                 bool flag = true;
-                for (int tableIDIter = 0;
-                     tableIDIter < tableOneColumnNames.size(); ++tableIDIter) {
-                    if (t1Columns[tableIDIter][colOneIter] !=
-                        t2Columns[tableIDIter][colTwoIter]) {
+                for (int idIter = 0; idIter < t1JoinCols.size(); ++idIter) {
+                    if (t1IDCols[idIter][t1Iter] != t2IDCols[idIter][t2Iter]) {
                         flag = false;
                     }
                 }
                 if (flag) {
-                    indices.push_back({colOneIter, colTwoIter});
+                    indices.push_back({t1Iter, t2Iter});
                 }
             }
         }
 
         std::vector<std::string> t1headers = this->getHeaders();
         std::vector<std::string> t2headers = tableTwo->getHeaders();
-        for (std::string tableTwoColumnName : tableTwoColumnNames) {
-            auto it =
-                find(t2headers.begin(), t2headers.end(), tableTwoColumnName);
-            t2headers.erase(it);
-        }
+        // for (std::string t2JoinCol : t2JoinCols) {
+        //     auto it = find(t2headers.begin(), t2headers.end(), t2JoinCol);
+        //     t2headers.erase(it);
+        // }
 
         // Add the t1 rows column by column
         std::map<std::string, std::vector<std::string>> newData;
@@ -421,6 +413,10 @@ namespace Data {
 
         // Add the t2 rows column by column
         for (std::string t2header : t2headers) {
+            if (std::find(t2JoinCols.begin(), t2JoinCols.end(), t2header) !=
+                t2JoinCols.end()) {
+                continue;
+            }
             std::vector<std::string> column = tableTwo->getColumn(t2header);
             std::vector<std::string> newColumn;
             for (std::vector<int> idxs : indices) {
@@ -428,8 +424,9 @@ namespace Data {
             }
             newData[t2header] = newColumn;
         }
-        DataTableShape newShape(indices.size(),
-                                t1headers.size() + t2headers.size());
+        DataTableShape newShape(
+            indices.size(),
+            (t1headers.size() + t2headers.size() - t2JoinCols.size()));
         std::shared_ptr<IDataTable> newDT =
             std::make_shared<DataTable>(newData, newShape, this->headerOrder);
         return newDT;
@@ -437,22 +434,19 @@ namespace Data {
 
     std::shared_ptr<IDataTable>
     DataTable::leftJoin(std::shared_ptr<IDataTable> const tableTwo,
-                        std::string tableOneColumnName,
-                        std::string tableTwoColumnName) const {
+                        std::string t1JoinCol, std::string t2JoinCol) const {
         throw std::logic_error("Not Implemented Yet");
     }
 
     std::shared_ptr<IDataTable>
     DataTable::rightJoin(std::shared_ptr<IDataTable> const tableTwo,
-                         std::string tableOneColumnName,
-                         std::string tableTwoColumnName) const {
+                         std::string t1JoinCol, std::string t2JoinCol) const {
         throw std::logic_error("Not Implemented Yet");
     }
 
     std::shared_ptr<IDataTable>
     DataTable::outerJoin(std::shared_ptr<IDataTable> const tableTwo,
-                         std::string tableOneColumnName,
-                         std::string tableTwoColumnName) const {
+                         std::string t1JoinCol, std::string t2JoinCol) const {
         throw std::logic_error("Not Implemented Yet");
     }
 

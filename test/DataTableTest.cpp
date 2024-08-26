@@ -836,6 +836,59 @@ TEST_F(DataTableTest, innerJoin) {
     }
 }
 
+TEST_F(DataTableTest, innerJoinSingleColumnAdded) {
+    std::vector<std::string> headerOrder1 = {"id", "test1", "test2"};
+    std::map<std::string, std::vector<std::string>> d1;
+    d1["id"] = {"1", "2", "2"};
+    d1["test1"] = {"hi1.1", "hi2.1", "hi3.1"};
+    d1["test2"] = {"hi1.2", "hi2.2", "hi3.2"};
+
+    Data::DataTableShape shape1;
+    shape1.setNCols(3);
+    shape1.setNRows(3);
+
+    std::vector<std::string> headerOrder2 = {"id", "test1", "test6"};
+    std::map<std::string, std::vector<std::string>> d2;
+    d2["id"] = {"1", "2", "3"};
+    d2["test1"] = {"hi1.1", "hi2.1", "hi3.1"};
+    d2["test6"] = {"hi1.6", "hi2.6", "hi3.6"};
+
+    Data::DataTableShape shape2;
+    shape2.setNCols(3);
+    shape2.setNRows(3);
+
+    Data::DataTable dt1(d1, shape1, headerOrder1);
+    Data::IDataTablePtr dt2 =
+        std::make_shared<Data::DataTable>(d2, shape2, headerOrder2);
+
+    std::vector<std::string> joinCols = {"id", "test1"};
+
+    Data::IDataTablePtr resultTable = dt1.innerJoin(dt2, joinCols, joinCols);
+    std::vector<std::string> resultHeaders = resultTable->getHeaders();
+    std::vector<std::vector<std::string>> resultData = resultTable->getData();
+
+    std::vector<std::string> expectedHeaders = {"id", "test1", "test2",
+                                                "test6"};
+
+    ASSERT_TRUE(resultHeaders.size() == expectedHeaders.size());
+
+    std::vector<std::vector<std::string>> expectedData = {
+        {"1", "hi1.1", "hi1.2", "hi1.6"}, {"2", "hi2.1", "hi2.2", "hi2.6"}};
+
+    ASSERT_TRUE(resultData.size() == expectedData.size());
+    ASSERT_TRUE(resultData[0].size() == expectedData[0].size());
+
+    for (int i = 0; i < resultHeaders.size(); ++i) {
+        EXPECT_EQ(resultHeaders[i], expectedHeaders[i]);
+    }
+
+    for (int i = 0; i < resultData.size(); ++i) {
+        for (int j = 0; j < resultData[0].size(); ++j) {
+            EXPECT_EQ(resultData[i][j], expectedData[i][j]);
+        }
+    }
+}
+
 TEST_F(DataTableTest, multiInnerJoin) {
     std::map<std::string, std::vector<std::string>> d1;
     d1["id"] = {"1", "2", "2", "3"};
