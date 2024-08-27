@@ -991,3 +991,20 @@ TEST_F(DataTableTest, operatorPlusOverload) {
         }
     }
 }
+
+TEST_F(DataTableTest, outputOperatorOverload) {
+    std::map<std::string, std::vector<std::string>> d1;
+    d1["id"] = {"1", "2", "2"};
+    d1["test1"] = {"hi1.1", "hi2.1", "hi3.1"};
+    d1["test2"] = {"hi1.2", "hi2.2", "hi3.2"};
+    d1["test3"] = {"hi1.3", "hi2.3", "hi3.3"};
+
+    Data::DataTableShape shape1;
+    shape1.setNCols(4);
+    shape1.setNRows(3);
+
+    std::shared_ptr<Data::DataTable> dt1 =
+        std::make_shared<Data::DataTable>(d1, shape1);
+    Data::DataTable dt = *dt1;
+    std::cout << dt;
+}

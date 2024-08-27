@@ -19,6 +19,7 @@
 #ifndef DATATABLE_HPP_
 #define DATATABLE_HPP_
 
+#include <iomanip>
 #include <map>
 #include <memory>
 #include <sstream>
@@ -65,7 +66,7 @@ namespace Data {
 
     public:
         /// @brief Default constructor. Leaves Rows and Cols set to 0.
-        DataTableShape(){};
+        DataTableShape() {};
 
         /// @brief Primary use constructor. Provides a setter for Rows and Cols.
         /// @param nrows Number of Rows to provide to the shape
@@ -271,7 +272,7 @@ namespace Data {
 
     public:
         /// @brief Default constructor. Sets everything to default
-        DataTable(){};
+        DataTable() {};
 
         DataTable(const DataTable &dt);
 
@@ -296,7 +297,7 @@ namespace Data {
                   std::vector<std::string> headOrder = {});
 
         /// @brief Default destructor
-        ~DataTable(){};
+        ~DataTable() {};
 
         /// @brief Function used to load a DataTable to the provided CSV
         /// @param filename csv file to write data to
@@ -543,8 +544,25 @@ namespace Data {
         /// @param os
         /// @param table
         /// @return
-        friend std::ostream &
-        operator<<(std::ostream &os, std::shared_ptr<IDataTable> const table);
+        friend std::ostream &operator<<(std::ostream &os,
+                                        DataTable const table) {
+            std::vector<std::string> headers = table.getColumnNames();
+            int nRows = table.getShape().getNRows();
+            int nCols = table.getShape().getNCols();
+            for (auto &h : headers) {
+                os << std::left << std::setw(12) << h << " " << std::setw(6);
+            }
+            os << std::endl;
+            for (int i = 0; i < nRows; ++i) {
+                std::shared_ptr<IDataTable> row = table.getRow(i);
+                for (auto &h : headers) {
+                    os << std::left << std::setw(12) << row->getColumn(h)[0]
+                       << " " << std::setw(6);
+                }
+                os << std::endl;
+            }
+            return os;
+        }
 
         std::shared_ptr<IDataTable>
         concat(IDataTable const &tableTwo) const override;
