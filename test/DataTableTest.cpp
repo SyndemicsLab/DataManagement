@@ -1005,6 +1005,15 @@ TEST_F(DataTableTest, outputOperatorOverload) {
 
     std::shared_ptr<Data::DataTable> dt1 =
         std::make_shared<Data::DataTable>(d1, shape1);
+    std::stringstream ss;
     Data::DataTable dt = *dt1;
-    std::cout << dt;
+    std::ostringstream out;
+    out << dt;
+    std::string res = out.str();
+    std::string expected =
+        "id           test1        test2        test3        \n1            "
+        "hi1.1        hi1.2        hi1.3        \n2            hi2.1        "
+        "hi2.2        hi2.3        \n2            hi3.1        hi3.2        "
+        "hi3.3        \n";
+    EXPECT_EQ(res, expected);
 }
