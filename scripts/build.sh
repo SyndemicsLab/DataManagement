@@ -111,8 +111,8 @@ done
             # if CORES > 1 compile in parallel where possible
             ([[ -n "$CORES" ]] && cmake --build . -j"$CORES") || cmake --build .
         )
-        # run tests, if they built properly
     )
+    # run tests, if they built properly
     if [[ (-n "$BUILD_TESTS") && (-f "bin/dataTests") ]]; then
         bin/dataTests
     fi
