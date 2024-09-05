@@ -122,9 +122,6 @@ namespace Data {
                              bool hasHeaders = true, char delim = ',') = 0;
         virtual bool fromSQL(const std::string &dbfile,
                              const std::string &tablename) = 0;
-        virtual std::vector<std::vector<std::string>> getData() const = 0;
-        virtual std::map<std::string, std::vector<std::string>>
-        getDataAsMap() const = 0;
         virtual std::shared_ptr<IDataTable> getRow(int idx) const = 0;
         virtual std::vector<std::string>
         getColumn(std::string columnName) const = 0;

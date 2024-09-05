@@ -4,8 +4,8 @@
 if command -v module &>/dev/null; then
     module load gcc/12.2.0
     module load miniconda
-    conda env create -f "/projectnb/respond/environment.yml" 2&>/dev/null
-    conda activate respond
+    conda env create -f "./environment.yml" 2&>/dev/null
+    conda activate datamanagement
 fi
 
 # help message to be output either with the -h flag or when using invalid syntax
