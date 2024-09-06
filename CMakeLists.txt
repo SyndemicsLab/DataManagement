@@ -6,6 +6,8 @@ project(
   DESCRIPTION "A Data Management Library Used By Syndemics Lab Simulation Models"
 )
 
+find_package(SQLite3 REQUIRED)
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../lib)
@@ -38,6 +40,11 @@ if(BUILD_STATIC_LIBRARY STREQUAL ON)
     FILE_SET headers TYPE HEADERS FILES ${PUBLIC_HEADER_LIST}
     PRIVATE
     ${PRIVATE_SOURCE_LIST}
+  )
+
+  target_link_libraries(
+    ${PROJECT_NAME}
+    SQLite::SQLite3
   )
 
   # target_sources(${PROJECT_NAME} PUBLIC FILE_SET headers TYPE HEADERS)
@@ -89,6 +96,10 @@ else()
     PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
     "$<INSTALL_INTERFACE:include>"
+  )
+  target_link_libraries(
+    ${PROJECT_NAME}
+    SQLite::SQLite3
   )
   install(
     TARGETS ${PROJECT_NAME}
