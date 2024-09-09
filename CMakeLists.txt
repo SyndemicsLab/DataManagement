@@ -28,8 +28,6 @@ if(BUILD_STATIC_LIBRARY STREQUAL ON)
 
   set(PUBLIC_HEADER_LIST
     ${PROJECT_SOURCE_DIR}/include/DataManager.hpp
-    ${PROJECT_SOURCE_DIR}/include/Reader.hpp
-    ${PROJECT_SOURCE_DIR}/include/Writer.hpp
   )
 
   target_sources(${PROJECT_NAME}

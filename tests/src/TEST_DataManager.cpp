@@ -10,7 +10,9 @@ class DataManagerTest : public ::testing::Test {
 protected:
     std::filesystem::path tempPath;
     std::filesystem::path absolute;
+    std::filesystem::path configFile;
     std::ofstream tempStream;
+    std::ofstream configStream;
     datamanagement::DataManager testManager;
     std::string testTableName;
     void SetUp() override {
@@ -30,10 +32,56 @@ protected:
           << "No_Treatment,10_14,Male,Nonactive_Noninjection,288.995723856067";
         s.close();
         int rc = testManager.AddCSVTable(a);
+
+        configFile = std::filesystem::temp_directory_path() /
+                     std::filesystem::path("sim.conf");
+        configStream.open(configFile);
+
+        configStream << "[simulation]" << std::endl
+                     << "duration = 52" << std::endl
+                     << "aging_interval = 260" << std::endl
+                     << "intervention_change_times = 52" << std::endl
+                     << "entering_sample_change_times = 52" << std::endl
+                     << "overdose_change_times = 52" << std::endl
+                     << "stratified_entering_cohort = false" << std::endl
+                     << std::endl
+                     << "[state]" << std::endl
+                     << "interventions = No_Treatment, Buprenorphine,"
+                        "Naltrexone, Methadone, Detox, Post-Buprenorphine,"
+                        "Post-Naltrexone, Post-Methadone, Post-Detox"
+                        ""
+                     << std::endl
+                     << "ouds = Active_Noninjection, Active_Injection,"
+                        "Nonactive_Noninjection, Nonactive_Injection"
+                     << std::endl
+                     << std::endl
+                     << "[demographic]" << std::endl
+                     << "age_groups = 10_14, 15_19, 20_24, 25_29, 30_34, "
+                        "35_39, 40_44, 45_49, 50_54, 55_59, 60_64, 65_69, "
+                        "70_74, 75_79, 80_84, 85_89, 90_94, 95_99 "
+                     << std::endl
+                     << "sex = Male, Female " << std::endl
+                     << std::endl
+                     << "[cost]" << std::endl
+                     << "cost_analysis = true" << std::endl
+                     << "cost_perspectives = healthcare" << std::endl
+                     << "discount_rate = 0.0025 " << std::endl
+                     << "reporting_interval = 1" << std::endl
+                     << "cost_utility_output_timesteps = 52 " << std::endl
+                     << "cost_category_outputs = false " << std::endl
+                     << std::endl
+                     << "[output] " << std::endl
+                     << "per_intervention_predictions = true " << std::endl
+                     << "general_outputs = false " << std::endl
+                     << "general_stats_output_timesteps = 52";
+        configStream.close();
     }
     void TearDown() override {
         if (tempStream.is_open()) {
             tempStream.close();
+        }
+        if (configStream.is_open()) {
+            configStream.close();
         }
     }
 };
@@ -137,4 +185,28 @@ TEST_F(DataManagerTest, Delete) {
     data.clear();
     testManager.Select("SELECT * FROM WORDS;", data);
     ASSERT_TRUE(data.empty());
+}
+
+TEST_F(DataManagerTest, LoadConfigAndGetFromConfig) {
+    testManager.LoadConfig(configFile);
+    std::string data = "";
+    int rc = testManager.GetFromConfig("simulation.duration", data);
+    ASSERT_EQ(data, "52");
+}
+
+TEST_F(DataManagerTest, GetConfigSectionCategories) {
+    testManager.LoadConfig(configFile);
+    std::vector<std::string> data = {};
+    int rc = testManager.GetConfigSectionCategories("simulation", data);
+    std::vector<std::string> expected = {"duration",
+                                         "aging_interval",
+                                         "intervention_change_times",
+                                         "entering_sample_change_times",
+                                         "overdose_change_times",
+                                         "stratified_entering_cohort"};
+    int i = 0;
+    for (std::string d : data) {
+        ASSERT_EQ(expected[i], d);
+        ++i;
+    }
 }

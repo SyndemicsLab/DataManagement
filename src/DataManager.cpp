@@ -1,4 +1,5 @@
 #include "DataManager.hpp"
+#include <boost/property_tree/ini_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <filesystem>
 #include <fstream>
@@ -75,11 +76,22 @@ namespace datamanagement {
     class DataManager::Config {
     private:
         boost::property_tree::ptree ptree;
+        bool tree_loaded = false;
 
     public:
         Config() {}
         ~Config() = default;
+
+        int LoadConfig(std::string const &filepath) {
+            read_ini(filepath, this->ptree);
+            tree_loaded = true;
+            return 0;
+        }
+
         int GetFromConfig(std::string const key, std::string &data) const {
+            if (!tree_loaded) {
+                return -1;
+            }
             try {
                 data = ptree.get<std::string>(key);
             } catch (const std::exception &e) {
@@ -91,6 +103,9 @@ namespace datamanagement {
 
         int GetConfigSectionCategories(std::string const section,
                                        std::vector<std::string> &data) const {
+            if (!tree_loaded) {
+                return -1;
+            }
             boost::property_tree::ptree subTree =
                 this->ptree.get_child(section);
             std::vector<std::string> keyList;
@@ -102,6 +117,10 @@ namespace datamanagement {
             return 0;
         }
     };
+
+    int DataManager::LoadConfig(std::string const &filepath) {
+        return pImplCF->LoadConfig(filepath);
+    }
 
     int DataManager::GetFromConfig(std::string const key,
                                    std::string &data) const {
