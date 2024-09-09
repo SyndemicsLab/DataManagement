@@ -83,8 +83,7 @@ if(BUILD_STATIC_LIBRARY STREQUAL ON)
   )
 else()
   add_library(${PROJECT_NAME} SHARED
-    "src/DataTable.cpp"
-    "src/Configuration.cpp"
+    "src/DataManager.cpp"
   )
   target_include_directories(
     ${PROJECT_NAME}
