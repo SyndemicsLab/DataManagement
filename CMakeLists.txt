@@ -39,7 +39,8 @@ if(BUILD_STATIC_LIBRARY STREQUAL ON)
 
   target_link_libraries(
     ${PROJECT_NAME}
-    SQLite::SQLite3
+    PRIVATE
+        SQLite::SQLite3
   )
 
   # target_sources(${PROJECT_NAME} PUBLIC FILE_SET headers TYPE HEADERS)
@@ -93,7 +94,8 @@ else()
   )
   target_link_libraries(
     ${PROJECT_NAME}
-    SQLite::SQLite3
+    PRIVATE
+        SQLite::SQLite3
   )
   install(
     TARGETS ${PROJECT_NAME}
@@ -107,8 +109,6 @@ else()
   install(
     FILES
     "include/DataManager.hpp"
-    "include/Reader.hpp"
-    "include/Writer.hpp"
     DESTINATION include
   )
 
