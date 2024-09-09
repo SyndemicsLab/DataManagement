@@ -1,4 +1,5 @@
 #include "DataManager.hpp"
+#include <boost/property_tree/ptree.hpp>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -7,7 +8,7 @@
 #include <vector>
 
 namespace datamanagement {
-    class DataManagerBase::DataManager {
+    class DataManager::Database {
     private:
         /* data */
         sqlite3 *db;
@@ -47,38 +48,81 @@ namespace datamanagement {
     public:
         // This works because we don't care about threadsafe currently. We
         // assume a single DB for the project
-        DataManager(/* args */) { sqlite3_open("temp.db", &db); }
+        Database(/* args */) { sqlite3_open("temp.db", &db); }
 
         // Must always close the DB and delete the temp db file when the Manager
         // ends
-        ~DataManager() {
+        ~Database() {
             sqlite3_close(db);
             std::filesystem::remove("temp.db");
         }
 
         // CRUD Logical Wrappers
-        int Create(std::string const query, Table data) const {
+        int Create(std::string const query, Table &data) const {
             return ExecuteQuery(query, NULL, 0);
         }
-        int Select(std::string const query, Table data) const {
+        int Select(std::string const query, Table &data) const {
             return ExecuteQuery(query, callback, &data);
         }
-        int Update(std::string const query, Table data) const {
+        int Update(std::string const query, Table &data) const {
             return ExecuteQuery(query, callback, &data);
         }
-        int Delete(std::string const query, Table data) const {
+        int Delete(std::string const query, Table &data) const {
             return ExecuteQuery(query, callback, &data);
         }
     };
 
-    DataManagerBase::DataManagerBase() {
-        pImplDM = std::make_unique<DataManager>();
+    class DataManager::Config {
+    private:
+        boost::property_tree::ptree ptree;
+
+    public:
+        Config() {}
+        ~Config() = default;
+        int GetFromConfig(std::string const key, std::string &data) const {
+            try {
+                data = ptree.get<std::string>(key);
+            } catch (const std::exception &e) {
+                // log bad cast
+                return -1;
+            }
+            return 0;
+        }
+
+        int GetConfigSectionCategories(std::string const section,
+                                       std::vector<std::string> &data) const {
+            boost::property_tree::ptree subTree =
+                this->ptree.get_child(section);
+            std::vector<std::string> keyList;
+
+            for (auto &key : subTree) {
+                keyList.push_back(key.first);
+            }
+            data = keyList;
+            return 0;
+        }
+    };
+
+    int DataManager::GetFromConfig(std::string const key,
+                                   std::string &data) const {
+        return pImplCF->GetFromConfig(key, data);
     }
 
-    DataManagerBase::~DataManagerBase() = default;
+    int DataManager::GetConfigSectionCategories(
+        std::string const section, std::vector<std::string> &data) const {
+        return pImplCF->GetConfigSectionCategories(section, data);
+    }
 
-    int DataManagerBase::AddCSVTable(std::string const &file) const {
+    DataManager::DataManager() {
+        pImplDB = std::make_unique<Database>();
+        pImplCF = std::make_unique<Config>();
+    }
+
+    DataManager::~DataManager() = default;
+
+    int DataManager::AddCSVTable(std::string const &file) const {
         std::ifstream csv;
+        Table data;
         csv.open(file, std::ios::in);
         if (!csv) {
             return false;
@@ -95,51 +139,45 @@ namespace datamanagement {
             headers.push_back(word);
             sql += (word + " NOT NULL,");
         }
+        sql.pop_back(); // remove last comma
         sql += ");";
-        int rc = DataManagerBase::Create(sql, {});
-        if (rc != SQLITE_OK) {
-            // log error
-            csv.close();
-            return;
-        }
+        int rc = (SQLITE_OK == DataManager::Update(sql, data)) ? SQLITE_OK
+                                                               : SQLITE_ERROR;
 
         sql.clear();
-        sql = "INSERT INTO " + table + "(";
-        for (std::string &head : headers) {
-            sql += (head + ",");
-        }
-        sql += ") VALUES ";
+        sql = "BEGIN TRANSACTION;";
+        rc = (SQLITE_OK == DataManager::Update(sql, data)) ? rc : SQLITE_ERROR;
 
         // Talk about insecure practices and SQL Injections
-        while (csv >> temp) {
-            sql += "(";
-            std::getline(csv, line);
+        while (std::getline(csv, line)) {
+            sql.clear();
+            sql = "INSERT INTO " + this->quoter(table) + " VALUES (";
             std::stringstream s(line);
             while (std::getline(s, word, ',')) {
-                sql += (word + ",");
+                sql += (this->quoter(word) + ",");
             }
-            sql += ")";
+            sql.pop_back(); // remove last comma
+            sql += ");";
+            rc = (SQLITE_OK == DataManager::Update(sql, data)) ? rc
+                                                               : SQLITE_ERROR;
         }
-        rc = DataManagerBase::Update(sql, {});
-        if (rc != SQLITE_OK) {
-            // log error
-            csv.close();
-            return;
-        }
+        sql.clear();
+        sql = "COMMIT;";
+        rc = (SQLITE_OK == DataManager::Update(sql, data)) ? rc : SQLITE_ERROR;
 
         csv.close();
-        return 0;
+        return rc;
     }
-    int DataManagerBase::Create(std::string const query, Table data) const {
-        return pImplDM->Create(query, data);
+    int DataManager::Create(std::string const query, Table &data) const {
+        return pImplDB->Create(query, data);
     }
-    int DataManagerBase::Select(std::string const query, Table data) const {
-        return pImplDM->Select(query, data);
+    int DataManager::Select(std::string const query, Table &data) const {
+        return pImplDB->Select(query, data);
     }
-    int DataManagerBase::Update(std::string const query, Table data) const {
-        return pImplDM->Update(query, data);
+    int DataManager::Update(std::string const query, Table &data) const {
+        return pImplDB->Update(query, data);
     }
-    int DataManagerBase::Delete(std::string const query, Table data) const {
-        return pImplDM->Delete(query, data);
+    int DataManager::Delete(std::string const query, Table &data) const {
+        return pImplDB->Delete(query, data);
     }
 } // namespace datamanagement

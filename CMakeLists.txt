@@ -16,21 +16,18 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../bin)
 
 option(BUILD_TESTS "enable Data tests" OFF)
 if(BUILD_TESTS STREQUAL ON)
-  add_subdirectory(test)
+  add_subdirectory(tests)
 endif()
 
 option(BUILD_STATIC_LIBRARY "build static library" ON)
 if(BUILD_STATIC_LIBRARY STREQUAL ON)
   add_library(${PROJECT_NAME} STATIC)
   set(PRIVATE_SOURCE_LIST
-    ${PROJECT_SOURCE_DIR}/src/DataTable.cpp
-    ${PROJECT_SOURCE_DIR}/src/Configuration.cpp
+    ${PROJECT_SOURCE_DIR}/src/DataManager.cpp
   )
 
   set(PUBLIC_HEADER_LIST
-    ${PROJECT_SOURCE_DIR}/include/Configuration.hpp
-    ${PROJECT_SOURCE_DIR}/include/DataManagement.hpp
-    ${PROJECT_SOURCE_DIR}/include/DataTable.hpp
+    ${PROJECT_SOURCE_DIR}/include/DataManager.hpp
     ${PROJECT_SOURCE_DIR}/include/Reader.hpp
     ${PROJECT_SOURCE_DIR}/include/Writer.hpp
   )
@@ -112,9 +109,7 @@ else()
 
   install(
     FILES
-    "include/Configuration.hpp"
-    "include/DataManagement.hpp"
-    "include/DataTable.hpp"
+    "include/DataManager.hpp"
     "include/Reader.hpp"
     "include/Writer.hpp"
     DESTINATION include

@@ -10,24 +10,29 @@
 namespace datamanagement {
     using Row = std::vector<std::string>;
     using Table = std::vector<Row>;
-    class DataManagerBase {
+    class DataManager {
+    protected:
+        std::string quoter(const std::string &s) const {
+            return std::string("'") + s + std::string("'");
+        }
+
     private:
-        class DataManager;
+        class Database;
         class Config;
-        std::unique_ptr<DataManager> pImplDM;
+        std::unique_ptr<Database> pImplDB;
         std::unique_ptr<Config> pImplCF;
 
     public:
-        DataManagerBase();
-        ~DataManagerBase();
+        DataManager();
+        ~DataManager();
         int AddCSVTable(std::string const &filepath) const;
-        int Create(std::string const query, Table data) const;
-        int Select(std::string const query, Table data) const;
-        int Update(std::string const query, Table data) const;
-        int Delete(std::string const query, Table data) const;
-        int GetFromConfig(std::string const key, std::any &data) const;
-        std::vector<std::string>
-        GetConfigSectionCategories(std::string const section) const;
+        int Create(std::string const query, Table &data) const;
+        int Select(std::string const query, Table &data) const;
+        int Update(std::string const query, Table &data) const;
+        int Delete(std::string const query, Table &data) const;
+        int GetFromConfig(std::string const key, std::string &data) const;
+        int GetConfigSectionCategories(std::string const section,
+                                       std::vector<std::string> &data) const;
     };
 }; // namespace datamanagement
 
