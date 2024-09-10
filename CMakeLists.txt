@@ -7,6 +7,7 @@ project(
 )
 
 find_package(SQLite3 REQUIRED)
+find_package(Boost REQUIRED)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
@@ -37,10 +38,10 @@ if(BUILD_STATIC_LIBRARY STREQUAL ON)
     ${PRIVATE_SOURCE_LIST}
   )
 
-  target_link_libraries(
-    ${PROJECT_NAME}
-    PRIVATE
+  target_link_libraries(${PROJECT_NAME} 
+    PRIVATE 
         SQLite::SQLite3
+        Boost::boost
   )
 
   # target_sources(${PROJECT_NAME} PUBLIC FILE_SET headers TYPE HEADERS)
@@ -92,10 +93,10 @@ else()
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
     "$<INSTALL_INTERFACE:include>"
   )
-  target_link_libraries(
-    ${PROJECT_NAME}
-    PRIVATE
+  target_link_libraries(${PROJECT_NAME} 
+    PRIVATE 
         SQLite::SQLite3
+        Boost::boost
   )
   install(
     TARGETS ${PROJECT_NAME}
