@@ -30,6 +30,10 @@ namespace datamanagement {
         int Select(std::string const query, Table &data) const;
         int Update(std::string const query, Table &data) const;
         int Delete(std::string const query, Table &data) const;
+        int SelectCustomCallback(std::string const query,
+                                 int (*callback_func)(void *, int, char **,
+                                                      char **),
+                                 void *data, std::string &error) const;
         int LoadConfig(std::string const &filepath);
         int GetFromConfig(std::string const key, std::string &data) const;
         int GetConfigSectionCategories(std::string const section,

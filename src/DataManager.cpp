@@ -71,6 +71,21 @@ namespace datamanagement {
         int Delete(std::string const query, Table &data) const {
             return ExecuteQuery(query, callback, &data);
         }
+
+        // I Don't Like how unsecure this feels, but we need the ability to
+        // manipulate the callback
+        int SelectCustomCallback(std::string const query,
+                                 int (*callback_func)(void *, int, char **,
+                                                      char **),
+                                 void *data, std::string &error) const {
+            char *error_message;
+            int rc = sqlite3_exec(db, query.c_str(), callback_func, data,
+                                  &error_message);
+            if (rc != SQLITE_OK) {
+                error = std::string(error_message);
+            }
+            return rc;
+        }
     };
 
     class DataManager::Config {
@@ -199,4 +214,12 @@ namespace datamanagement {
     int DataManager::Delete(std::string const query, Table &data) const {
         return pImplDB->Delete(query, data);
     }
+
+    int DataManager::SelectCustomCallback(
+        std::string const query,
+        int (*callback_func)(void *, int, char **, char **), void *data,
+        std::string &error) const {
+        return pImplDB->SelectCustomCallback(query, callback_func, data, error);
+    }
+
 } // namespace datamanagement

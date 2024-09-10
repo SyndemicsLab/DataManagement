@@ -8,6 +8,25 @@
 
 class DataManagerTest : public ::testing::Test {
 protected:
+    struct tablerow {
+        std::string intervention;
+        std::string age;
+        std::string sex;
+        std::string oud;
+        double value;
+    };
+    static int callback(void *storage, int count, char **data, char **columns) {
+        std::vector<struct tablerow> *vecPtr =
+            (std::vector<struct tablerow> *)storage;
+        struct tablerow row;
+        row.intervention = std::string(data[0]);
+        row.age = std::string(data[1]);
+        row.sex = std::string(data[2]);
+        row.oud = std::string(data[3]);
+        row.value = std::stod(std::string(data[4]));
+        vecPtr->push_back(row);
+        return 0;
+    };
     std::filesystem::path tempPath;
     std::filesystem::path absolute;
     std::filesystem::path configFile;
@@ -149,6 +168,16 @@ TEST_F(DataManagerTest, Select) {
             ++i;
         }
     }
+}
+
+TEST_F(DataManagerTest, SelectCustomCallback) {
+    std::string sql = "SELECT * FROM '" + testTableName + "';";
+    std::vector<struct tablerow> result = {};
+    std::string error = "";
+    int rc = testManager.SelectCustomCallback(sql, callback, &result, error);
+    ASSERT_EQ(rc, 0);
+    ASSERT_EQ(result[0].intervention, "No_Treatment");
+    ASSERT_NEAR(result[2].value, 288.995723856067, 0.000001);
 }
 
 TEST_F(DataManagerTest, Update) {
