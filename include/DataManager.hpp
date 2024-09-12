@@ -26,6 +26,8 @@ namespace datamanagement {
         DataManager();
         ~DataManager();
         int AddCSVTable(std::string const &filepath) const;
+        int WriteTableToCSV(std::string const &filepath, std::string tablename,
+                            std::string column_names) const;
         int Create(std::string const query, Table &data) const;
         int Select(std::string const query, Table &data) const;
         int Update(std::string const query, Table &data) const;

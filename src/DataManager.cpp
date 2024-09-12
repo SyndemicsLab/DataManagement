@@ -202,6 +202,29 @@ namespace datamanagement {
         csv.close();
         return rc;
     }
+    int DataManager::WriteTableToCSV(std::string const &filepath,
+                                     std::string tablename,
+                                     std::string column_names) const {
+        std::ofstream csv;
+        csv.open(filepath, std::ofstream::out);
+        if (!csv) {
+            return false;
+        }
+        csv << column_names << std::endl;
+
+        Table data;
+        std::stringstream query;
+        query << "SELECT " << column_names << " FROM " << tablename;
+        pImplDB->Select(query.str(), data);
+        for (auto &row : data) {
+            for (auto &val : row) {
+                csv << val;
+            }
+            csv << std::endl;
+        }
+        csv.close();
+        return 0;
+    }
     int DataManager::Create(std::string const query, Table &data) const {
         return pImplDB->Create(query, data);
     }

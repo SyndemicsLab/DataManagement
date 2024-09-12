@@ -129,6 +129,40 @@ TEST_F(DataManagerTest, AddCSVTable) {
     ASSERT_EQ(std::stoi(data[0][0]), 2);
 }
 
+TEST_F(DataManagerTest, WriteTableToCSV) {
+    tempStream
+        << "block,agegrp,sex,oud,counts" << std::endl
+        << "No_Treatment,10_14,Male,Active_Noninjection,2917.55795376043"
+        << std::endl
+        << "No_Treatment,10_14,Male,Active_Injection,977.390032367151"
+        << std::endl
+        << "No_Treatment,10_14,Male,Nonactive_Noninjection,288.995723856067";
+    tempStream.close();
+
+    int rc = testManager.AddCSVTable(absolute);
+
+    std::filesystem::path tempResult;
+    std::filesystem::path absoluteResult;
+    tempResult = std::tmpnam(nullptr) + std::string(".csv");
+    absoluteResult = std::filesystem::temp_directory_path() / tempResult;
+    testManager.WriteTableToCSV(absoluteResult, absolute.filename().stem(),
+                                "block,agegrp,sex,out,counts");
+
+    std::vector<std::string> expected = {
+        "block,agegrp,sex,oud,counts",
+        "No_Treatment,10_14,Male,Active_Noninjection,2917.55795376043",
+        "No_Treatment,10_14,Male,Active_Injection,977.390032367151",
+        "No_Treatment,10_14,Male,Nonactive_Noninjection,288.995723856067"};
+    std::ifstream resultStream;
+    resultStream.open(absolute, std::ios::in);
+    std::string line;
+    int i = 0;
+    while (std::getline(resultStream, line)) {
+        ASSERT_EQ(line, expected[i]);
+        ++i;
+    }
+}
+
 TEST_F(DataManagerTest, Create) {
     std::string sql = "CREATE TABLE WORDS("
                       "ID INT PRIMARY KEY  NOT NULL,"
