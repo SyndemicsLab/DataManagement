@@ -20,7 +20,8 @@ showhelp () {
     echo "               Default: Debug"
     echo "p              Build and run tests."
     echo "l              Build Shared Library."
-    echo "n              Build Benchmarking executable"
+    echo "n              Build Benchmarking executable."
+    echo "i PATH         Install Library To Given Path."
 }
 
 # red output
@@ -36,10 +37,12 @@ err () {
 BUILDTYPE="Release"
 BUILD_TESTS=""
 BUILD_BENCHMARK=""
-BUILD_STATIC_LIBRARY="ON"
+BUILD_SHARED_LIBS="ON"
+INSTALL_PATH="${CMAKE_SOURCE_DIR}/install"
+INSTALL="OFF"
 
 # process optional command line flags
-while getopts ":lhnpt:" option; do
+while getopts ":lhnpti:" option; do
     case $option in
         h)
             showhelp
@@ -60,10 +63,14 @@ while getopts ":lhnpt:" option; do
             BUILD_TESTS="ON"
             ;;
         l)
-            BUILD_STATIC_LIBRARY="OFF"
+            BUILD_SHARED_LIBS="OFF"
             ;;
         n)
             BUILD_BENCHMARK="ON"
+            ;;
+        i)
+            INSTALL_PATH="$OPTARG"
+            INSTALL="ON"
             ;;
         \?)
             err "Error: Invalid option flag provided!"
@@ -94,7 +101,9 @@ done
         fi
 	# build static library if BUILD_STATIC_LIBRARY is on, otherwise build
 	# shared library
-        CMAKE_COMMAND="$CMAKE_COMMAND -DBUILD_STATIC_LIBRARY=$BUILD_STATIC_LIBRARY"
+    CMAKE_COMMAND="$CMAKE_COMMAND -DBUILD_SHARED_LIBS=$BUILD_SHARED_LIBS"
+
+    CMAKE_COMMAND="$CMAKE_COMMAND -DCMAKE_INSTALL_PREFIX=$INSTALL_PATH"
 
 	err "[EXECUTE] $CMAKE_COMMAND"
         # run the full build command as specified
@@ -108,8 +117,13 @@ done
         (
             # determine the number of processing units available
             CORES="$(nproc --all)"
-            # if CORES > 1 compile in parallel where possible
-            ([[ -n "$CORES" ]] && cmake --build . -j"$CORES") || cmake --build .
+            if [[ (-n "$INSTALL") ]]; then
+                # if CORES > 1 compile in parallel where possible
+                ([[ -n "$CORES" ]] && cmake --build . -j"$CORES" --target install) || cmake --build . --target install
+            else
+                # if CORES > 1 compile in parallel where possible
+                ([[ -n "$CORES" ]] && cmake --build . -j"$CORES") || cmake --build .
+            fi
         )
     )
     # run tests, if they built properly
