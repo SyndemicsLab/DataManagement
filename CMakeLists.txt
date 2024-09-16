@@ -106,6 +106,7 @@ else()
     RUNTIME DESTINATION bin
     INCLUDES DESTINATION include
   )
+  install(IMPORTED_RUNTIME_ARTIFACTS ${PROJECT_NAME})
 
   install(
     FILES
@@ -146,6 +147,7 @@ else()
     VERSION "${version}"
     COMPATIBILITY AnyNewerVersion
   )
+  
 endif()
 
 
