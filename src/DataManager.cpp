@@ -86,6 +86,22 @@ namespace datamanagement {
             }
             return rc;
         }
+
+        int SaveDatabase(std::string const &outfile) {
+            if (db) {
+                sqlite3_close(db);
+            }
+            if (std::filesystem::exists("temp.db")) {
+                std::ifstream src("temp.db", std::ios::binary);
+                std::ofstream dest(outfile, std::ios::binary);
+                dest << src.rdbuf();
+                src.close();
+                dest.close();
+                return 0;
+            } else {
+                return -1;
+            }
+        }
     };
 
     class DataManager::Config {
@@ -243,6 +259,10 @@ namespace datamanagement {
         int (*callback_func)(void *, int, char **, char **), void *data,
         std::string &error) const {
         return pImplDB->SelectCustomCallback(query, callback_func, data, error);
+    }
+
+    int DataManager::SaveDatabase(std::string const &outfile) {
+        return pImplDB->SaveDatabase(outfile);
     }
 
 } // namespace datamanagement

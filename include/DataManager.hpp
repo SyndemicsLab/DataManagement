@@ -40,6 +40,7 @@ namespace datamanagement {
         int GetFromConfig(std::string const key, std::string &data) const;
         int GetConfigSectionCategories(std::string const section,
                                        std::vector<std::string> &data) const;
+        int SaveDatabase(std::string const &outfile);
     };
 }; // namespace datamanagement
 
