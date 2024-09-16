@@ -92,7 +92,7 @@ install(TARGETS ${PROJECT_NAME}
 # generate and install export file
 install(EXPORT "${PROJECT_NAME}Targets"
     FILE "${PROJECT_NAME}Targets.cmake"
-    NAMESPACE ${namespace}::
+    NAMESPACE DataManagement::
     DESTINATION cmake
 )
 
