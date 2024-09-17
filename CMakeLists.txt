@@ -46,7 +46,7 @@ target_include_directories(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME} 
     PRIVATE 
         ${SQLite3_LIBRARIES}
-        ${Boost_LIBRARIES}
+        ${Boost_LIBRARY_DIRS}
 )
 
 # note that it is not CMAKE_INSTALL_PREFIX we are checking here
