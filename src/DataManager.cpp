@@ -37,6 +37,9 @@ namespace datamanagement {
                                   &error_message);
             // If there is an error, return the error message in the first index
             // of the data vector
+            if (data == nullptr) {
+                return -1;
+            }
             Table *vecPtr = (Table *)data;
             Row row;
             if (rc != SQLITE_OK) {
@@ -60,7 +63,7 @@ namespace datamanagement {
 
         // CRUD Logical Wrappers
         int Create(std::string const query, Table &data) const {
-            return ExecuteQuery(query, NULL, 0);
+            return ExecuteQuery(query, NULL, &data);
         }
         int Select(std::string const query, Table &data) const {
             return ExecuteQuery(query, callback, &data);
