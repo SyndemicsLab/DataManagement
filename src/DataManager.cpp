@@ -4,9 +4,12 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <mutex>
 #include <sqlite3.h>
 #include <sstream>
 #include <vector>
+
+std::mutex m;
 
 namespace datamanagement {
     class DataManager::Database {
@@ -33,8 +36,10 @@ namespace datamanagement {
                          int (*callback_func)(void *, int, char **, char **),
                          void *data) const {
             char *error_message;
+            m.lock();
             int rc = sqlite3_exec(db, query.c_str(), callback_func, data,
                                   &error_message);
+            m.unlock();
             // If there is an error, return the error message in the first index
             // of the data vector
             if (data == nullptr) {
@@ -82,8 +87,10 @@ namespace datamanagement {
                                                       char **),
                                  void *data, std::string &error) const {
             char *error_message;
+            m.lock();
             int rc = sqlite3_exec(db, query.c_str(), callback_func, data,
                                   &error_message);
+            m.unlock();
             if (rc != SQLITE_OK) {
                 error = std::string(error_message);
             }
