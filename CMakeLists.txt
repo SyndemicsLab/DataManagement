@@ -45,13 +45,8 @@ target_include_directories(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME} 
     PRIVATE 
-        SQLite::SQLite3
-        Boost::boost
-)
-
-set_target_properties(${PROJECT_NAME}
-       PROPERTIES
-       LINK_FLAGS "-Wl,-rpath,${RPATH}"
+        ${SQLite3_LIBRARIES}
+        ${Boost_LIBRARIES}
 )
 
 # note that it is not CMAKE_INSTALL_PREFIX we are checking here
