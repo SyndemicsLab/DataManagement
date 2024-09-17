@@ -49,6 +49,11 @@ target_link_libraries(${PROJECT_NAME}
         Boost::boost
 )
 
+set_target_properties(${PROJECT_NAME}
+       PROPERTIES
+       LINK_FLAGS "-Wl,-rpath,${RPATH}"
+)
+
 # note that it is not CMAKE_INSTALL_PREFIX we are checking here
 if(DEFINED CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     message(
@@ -90,7 +95,6 @@ install(TARGETS ${PROJECT_NAME}
     PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME} # include/SomeLibrary
     INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} # include
 )
-install(IMPORTED_RUNTIME_ARTIFACTS ${PROJECT_NAME})
 
 # generate and install export file
 install(EXPORT "${PROJECT_NAME}Targets"
