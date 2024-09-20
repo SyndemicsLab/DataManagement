@@ -5,7 +5,7 @@
 #include <memory>
 
 namespace datamanagement {
-    class DataManager : DataManagerBase {
+    class DataManager : public DataManagerBase {
     protected:
         std::string quoter(const std::string &s) const {
             return std::string("'") + s + std::string("'");
