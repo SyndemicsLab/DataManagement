@@ -74,6 +74,7 @@ endif()
 
 SET(public_headers
     include/DataManager.hpp
+    include/DataManagerBase.hpp
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES PUBLIC_HEADER "${public_headers}")
