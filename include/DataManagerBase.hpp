@@ -8,6 +8,7 @@ namespace datamanagement {
     using Row = std::vector<std::string>;
     using Table = std::vector<Row>;
     class DataManagerBase {
+    public:
         virtual int AddCSVTable(std::string const &filepath) const = 0;
         virtual int WriteTableToCSV(std::string const &filepath,
                                     std::string tablename,
