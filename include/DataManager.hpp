@@ -1,16 +1,11 @@
 #ifndef DATAMANAGER_HPP_
 #define DATAMANAGER_HPP_
 
-#include <any>
+#include "DataManagerBase.hpp"
 #include <memory>
-#include <string>
-#include <unordered_map>
-#include <vector>
 
 namespace datamanagement {
-    using Row = std::vector<std::string>;
-    using Table = std::vector<Row>;
-    class DataManager {
+    class DataManager : DataManagerBase {
     protected:
         std::string quoter(const std::string &s) const {
             return std::string("'") + s + std::string("'");
@@ -25,22 +20,24 @@ namespace datamanagement {
     public:
         DataManager();
         ~DataManager();
-        int AddCSVTable(std::string const &filepath) const;
+        int AddCSVTable(std::string const &filepath) const override;
         int WriteTableToCSV(std::string const &filepath, std::string tablename,
-                            std::string column_names) const;
-        int Create(std::string const query, Table &data) const;
-        int Select(std::string const query, Table &data) const;
-        int Update(std::string const query, Table &data) const;
-        int Delete(std::string const query, Table &data) const;
+                            std::string column_names) const override;
+        int Create(std::string const query, Table &data) const override;
+        int Select(std::string const query, Table &data) const override;
+        int Update(std::string const query, Table &data) const override;
+        int Delete(std::string const query, Table &data) const override;
         int SelectCustomCallback(std::string const query,
                                  int (*callback_func)(void *, int, char **,
                                                       char **),
-                                 void *data, std::string &error) const;
-        int LoadConfig(std::string const &filepath);
-        int GetFromConfig(std::string const key, std::string &data) const;
-        int GetConfigSectionCategories(std::string const section,
-                                       std::vector<std::string> &data) const;
-        int SaveDatabase(std::string const &outfile);
+                                 void *data, std::string &error) const override;
+        int LoadConfig(std::string const &filepath) override;
+        int GetFromConfig(std::string const key,
+                          std::string &data) const override;
+        int GetConfigSectionCategories(
+            std::string const section,
+            std::vector<std::string> &data) const override;
+        int SaveDatabase(std::string const &outfile) override;
     };
 }; // namespace datamanagement
 
