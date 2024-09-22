@@ -96,6 +96,7 @@ done
         CMAKE_COMMAND="cmake .. -DCMAKE_BUILD_TYPE=$BUILDTYPE"
         if [[ -n "$BUILD_TESTS" ]]; then
             CMAKE_COMMAND="$CMAKE_COMMAND -DBUILD_TESTS=$BUILD_TESTS"
+            rm -rf ../bin/dataTests
         fi
         # build benchmarking executable
         if [[ -n "$BUILD_BENCHMARK" ]]; then
