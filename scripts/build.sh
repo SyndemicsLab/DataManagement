@@ -37,7 +37,7 @@ err () {
 BUILDTYPE="Release"
 BUILD_TESTS=""
 BUILD_BENCHMARK=""
-BUILD_SHARED_LIBS="ON"
+BUILD_SHARED_LIBS="OFF"
 INSTALL_PATH="${CMAKE_SOURCE_DIR}/install"
 INSTALL=""
 
@@ -63,7 +63,7 @@ while getopts ":lhnpti:" option; do
             BUILD_TESTS="ON"
             ;;
         l)
-            BUILD_SHARED_LIBS="OFF"
+            BUILD_SHARED_LIBS="ON"
             ;;
         n)
             BUILD_BENCHMARK="ON"
