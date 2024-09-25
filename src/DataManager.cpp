@@ -16,6 +16,7 @@ namespace datamanagement {
     private:
         /* data */
         sqlite3 *db;
+        sqlite3_stmt *stmt;
 
         // Generalized Callback function used to return a vector of string (each
         // string is a column)
@@ -63,6 +64,7 @@ namespace datamanagement {
         // ends
         ~Database() {
             sqlite3_close(db);
+            sqlite3_finalize(stmt);
             std::filesystem::remove("temp.db");
         }
 
@@ -122,6 +124,40 @@ namespace datamanagement {
             return sqlite3_exec(db, "END TRANSACTION", NULL, NULL,
                                 &error_message);
         }
+        /// @brief Function to Build a Prepared Statement. NOTE: User must call
+        /// sqlite3_finalize later on to free the memory allocated here.
+        /// @param query String to add with the binding spaces marked
+        int BuildTextPreparedStatement(std::string query) {
+            if (this->stmt != nullptr) {
+                sqlite3_finalize(stmt);
+            }
+            return sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, NULL);
+        }
+
+        int BindTextToPreparedStatement(std::vector<std::string> bindings) {
+            if (this->stmt == nullptr) {
+                return -1;
+            }
+            for (int i = 0; i < bindings.size(); ++i) {
+                sqlite3_bind_text(stmt, i, bindings[i].c_str(), -1,
+                                  SQLITE_TRANSIENT);
+            }
+            return 0;
+        }
+
+        int StepAndResetStatement() {
+            if (stmt == nullptr) {
+                return -1;
+            }
+            sqlite3_step(stmt);
+            sqlite3_clear_bindings(stmt);
+            return sqlite3_reset(stmt);
+        }
+
+        /// @brief THIS FUNTION MUST BE CALLED IF YOU CREATE A PREPARED
+        /// STATEMENT THROUGH BuildTextPreparedStatement
+        /// @param stmt
+        int FinalizePreparedStatement() { return sqlite3_finalize(this->stmt); }
     };
 
     class DataManager::Config {
@@ -287,5 +323,19 @@ namespace datamanagement {
 
     int DataManager::StartTransaction() { return pImplDB->StartTransaction(); }
     int DataManager::EndTransaction() { return pImplDB->EndTransaction(); }
+
+    int DataManager::BuildTextPreparedStatement(std::string query) {
+        return pImplDB->BuildTextPreparedStatement(query);
+    }
+    int DataManager::BindTextToPreparedStatement(
+        std::vector<std::string> bindings) {
+        return pImplDB->BindTextToPreparedStatement(bindings);
+    }
+    int DataManager::StepAndResetStatement() {
+        return pImplDB->StepAndResetStatement();
+    }
+    int DataManager::FinalizePreparedStatement() {
+        return pImplDB->FinalizePreparedStatement();
+    }
 
 } // namespace datamanagement
