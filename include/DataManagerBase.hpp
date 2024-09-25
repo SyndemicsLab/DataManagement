@@ -29,13 +29,8 @@ namespace datamanagement {
         GetConfigSectionCategories(std::string const section,
                                    std::vector<std::string> &data) const = 0;
         virtual int SaveDatabase(std::string const &outfile) = 0;
-        virtual int StartTransaction() = 0;
-        virtual int EndTransaction() = 0;
-        virtual int BuildTextPreparedStatement(std::string query) = 0;
-        virtual int
-        BindTextToPreparedStatement(std::vector<std::string> bindings) = 0;
-        virtual int StepAndResetStatement() = 0;
-        virtual int FinalizePreparedStatement() = 0;
+        virtual int StartTransaction() const = 0;
+        virtual int EndTransaction() const = 0;
     };
 } // namespace datamanagement
 

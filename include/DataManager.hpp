@@ -38,13 +38,8 @@ namespace datamanagement {
             std::string const section,
             std::vector<std::string> &data) const override;
         int SaveDatabase(std::string const &outfile) override;
-        int StartTransaction() override;
-        int EndTransaction() override;
-        int BuildTextPreparedStatement(std::string query) override;
-        int
-        BindTextToPreparedStatement(std::vector<std::string> bindings) override;
-        int StepAndResetStatement() override;
-        int FinalizePreparedStatement() override;
+        int StartTransaction() const override;
+        int EndTransaction() const override;
     };
 }; // namespace datamanagement
 

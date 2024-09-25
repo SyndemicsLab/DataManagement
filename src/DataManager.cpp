@@ -4,19 +4,15 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
-#include <mutex>
 #include <sqlite3.h>
 #include <sstream>
 #include <vector>
-
-std::mutex m;
 
 namespace datamanagement {
     class DataManager::Database {
     private:
         /* data */
         sqlite3 *db;
-        sqlite3_stmt *stmt;
 
         // Generalized Callback function used to return a vector of string (each
         // string is a column)
@@ -37,10 +33,8 @@ namespace datamanagement {
                          int (*callback_func)(void *, int, char **, char **),
                          void *data) const {
             char *error_message;
-            m.lock();
             int rc = sqlite3_exec(db, query.c_str(), callback_func, data,
                                   &error_message);
-            m.unlock();
             // If there is an error, return the error message in the first index
             // of the data vector
             if (data == nullptr) {
@@ -55,6 +49,44 @@ namespace datamanagement {
             return rc;
         }
 
+        /// @brief Function to Build a Prepared Statement. NOTE: User must call
+        /// sqlite3_finalize later on to free the memory allocated here.
+        /// @param query String to add with the binding spaces marked
+        sqlite3_stmt *BuildTextPreparedStatement(std::string query) const {
+            sqlite3_stmt *stmt;
+            sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, NULL);
+            return stmt;
+        }
+
+        int
+        BindTextToPreparedStatement(sqlite3_stmt *stmt,
+                                    std::vector<std::string> bindings) const {
+            if (stmt == nullptr) {
+                return -1;
+            }
+            for (int i = 0; i < bindings.size(); ++i) {
+                sqlite3_bind_text(stmt, i + 1, bindings[i].c_str(), -1,
+                                  SQLITE_TRANSIENT);
+            }
+            return 0;
+        }
+
+        int StepAndResetStatement(sqlite3_stmt *stmt) const {
+            if (stmt == nullptr) {
+                return -1;
+            }
+            sqlite3_step(stmt);
+            sqlite3_clear_bindings(stmt);
+            return sqlite3_reset(stmt);
+        }
+
+        /// @brief THIS FUNTION MUST BE CALLED IF YOU CREATE A PREPARED
+        /// STATEMENT THROUGH BuildTextPreparedStatement
+        /// @param stmt
+        int FinalizePreparedStatement(sqlite3_stmt *stmt) const {
+            return sqlite3_finalize(stmt);
+        }
+
     public:
         // This works because we don't care about threadsafe currently. We
         // assume a single DB for the project
@@ -64,7 +96,6 @@ namespace datamanagement {
         // ends
         ~Database() {
             sqlite3_close(db);
-            sqlite3_finalize(stmt);
             std::filesystem::remove("temp.db");
         }
 
@@ -89,10 +120,8 @@ namespace datamanagement {
                                                       char **),
                                  void *data, std::string &error) const {
             char *error_message;
-            m.lock();
             int rc = sqlite3_exec(db, query.c_str(), callback_func, data,
                                   &error_message);
-            m.unlock();
             if (rc != SQLITE_OK) {
                 error = std::string(error_message);
             }
@@ -114,50 +143,85 @@ namespace datamanagement {
                 return -1;
             }
         }
-        int StartTransaction() {
+        int StartTransaction() const {
             char *error_message;
             return sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL,
                                 &error_message);
         }
-        int EndTransaction() {
+        int EndTransaction() const {
             char *error_message;
             return sqlite3_exec(db, "END TRANSACTION", NULL, NULL,
                                 &error_message);
         }
-        /// @brief Function to Build a Prepared Statement. NOTE: User must call
-        /// sqlite3_finalize later on to free the memory allocated here.
-        /// @param query String to add with the binding spaces marked
-        int BuildTextPreparedStatement(std::string query) {
-            if (this->stmt != nullptr) {
-                sqlite3_finalize(stmt);
+        int AddCSVTable(std::string const &file) const {
+            std::ifstream csv;
+            Table data;
+            csv.open(file, std::ios::in);
+            if (!csv) {
+                return false;
             }
-            return sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, NULL);
+            std::string table = std::filesystem::path(file).stem();
+            std::string createquery =
+                "CREATE TABLE IF NOT EXISTS " + table + "(";
+            std::string insertquery = "INSERT INTO '" + table + "' VALUES (";
+            std::string line, word;
+            std::getline(csv, line);
+            std::stringstream s(line);
+
+            // Talk about insecure practices and SQL Injections
+            while (std::getline(s, word, ',')) {
+                createquery += (word + " NOT NULL,");
+                insertquery += "?,";
+            }
+            createquery.pop_back(); // remove last comma
+            createquery += ");";
+            insertquery.pop_back();
+            insertquery += ");";
+            int rc = (SQLITE_OK == Create(createquery, data)) ? SQLITE_OK
+                                                              : SQLITE_ERROR;
+
+            StartTransaction();
+            sqlite3_stmt *stmt = BuildTextPreparedStatement(insertquery);
+
+            // Grab a Row
+            while (std::getline(csv, line)) {
+                Row row = {};
+                std::stringstream s(line);
+                // Grab a Entry in the Row
+                while (std::getline(s, word, ',')) {
+                    row.push_back(word);
+                }
+                BindTextToPreparedStatement(stmt, row);
+                StepAndResetStatement(stmt);
+            }
+            FinalizePreparedStatement(stmt);
+            EndTransaction();
+            csv.close();
+            return rc;
         }
 
-        int BindTextToPreparedStatement(std::vector<std::string> bindings) {
-            if (this->stmt == nullptr) {
-                return -1;
+        int WriteTableToCSV(std::string const &filepath, std::string tablename,
+                            std::string column_names) const {
+            std::ofstream csv;
+            csv.open(filepath, std::ofstream::out);
+            if (!csv) {
+                return false;
             }
-            for (int i = 0; i < bindings.size(); ++i) {
-                sqlite3_bind_text(stmt, i, bindings[i].c_str(), -1,
-                                  SQLITE_TRANSIENT);
+            csv << column_names << std::endl;
+
+            Table data;
+            std::stringstream query;
+            query << "SELECT " << column_names << " FROM " << tablename;
+            Select(query.str(), data);
+            for (auto &row : data) {
+                for (auto &val : row) {
+                    csv << val;
+                }
+                csv << std::endl;
             }
+            csv.close();
             return 0;
         }
-
-        int StepAndResetStatement() {
-            if (stmt == nullptr) {
-                return -1;
-            }
-            sqlite3_step(stmt);
-            sqlite3_clear_bindings(stmt);
-            return sqlite3_reset(stmt);
-        }
-
-        /// @brief THIS FUNTION MUST BE CALLED IF YOU CREATE A PREPARED
-        /// STATEMENT THROUGH BuildTextPreparedStatement
-        /// @param stmt
-        int FinalizePreparedStatement() { return sqlite3_finalize(this->stmt); }
     };
 
     class DataManager::Config {
@@ -227,75 +291,12 @@ namespace datamanagement {
     DataManager::~DataManager() = default;
 
     int DataManager::AddCSVTable(std::string const &file) const {
-        std::ifstream csv;
-        Table data;
-        csv.open(file, std::ios::in);
-        if (!csv) {
-            return false;
-        }
-        std::string table = std::filesystem::path(file).stem();
-        std::string sql = "CREATE TABLE IF NOT EXISTS " + table + "(";
-        std::string line, word, temp;
-        std::vector<std::string> headers;
-        std::getline(csv, line);
-        std::stringstream s(line);
-
-        // Talk about insecure practices and SQL Injections
-        while (std::getline(s, word, ',')) {
-            headers.push_back(word);
-            sql += (word + " NOT NULL,");
-        }
-        sql.pop_back(); // remove last comma
-        sql += ");";
-        int rc = (SQLITE_OK == DataManager::Update(sql, data)) ? SQLITE_OK
-                                                               : SQLITE_ERROR;
-
-        sql.clear();
-        sql = "BEGIN TRANSACTION;";
-        rc = (SQLITE_OK == DataManager::Update(sql, data)) ? rc : SQLITE_ERROR;
-
-        // Talk about insecure practices and SQL Injections
-        while (std::getline(csv, line)) {
-            sql.clear();
-            sql = "INSERT INTO " + this->quoter(table) + " VALUES (";
-            std::stringstream s(line);
-            while (std::getline(s, word, ',')) {
-                sql += (this->quoter(word) + ",");
-            }
-            sql.pop_back(); // remove last comma
-            sql += ");";
-            rc = (SQLITE_OK == DataManager::Update(sql, data)) ? rc
-                                                               : SQLITE_ERROR;
-        }
-        sql.clear();
-        sql = "COMMIT;";
-        rc = (SQLITE_OK == DataManager::Update(sql, data)) ? rc : SQLITE_ERROR;
-
-        csv.close();
-        return rc;
+        return pImplDB->AddCSVTable(file);
     }
     int DataManager::WriteTableToCSV(std::string const &filepath,
                                      std::string tablename,
                                      std::string column_names) const {
-        std::ofstream csv;
-        csv.open(filepath, std::ofstream::out);
-        if (!csv) {
-            return false;
-        }
-        csv << column_names << std::endl;
-
-        Table data;
-        std::stringstream query;
-        query << "SELECT " << column_names << " FROM " << tablename;
-        pImplDB->Select(query.str(), data);
-        for (auto &row : data) {
-            for (auto &val : row) {
-                csv << val;
-            }
-            csv << std::endl;
-        }
-        csv.close();
-        return 0;
+        return pImplDB->WriteTableToCSV(filepath, tablename, column_names);
     }
     int DataManager::Create(std::string const query, Table &data) const {
         return pImplDB->Create(query, data);
@@ -321,21 +322,11 @@ namespace datamanagement {
         return pImplDB->SaveDatabase(outfile);
     }
 
-    int DataManager::StartTransaction() { return pImplDB->StartTransaction(); }
-    int DataManager::EndTransaction() { return pImplDB->EndTransaction(); }
-
-    int DataManager::BuildTextPreparedStatement(std::string query) {
-        return pImplDB->BuildTextPreparedStatement(query);
+    int DataManager::StartTransaction() const {
+        return pImplDB->StartTransaction();
     }
-    int DataManager::BindTextToPreparedStatement(
-        std::vector<std::string> bindings) {
-        return pImplDB->BindTextToPreparedStatement(bindings);
-    }
-    int DataManager::StepAndResetStatement() {
-        return pImplDB->StepAndResetStatement();
-    }
-    int DataManager::FinalizePreparedStatement() {
-        return pImplDB->FinalizePreparedStatement();
+    int DataManager::EndTransaction() const {
+        return pImplDB->EndTransaction();
     }
 
 } // namespace datamanagement

@@ -34,7 +34,7 @@ err () {
 }
 
 # set default build type
-BUILDTYPE="Release"
+BUILDTYPE="Debug"
 BUILD_TESTS=""
 BUILD_BENCHMARK=""
 BUILD_SHARED_LIBS="OFF"
