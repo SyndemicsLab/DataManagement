@@ -112,6 +112,16 @@ namespace datamanagement {
                 return -1;
             }
         }
+        int StartTransaction() {
+            char *error_message;
+            return sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL,
+                                &error_message);
+        }
+        int EndTransaction() {
+            char *error_message;
+            return sqlite3_exec(db, "END TRANSACTION", NULL, NULL,
+                                &error_message);
+        }
     };
 
     class DataManager::Config {
@@ -274,5 +284,8 @@ namespace datamanagement {
     int DataManager::SaveDatabase(std::string const &outfile) {
         return pImplDB->SaveDatabase(outfile);
     }
+
+    int DataManager::StartTransaction() { return pImplDB->StartTransaction(); }
+    int DataManager::EndTransaction() { return pImplDB->EndTransaction(); }
 
 } // namespace datamanagement
