@@ -44,10 +44,8 @@ namespace datamanagement {
         std::string GetDBFileName() const override;
 
         // Copy Operations
-        DataManager(DataManager const &original) = delete;
-        DataManager &operator=(DataManager const &original) = delete;
-        DataManager(DataManager &&) noexcept;
-        DataManager &operator=(DataManager &&) noexcept;
+        DataManager(DataManager const &original);
+        DataManager &operator=(DataManager const &original);
     };
 }; // namespace datamanagement
 

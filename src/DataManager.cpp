@@ -335,9 +335,9 @@ namespace datamanagement {
     }
 
     DataManager::~DataManager() = default;
-    DataManager::DataManager(DataManager &&original) noexcept
+    DataManager::DataManager(DataManager const &original)
         : DataManager(original.GetDBFileName()) {}
-    DataManager &DataManager::operator=(DataManager &&original) noexcept {
+    DataManager &DataManager::operator=(DataManager const &original) {
         pImplDB = std::make_unique<Database>(original.GetDBFileName());
         pImplCF = std::make_unique<Config>();
         return *this;
