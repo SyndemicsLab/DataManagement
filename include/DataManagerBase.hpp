@@ -23,6 +23,7 @@ namespace datamanagement {
                                          void *data,
                                          std::string &error) const = 0;
         virtual int LoadConfig(std::string const &filepath) = 0;
+        virtual std::string GetConfigFile() const = 0;
         virtual int GetFromConfig(std::string const key,
                                   std::string &data) const = 0;
         virtual int

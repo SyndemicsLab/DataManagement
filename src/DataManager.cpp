@@ -240,6 +240,7 @@ namespace datamanagement {
     class DataManager::Config {
     private:
         boost::property_tree::ptree ptree;
+        std::string configfile = "";
         bool tree_loaded = false;
 
     public:
@@ -247,10 +248,13 @@ namespace datamanagement {
         ~Config() = default;
 
         int LoadConfig(std::string const &filepath) {
+            configfile = filepath;
             read_ini(filepath, this->ptree);
             tree_loaded = true;
             return 0;
         }
+
+        std::string GetConfigFile() const { return configfile; }
 
         int GetFromConfig(std::string const key, std::string &data) const {
             if (!tree_loaded) {
@@ -284,6 +288,10 @@ namespace datamanagement {
 
     int DataManager::LoadConfig(std::string const &filepath) {
         return pImplCF->LoadConfig(filepath);
+    }
+
+    std::string DataManager::GetConfigFile() const {
+        return pImplCF->GetConfigFile();
     }
 
     int DataManager::GetFromConfig(std::string const key,

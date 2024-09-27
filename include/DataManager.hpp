@@ -30,6 +30,7 @@ namespace datamanagement {
                                                       char **),
                                  void *data, std::string &error) const override;
         int LoadConfig(std::string const &filepath) override;
+        std::string GetConfigFile() const override;
         int GetFromConfig(std::string const key,
                           std::string &data) const override;
         int GetConfigSectionCategories(
