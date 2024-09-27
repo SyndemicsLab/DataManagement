@@ -133,8 +133,10 @@ namespace datamanagement {
                                                       char **),
                                  void *data, std::string &error) const {
             char *error_message;
+            StartTransaction();
             int rc = sqlite3_exec(db, query.c_str(), callback_func, data,
                                   &error_message);
+            EndTransaction();
             if (rc != SQLITE_OK) {
                 error = std::string(error_message);
             }
