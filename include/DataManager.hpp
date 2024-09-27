@@ -18,7 +18,8 @@ namespace datamanagement {
         std::unique_ptr<Config> pImplCF;
 
     public:
-        DataManager();
+        DataManager(std::string const &dbfile);
+        DataManager() = delete;
         ~DataManager();
         int AddCSVTable(std::string const &filepath) const override;
         int WriteTableToCSV(std::string const &filepath, std::string tablename,

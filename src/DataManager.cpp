@@ -90,14 +90,13 @@ namespace datamanagement {
     public:
         // This works because we don't care about threadsafe currently. We
         // assume a single DB for the project
-        Database(/* args */) { sqlite3_open("temp.db", &db); }
+        Database(std::string const &dbfile) {
+            sqlite3_open(dbfile.c_str(), &db);
+        }
 
         // Must always close the DB and delete the temp db file when the Manager
         // ends
-        ~Database() {
-            sqlite3_close(db);
-            std::filesystem::remove("temp.db");
-        }
+        ~Database() { sqlite3_close(db); }
 
         // CRUD Logical Wrappers
         int Create(std::string const query, Table &data) const {
@@ -283,8 +282,8 @@ namespace datamanagement {
         return pImplCF->GetConfigSectionCategories(section, data);
     }
 
-    DataManager::DataManager() {
-        pImplDB = std::make_unique<Database>();
+    DataManager::DataManager(std::string const &dbfile) {
+        pImplDB = std::make_unique<Database>(dbfile);
         pImplCF = std::make_unique<Config>();
     }
 
