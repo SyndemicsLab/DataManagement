@@ -31,6 +31,7 @@ namespace datamanagement {
         virtual int SaveDatabase(std::string const &outfile) = 0;
         virtual int StartTransaction() const = 0;
         virtual int EndTransaction() const = 0;
+        virtual std::string GetDBFileName() const = 0;
     };
 } // namespace datamanagement
 

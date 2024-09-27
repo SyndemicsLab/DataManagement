@@ -41,10 +41,11 @@ namespace datamanagement {
         int SaveDatabase(std::string const &outfile) override;
         int StartTransaction() const override;
         int EndTransaction() const override;
+        std::string GetDBFileName() const override;
 
         // Copy Operations
-        DataManager(DataManager const &) = delete;
-        DataManager &operator=(DataManager const &) = delete;
+        DataManager(DataManager const &original) = delete;
+        DataManager &operator=(DataManager const &original) = delete;
         DataManager(DataManager &&) noexcept;
         DataManager &operator=(DataManager &&) noexcept;
     };

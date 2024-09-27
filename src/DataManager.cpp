@@ -13,6 +13,7 @@ namespace datamanagement {
     private:
         /* data */
         sqlite3 *db;
+        std::string dbf = "";
 
         // Generalized Callback function used to return a vector of string (each
         // string is a column)
@@ -91,6 +92,7 @@ namespace datamanagement {
         // This works because we don't care about threadsafe currently. We
         // assume a single DB for the project
         Database(std::string const &dbfile) {
+            dbf = dbfile;
             sqlite3_open(dbfile.c_str(), &db);
         }
 
@@ -221,6 +223,8 @@ namespace datamanagement {
             csv.close();
             return 0;
         }
+
+        std::string GetDBFileName() const { return dbf; }
     };
 
     class DataManager::Config {
@@ -321,13 +325,22 @@ namespace datamanagement {
         return pImplDB->EndTransaction();
     }
 
+    std::string DataManager::GetDBFileName() const {
+        return pImplDB->GetDBFileName();
+    }
+
     DataManager::DataManager(std::string const &dbfile) {
         pImplDB = std::make_unique<Database>(dbfile);
         pImplCF = std::make_unique<Config>();
     }
 
     DataManager::~DataManager() = default;
-    DataManager::DataManager(DataManager &&) noexcept = default;
-    DataManager &DataManager::operator=(DataManager &&) noexcept = default;
+    DataManager::DataManager(DataManager &&original) noexcept
+        : DataManager(original.GetDBFileName()) {}
+    DataManager &DataManager::operator=(DataManager &&original) noexcept {
+        pImplDB = std::make_unique<Database>(original.GetDBFileName());
+        pImplCF = std::make_unique<Config>();
+        return *this;
+    }
 
 } // namespace datamanagement
