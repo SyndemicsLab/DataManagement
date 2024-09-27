@@ -18,9 +18,6 @@ namespace datamanagement {
         std::unique_ptr<Config> pImplCF;
 
     public:
-        DataManager(std::string const &dbfile);
-        DataManager() = delete;
-        ~DataManager();
         int AddCSVTable(std::string const &filepath) const override;
         int WriteTableToCSV(std::string const &filepath, std::string tablename,
                             std::string column_names) const override;
@@ -42,10 +39,19 @@ namespace datamanagement {
         int StartTransaction() const override;
         int EndTransaction() const override;
         std::string GetDBFileName() const override;
+        int ConnectToDatabase(std::string const &dbfile) override;
+
+        // Default Constructor/Destructor
+        DataManager();
+        ~DataManager();
 
         // Copy Operations
-        DataManager(DataManager const &original);
-        DataManager &operator=(DataManager const &original);
+        DataManager(DataManager const &) = default;
+        DataManager &operator=(DataManager const &) = default;
+
+        // Move Operations
+        DataManager(DataManager &&) noexcept;
+        DataManager &operator=(DataManager &&) noexcept;
     };
 }; // namespace datamanagement
 

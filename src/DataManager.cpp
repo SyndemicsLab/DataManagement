@@ -14,6 +14,7 @@ namespace datamanagement {
         /* data */
         sqlite3 *db;
         std::string dbf = "";
+        bool db_isopen = false;
 
         // Generalized Callback function used to return a vector of string (each
         // string is a column)
@@ -36,10 +37,13 @@ namespace datamanagement {
             char *error_message;
             int rc = sqlite3_exec(db, query.c_str(), callback_func, data,
                                   &error_message);
+            if (rc != SQLITE_OK) {
+                return rc;
+            }
             // If there is an error, return the error message in the first index
             // of the data vector
             if (data == nullptr) {
-                return -1;
+                return rc;
             }
             Table *vecPtr = (Table *)data;
             Row row;
@@ -89,16 +93,22 @@ namespace datamanagement {
         }
 
     public:
-        // This works because we don't care about threadsafe currently. We
-        // assume a single DB for the project
-        Database(std::string const &dbfile) {
+        Database() {}
+
+        int ConnectToDatabase(std::string const &dbfile) {
             dbf = dbfile;
-            sqlite3_open(dbfile.c_str(), &db);
+            int rc = sqlite3_open(dbfile.c_str(), &db);
+            db_isopen = (rc == SQLITE_OK) ? true : false;
+            return rc;
         }
 
         // Must always close the DB and delete the temp db file when the Manager
         // ends
-        ~Database() { sqlite3_close(db); }
+        ~Database() {
+            if (db_isopen) {
+                sqlite3_close(db);
+            }
+        }
 
         // CRUD Logical Wrappers
         int Create(std::string const query, Table &data) const {
@@ -133,8 +143,8 @@ namespace datamanagement {
             if (db) {
                 sqlite3_close(db);
             }
-            if (std::filesystem::exists("temp.db")) {
-                std::ifstream src("temp.db", std::ios::binary);
+            if (std::filesystem::exists(GetDBFileName())) {
+                std::ifstream src(GetDBFileName(), std::ios::binary);
                 std::ofstream dest(outfile, std::ios::binary);
                 dest << src.rdbuf();
                 src.close();
@@ -329,18 +339,17 @@ namespace datamanagement {
         return pImplDB->GetDBFileName();
     }
 
-    DataManager::DataManager(std::string const &dbfile) {
-        pImplDB = std::make_unique<Database>(dbfile);
-        pImplCF = std::make_unique<Config>();
+    int DataManager::ConnectToDatabase(std::string const &dbfile) {
+        return pImplDB->ConnectToDatabase(dbfile);
     }
 
-    DataManager::~DataManager() = default;
-    DataManager::DataManager(DataManager const &original)
-        : DataManager(original.GetDBFileName()) {}
-    DataManager &DataManager::operator=(DataManager const &original) {
-        pImplDB = std::make_unique<Database>(original.GetDBFileName());
+    DataManager::DataManager() {
+        pImplDB = std::make_unique<Database>();
         pImplCF = std::make_unique<Config>();
-        return *this;
     }
+    DataManager::~DataManager() = default;
+
+    DataManager::DataManager(DataManager &&) noexcept = default;
+    DataManager &DataManager::operator=(DataManager &&) noexcept = default;
 
 } // namespace datamanagement
