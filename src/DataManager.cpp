@@ -282,13 +282,6 @@ namespace datamanagement {
         return pImplCF->GetConfigSectionCategories(section, data);
     }
 
-    DataManager::DataManager(std::string const &dbfile) {
-        pImplDB = std::make_unique<Database>(dbfile);
-        pImplCF = std::make_unique<Config>();
-    }
-
-    DataManager::~DataManager() = default;
-
     int DataManager::AddCSVTable(std::string const &file) const {
         return pImplDB->AddCSVTable(file);
     }
@@ -327,5 +320,14 @@ namespace datamanagement {
     int DataManager::EndTransaction() const {
         return pImplDB->EndTransaction();
     }
+
+    DataManager::DataManager(std::string const &dbfile) {
+        pImplDB = std::make_unique<Database>(dbfile);
+        pImplCF = std::make_unique<Config>();
+    }
+
+    DataManager::~DataManager() = default;
+    DataManager::DataManager(DataManager &&) noexcept = default;
+    DataManager &DataManager::operator=(DataManager &&) noexcept = default;
 
 } // namespace datamanagement

@@ -41,6 +41,12 @@ namespace datamanagement {
         int SaveDatabase(std::string const &outfile) override;
         int StartTransaction() const override;
         int EndTransaction() const override;
+
+        // Copy Operations
+        DataManager(DataManager const &) = delete;
+        DataManager &operator=(DataManager const &) = delete;
+        DataManager(DataManager &&) noexcept;
+        DataManager &operator=(DataManager &&) noexcept;
     };
 }; // namespace datamanagement
 
