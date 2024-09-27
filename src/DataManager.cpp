@@ -34,9 +34,11 @@ namespace datamanagement {
         int ExecuteQuery(std::string const query,
                          int (*callback_func)(void *, int, char **, char **),
                          void *data) const {
+            StartTransaction();
             char *error_message;
             int rc = sqlite3_exec(db, query.c_str(), callback_func, data,
                                   &error_message);
+            EndTransaction();
             if (rc != SQLITE_OK) {
                 return rc;
             }
