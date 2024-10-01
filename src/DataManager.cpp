@@ -39,18 +39,18 @@ namespace datamanagement {
             int rc = sqlite3_exec(db, query.c_str(), callback_func, data,
                                   &error_message);
             EndTransaction();
-            if (rc != SQLITE_OK) {
-                return rc;
-            }
-            // If there is an error, return the error message in the first index
-            // of the data vector
-            if (data == nullptr) {
-                return rc;
-            }
             Table *vecPtr = (Table *)data;
             Row row;
+            // If there is an error, return the error message in the first index
+            // of the data vector
             if (rc != SQLITE_OK) {
-                row.push_back(std::string(error_message));
+                row.push_back(CleanErrorMessages(error_message));
+                vecPtr->push_back(row);
+                return rc;
+            }
+
+            if (data == nullptr) {
+                row.push_back("");
                 vecPtr->push_back(row);
             }
             return rc;
@@ -92,6 +92,15 @@ namespace datamanagement {
         /// @param stmt
         int FinalizePreparedStatement(sqlite3_stmt *stmt) const {
             return sqlite3_finalize(stmt);
+        }
+
+        /// @brief I HATE SQLITE SOMETIMES
+        /// @param message The char * to free
+        /// @return The string copy of the error message that has scope
+        std::string CleanErrorMessages(char *message) const {
+            std::string usable_error = std::string(message);
+            sqlite3_free(message);
+            return usable_error;
         }
 
     public:
@@ -143,7 +152,7 @@ namespace datamanagement {
                                   &error_message);
             EndTransaction();
             if (rc != SQLITE_OK) {
-                error = std::string(error_message);
+                error = CleanErrorMessages(error_message);
             }
             return rc;
         }
