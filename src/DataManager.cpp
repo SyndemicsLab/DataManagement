@@ -104,13 +104,18 @@ namespace datamanagement {
             return rc;
         }
 
+        int CloseConnection() {
+            int rc = 0;
+            if (db_isopen) {
+                rc = sqlite3_close(db);
+                db_isopen = (rc == SQLITE_OK) ? false : true;
+            }
+            return rc;
+        }
+
         // Must always close the DB and delete the temp db file when the Manager
         // ends
-        ~Database() {
-            if (db_isopen) {
-                sqlite3_close(db);
-            }
-        }
+        ~Database() { CloseConnection(); }
 
         // CRUD Logical Wrappers
         int Create(std::string const query, Table &data) const {
@@ -144,8 +149,8 @@ namespace datamanagement {
         }
 
         int SaveDatabase(std::string const &outfile) {
-            if (db) {
-                sqlite3_close(db);
+            if (db_isopen) {
+                CloseConnection();
             }
             if (std::filesystem::exists(GetDBFileName())) {
                 std::ifstream src(GetDBFileName(), std::ios::binary);
@@ -177,7 +182,7 @@ namespace datamanagement {
             }
             std::string table = std::filesystem::path(file).stem();
             std::string createquery =
-                "CREATE TABLE IF NOT EXISTS " + table + "(";
+                "CREATE TABLE IF NOT EXISTS " + table + " (";
             std::string insertquery = "INSERT INTO '" + table + "' VALUES (";
             std::string line, word;
             std::getline(csv, line);
@@ -355,11 +360,13 @@ namespace datamanagement {
         return pImplDB->ConnectToDatabase(dbfile);
     }
 
+    int DataManager::CloseConnection() { return pImplDB->CloseConnection(); }
+
     DataManager::DataManager() {
         pImplDB = std::make_unique<Database>();
         pImplCF = std::make_unique<Config>();
     }
-    DataManager::~DataManager() = default;
+    DataManager::~DataManager() { pImplDB->CloseConnection(); }
 
     DataManager::DataManager(DataManager &&) noexcept = default;
     DataManager &DataManager::operator=(DataManager &&) noexcept = default;

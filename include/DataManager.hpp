@@ -41,6 +41,7 @@ namespace datamanagement {
         int EndTransaction() const override;
         std::string GetDBFileName() const override;
         int ConnectToDatabase(std::string const &dbfile) override;
+        int CloseConnection() override;
 
         // Default Constructor/Destructor
         DataManager();

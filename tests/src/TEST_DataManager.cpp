@@ -28,6 +28,7 @@ protected:
         vecPtr->push_back(row);
         return 0;
     };
+
     std::filesystem::path tempPath;
     std::filesystem::path absolute;
     std::filesystem::path configFile;
@@ -149,7 +150,7 @@ TEST_F(DataManagerTest, WriteTableToCSV) {
     tempResult = std::tmpnam(nullptr) + std::string(".csv");
     absoluteResult = std::filesystem::temp_directory_path() / tempResult;
     testManager.WriteTableToCSV(absoluteResult, absolute.filename().stem(),
-                                "block,agegrp,sex,out,counts");
+                                "block,agegrp,sex,oud,counts");
 
     std::vector<std::string> expected = {
         "block,agegrp,sex,oud,counts",
