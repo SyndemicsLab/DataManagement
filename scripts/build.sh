@@ -21,7 +21,7 @@ showhelp () {
     echo "p              Build and run tests."
     echo "l              Build Shared Library."
     echo "n              Build Benchmarking executable."
-    echo "i PATH         Install Library To Given Path."
+    echo "i PATH         Install Library To PATH."
 }
 
 # red output
