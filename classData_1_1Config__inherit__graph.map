@@ -1,6 +1,0 @@
-<map id="Data::Config" name="Data::Config">
-<area shape="rect" id="node1" title="Class describing a standard configuration file." alt="" coords="89,155,192,181"/>
-<area shape="rect" id="node2" href="$classData_1_1IConfigable.html" title="Interface used for Configuration, provides guaranteed methods." alt="" coords="73,80,208,107"/>
-<area shape="rect" id="node3" href="$classData_1_1IGettable.html" title=" " alt="" coords="5,5,127,32"/>
-<area shape="rect" id="node4" href="$classData_1_1IParseable.html" title=" " alt="" coords="151,5,279,32"/>
-</map>

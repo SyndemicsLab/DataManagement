@@ -1,6 +1,0 @@
-<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classData_1_1IGettable.html" title=" " alt="" coords="9,5,130,32"/>
-<area shape="rect" id="node2" href="$classData_1_1IConfigable.html" title="Interface used for Configuration, provides guaranteed methods." alt="" coords="181,31,316,57"/>
-<area shape="rect" id="node3" href="$classData_1_1Config.html" title="Class describing a standard configuration file." alt="" coords="364,31,467,57"/>
-<area shape="rect" id="node4" href="$classData_1_1IParseable.html" title=" " alt="" coords="5,56,133,83"/>
-</map>

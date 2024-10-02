@@ -1,7 +1,6 @@
 var searchData=
 [
-  ['database_68',['Database',['../classData_1_1Database.html',1,'Data']]],
-  ['datatable_69',['DataTable',['../classData_1_1DataTable.html',1,'Data']]],
-  ['datatableshape_70',['DataTableShape',['../classData_1_1DataTableShape.html',1,'Data']]],
-  ['datatabletest_71',['DataTableTest',['../classDataTableTest.html',1,'']]]
+  ['database_6',['Database',['../classdatamanagement_1_1DataManager_1_1Database.html',1,'datamanagement::DataManager']]],
+  ['datamanager_7',['DataManager',['../classdatamanagement_1_1DataManager.html',1,'datamanagement']]],
+  ['datamanagerbase_8',['DataManagerBase',['../classdatamanagement_1_1DataManagerBase.html',1,'datamanagement']]]
 ];

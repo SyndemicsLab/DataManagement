@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>DataManagement: Class Hierarchy</title>
+<title>DataManagement: datamanagement::DataManager::Config Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -54,7 +54,6 @@ $(function() {
 });
 /* @license-end */</script>
 <div id="main-nav"></div>
-</div><!-- top -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -69,21 +68,38 @@ $(function() {
 </iframe>
 </div>
 
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><b>datamanagement</b></li><li class="navelem"><a class="el" href="classdatamanagement_1_1DataManager.html">DataManager</a></li><li class="navelem"><a class="el" href="classdatamanagement_1_1DataManager_1_1Config.html">Config</a></li>  </ul>
+</div>
+</div><!-- top -->
 <div class="header">
+  <div class="summary">
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="classdatamanagement_1_1DataManager_1_1Config-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">Class Hierarchy</div>  </div>
+<div class="title">datamanagement::DataManager::Config Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock">
-<p><a href="inherits.html">Go to the graphical class hierarchy</a></p>
-This inheritance list is sorted roughly, but not completely, alphabetically:</div><div class="directory">
-<div class="levels">[detail level <span onclick="javascript:toggleLevel(1);">1</span><span onclick="javascript:toggleLevel(2);">2</span>]</div><table class="directory">
-<tr id="row_0_" class="even"><td class="entry"><span style="width:16px;display:inline-block;">&#160;</span><span class="icona"><span class="icon">C</span></span><a class="el" href="classdatamanagement_1_1DataManager_1_1Config.html" target="_self">datamanagement::DataManager::Config</a></td><td class="desc"></td></tr>
-<tr id="row_1_"><td class="entry"><span style="width:16px;display:inline-block;">&#160;</span><span class="icona"><span class="icon">C</span></span><a class="el" href="classdatamanagement_1_1DataManager_1_1Database.html" target="_self">datamanagement::DataManager::Database</a></td><td class="desc"></td></tr>
-<tr id="row_2_" class="even"><td class="entry"><span style="width:0px;display:inline-block;">&#160;</span><span id="arr_2_" class="arrow" onclick="toggleFolder('2_')">&#9660;</span><span class="icona"><span class="icon">C</span></span><a class="el" href="classdatamanagement_1_1DataManagerBase.html" target="_self">datamanagement::DataManagerBase</a></td><td class="desc"></td></tr>
-<tr id="row_2_0_"><td class="entry"><span style="width:32px;display:inline-block;">&#160;</span><span class="icona"><span class="icon">C</span></span><a class="el" href="classdatamanagement_1_1DataManager.html" target="_self">datamanagement::DataManager</a></td><td class="desc"></td></tr>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:acdbe15107bb6549713b444b0b7f854c2"><td class="memItemLeft" align="right" valign="top"><a id="acdbe15107bb6549713b444b0b7f854c2"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>LoadConfig</b> (std::string const &amp;filepath)</td></tr>
+<tr class="separator:acdbe15107bb6549713b444b0b7f854c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a934357a75930ddc75cb4060d3a15f90c"><td class="memItemLeft" align="right" valign="top"><a id="a934357a75930ddc75cb4060d3a15f90c"></a>
+std::string&#160;</td><td class="memItemRight" valign="bottom"><b>GetConfigFile</b> () const</td></tr>
+<tr class="separator:a934357a75930ddc75cb4060d3a15f90c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a74172ce27bd6b550ab08e5ada4b665b0"><td class="memItemLeft" align="right" valign="top"><a id="a74172ce27bd6b550ab08e5ada4b665b0"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>GetFromConfig</b> (std::string const key, std::string &amp;data) const</td></tr>
+<tr class="separator:a74172ce27bd6b550ab08e5ada4b665b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a77d5a540f42e85447272328689d0c038"><td class="memItemLeft" align="right" valign="top"><a id="a77d5a540f42e85447272328689d0c038"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>GetConfigSectionCategories</b> (std::string const section, std::vector&lt; std::string &gt; &amp;data) const</td></tr>
+<tr class="separator:a77d5a540f42e85447272328689d0c038"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-</div><!-- directory -->
+<hr/>The documentation for this class was generated from the following file:<ul>
+<li>DataManager.cpp</li>
+</ul>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

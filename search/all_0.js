@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['bottomnrows_0',['bottomNRows',['../classData_1_1DataTable.html#ae873f197ffc85046c5fdc874e74be040',1,'Data::DataTable']]]
+  ['config_0',['Config',['../classdatamanagement_1_1DataManager_1_1Config.html',1,'datamanagement::DataManager']]]
 ];
