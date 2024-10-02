@@ -19,7 +19,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../bin)
 find_package(SQLite3 REQUIRED)
 find_package(Boost REQUIRED)
 
-option(BUILD_TESTS "enable HEPCE tests" OFF)
+option(BUILD_TESTS "enable DataManagement unit tests" OFF)
 if (NOT BUILD_TESTS STREQUAL OFF)
   add_subdirectory(tests)
 endif()
