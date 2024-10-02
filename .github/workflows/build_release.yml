@@ -47,7 +47,7 @@ jobs:
               uses: ddbaptiste/get-latest-release@v1.0.0
 
             - name: Release and Upload
-              run: gh release upload ${{ steps.get-latest-release.outputs.latest-release }} libDataManagement.a
+              run: gh release upload ${{ steps.get-latest-release.outputs.latest-release }} libDataManagement.a include/DataManagerBase.hpp include/DataManager.hpp
               env:
                 GITHUB_TOKEN: ${{ github.TOKEN }}
               shell: bash
