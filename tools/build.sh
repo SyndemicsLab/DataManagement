@@ -10,7 +10,7 @@ fi
 
 # help message to be output either with the -h flag or when using invalid syntax
 showhelp () {
-    printf "\033[31m%s\033[0m" "$0 - Build the DataManagement Model"
+    printf "\033[31m%s\033[0m" "$0 - Build the datamanagement Model"
     echo
     echo
     echo "Syntax: $(basename "$0") [-h|-t OPTION|-p|-l|-n]"
@@ -87,8 +87,8 @@ done
 
     # ensure the `build/` directory exists
     ([[ -d "build/" ]] && rm -rf build/*) || mkdir "build/"
-    # ensure the `build/` directory exists
-    ([[ -d "lib/" ]] && rm -rf lib/*) || mkdir "lib/"
+    # ensure the `lib/` directory exists
+    # ([[ -d "lib/" ]] && rm -rf lib/*) || mkdir "lib/"
 
     (
         cd "build" || exit

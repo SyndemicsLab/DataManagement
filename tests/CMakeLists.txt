@@ -19,7 +19,7 @@ add_executable(${PROJECT_NAME}
         src/TEST_DataManager.cpp
 )
 
-target_link_libraries(dataTests PRIVATE DataManagement)
+target_link_libraries(dataTests PRIVATE datamanagement)
 target_link_libraries(dataTests PRIVATE GTest::gtest)
 target_link_libraries(dataTests PRIVATE GTest::gtest_main)
 

@@ -18,4 +18,3 @@ _install/
 
 !.gitkeep
 lib/*
-bin/*
