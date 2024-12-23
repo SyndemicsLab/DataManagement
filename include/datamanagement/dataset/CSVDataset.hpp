@@ -8,7 +8,8 @@
 namespace datamanagement {
     class CSVDataset : public virtual Dataset {
     public:
-        virtual int AddCSV(std::string const &filepath) = 0;
+        virtual int ReadCSV(std::string const &filepath) = 0;
+        virtual int WriteCSV(std::string const &filepath) const = 0;
     };
 } // namespace datamanagement
 
