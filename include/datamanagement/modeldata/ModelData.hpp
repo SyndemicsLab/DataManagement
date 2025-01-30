@@ -6,13 +6,13 @@
 #include <vector>
 
 namespace datamanagement {
-    class Dataset;
+    class DataSource;
     class ModelData {
     public:
         virtual ~ModelData() = default;
         virtual void AddConfig(const std::string &path) = 0;
-        virtual void AddDataset(const Dataset &dataset) = 0;
-        virtual std::vector<Dataset> GetDatasets() const = 0;
+        virtual void AddDataSource(const DataSource &datasource) = 0;
+        virtual std::vector<DataSource> GetDataSources() const = 0;
 
         virtual std::string GetConfigFile() const = 0;
         virtual int GetFromConfig(std::string const key,

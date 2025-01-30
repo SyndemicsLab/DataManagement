@@ -87,8 +87,8 @@ include(LoadGlaze)
 
 target_link_libraries(${PROJECT_NAME} 
     INTERFACE 
-        SQLite3::SQLite3
-        Boost::Boost
+        SQLite::SQLite3
+        Boost::boost
         spdlog::spdlog
         Eigen3::Eigen
         glaze::glaze

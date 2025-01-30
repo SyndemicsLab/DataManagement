@@ -16,7 +16,12 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/../bin)
 enable_testing()
 
 add_executable(${PROJECT_NAME} 
-        src/TEST_DataManager.cpp
+        src/TEST_Config.cpp
+        src/TEST_CSVDataSource.cpp
+        src/TEST_DataSource.cpp
+        src/TEST_DBDataSource.cpp
+        src/TEST_ModelData.cpp
+        src/TEST_Utils.cpp
 )
 
 target_link_libraries(dataTests PRIVATE datamanagement)

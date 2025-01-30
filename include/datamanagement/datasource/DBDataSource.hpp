@@ -1,7 +1,7 @@
-#ifndef DBDATASET_HPP_
-#define DBDATASET_HPP_
+#ifndef DBDATASOURCE_HPP_
+#define DBDATASOURCE_HPP_
 
-#include <Dataset.hpp>
+#include <datamanagement/datasource/DataSource.hpp>
 #include <filesystem>
 #include <fstream>
 #include <sqlite3.h>
@@ -11,7 +11,7 @@
 namespace datamanagement {
     using Row = std::vector<std::string>;
     using Table = std::vector<Row>;
-    class DBDataset : public virtual Dataset {
+    class DBDataSource : public virtual DataSource {
     private:
         /* data */
         sqlite3 *db;
@@ -106,8 +106,8 @@ namespace datamanagement {
         }
 
     public:
-        DBDataset() {}
-        ~DBDataset() { CloseConnection(); }
+        DBDataSource() {}
+        ~DBDataSource() { CloseConnection(); }
 
         void ConnectToDatabase(const std::string &path) {
             dbf = path;
@@ -179,8 +179,10 @@ namespace datamanagement {
             return rc;
         }
 
-        int GetRun() const override {}
-        int GetTarget() const override {}
+        void AddData(const std::string &s) const override {}
+        Eigen::MatrixXd GetData(const std::string &query) const override {
+            return Eigen::MatrixXd();
+        }
     };
 } // namespace datamanagement
 

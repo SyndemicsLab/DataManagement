@@ -5,9 +5,9 @@
 #include <memory>
 #include <string>
 
-#include "DataManager.hpp"
+#include <datamanagement/datasource/DBDataSource.hpp>
 
-class DataManagerTest : public ::testing::Test {
+class DBDataSourceTest : public ::testing::Test {
 protected:
     struct tablerow {
         std::string intervention;
@@ -34,10 +34,10 @@ protected:
     std::filesystem::path configFile;
     std::ofstream tempStream;
     std::ofstream configStream;
-    datamanagement::DataManager testManager;
+    datamanagement::DBDataSource dbdatasource;
     std::string testTableName;
     void SetUp() override {
-        testManager.ConnectToDatabase("temp.db");
+        dbdatasource.ConnectToDatabase("temp.db");
         tempPath = std::tmpnam(nullptr) + std::string(".csv");
         absolute = std::filesystem::temp_directory_path() / tempPath;
         tempStream.open(absolute);
@@ -53,7 +53,7 @@ protected:
           << std::endl
           << "No_Treatment,10_14,Male,Nonactive_Noninjection,288.995723856067";
         s.close();
-        int rc = testManager.AddCSVTable(a);
+        int rc = dbdatasource.AddCSVTable(a);
 
         configFile = std::filesystem::temp_directory_path() /
                      std::filesystem::path("sim.conf");
@@ -109,12 +109,12 @@ protected:
     }
 };
 
-TEST_F(DataManagerTest, Constructor) {
-    datamanagement::DataManager manager;
+TEST_F(DBDataSourceTest, Constructor) {
+    datamanagement::DBDataSource datasource;
     ASSERT_TRUE(true); // ensure we create the object
 }
 
-TEST_F(DataManagerTest, AddCSVTable) {
+TEST_F(DBDataSourceTest, AddCSVTable) {
     tempStream
         << "block,agegrp,sex,oud,counts" << std::endl
         << "No_Treatment,10_14,Male,Active_Noninjection,2917.55795376043"
@@ -124,16 +124,16 @@ TEST_F(DataManagerTest, AddCSVTable) {
         << "No_Treatment,10_14,Male,Nonactive_Noninjection,288.995723856067";
     tempStream.close();
 
-    int rc = testManager.AddCSVTable(absolute);
+    int rc = dbdatasource.AddCSVTable(absolute);
     datamanagement::Table data = {};
-    rc = testManager.Select(
+    rc = dbdatasource.Select(
         "select count(*) from sqlite_master as tables where type='table'",
         data);
     ASSERT_EQ(rc, 0);
     ASSERT_EQ(std::stoi(data[0][0]), 2);
 }
 
-TEST_F(DataManagerTest, WriteTableToCSV) {
+TEST_F(DBDataSourceTest, WriteTableToCSV) {
     tempStream
         << "block,agegrp,sex,oud,counts" << std::endl
         << "No_Treatment,10_14,Male,Active_Noninjection,2917.55795376043"
@@ -143,14 +143,14 @@ TEST_F(DataManagerTest, WriteTableToCSV) {
         << "No_Treatment,10_14,Male,Nonactive_Noninjection,288.995723856067";
     tempStream.close();
 
-    int rc = testManager.AddCSVTable(absolute);
+    int rc = dbdatasource.AddCSVTable(absolute);
 
     std::filesystem::path tempResult;
     std::filesystem::path absoluteResult;
     tempResult = std::tmpnam(nullptr) + std::string(".csv");
     absoluteResult = std::filesystem::temp_directory_path() / tempResult;
-    testManager.WriteTableToCSV(absoluteResult, absolute.filename().stem(),
-                                "block,agegrp,sex,oud,counts");
+    dbdatasource.WriteTableToCSV(absoluteResult, absolute.filename().stem(),
+                                 "block,agegrp,sex,oud,counts");
 
     std::vector<std::string> expected = {
         "block,agegrp,sex,oud,counts",
@@ -167,7 +167,7 @@ TEST_F(DataManagerTest, WriteTableToCSV) {
     }
 }
 
-TEST_F(DataManagerTest, Create) {
+TEST_F(DBDataSourceTest, Create) {
     std::string sql = "CREATE TABLE WORDS("
                       "ID INT PRIMARY KEY  NOT NULL,"
                       "CURRENT_WORD   TEXT NOT NULL,"
@@ -175,15 +175,15 @@ TEST_F(DataManagerTest, Create) {
                       "AFTER_WORD     TEXT NOT NULL,"
                       "OCCURANCES     INT  NOT NULL);";
     datamanagement::Table data = {};
-    testManager.Create(sql, data);
+    dbdatasource.Create(sql, data);
     // verify a correct value returns (SQLITE_OK == 0)
-    ASSERT_EQ(testManager.Select("SELECT * from WORDS", data), 0);
+    ASSERT_EQ(dbdatasource.Select("SELECT * from WORDS", data), 0);
 }
 
-TEST_F(DataManagerTest, Select) {
+TEST_F(DBDataSourceTest, Select) {
     datamanagement::Table data = {};
     std::string sql = "SELECT * FROM '" + testTableName + "';";
-    testManager.Select(sql, data);
+    dbdatasource.Select(sql, data);
     std::vector<std::string> expected = {"No_Treatment",
                                          "10_14",
                                          "Male",
@@ -208,17 +208,17 @@ TEST_F(DataManagerTest, Select) {
     }
 }
 
-TEST_F(DataManagerTest, SelectCustomCallback) {
+TEST_F(DBDataSourceTest, SelectCustomCallback) {
     std::string sql = "SELECT * FROM '" + testTableName + "';";
     std::vector<struct tablerow> result = {};
     std::string error = "";
-    int rc = testManager.SelectCustomCallback(sql, callback, &result, error);
+    int rc = dbdatasource.SelectCustomCallback(sql, callback, &result, error);
     ASSERT_EQ(rc, 0);
     ASSERT_EQ(result[0].intervention, "No_Treatment");
     ASSERT_NEAR(result[2].value, 288.995723856067, 0.000001);
 }
 
-TEST_F(DataManagerTest, Update) {
+TEST_F(DBDataSourceTest, Update) {
     std::string sql = "CREATE TABLE WORDS("
                       "ID INT PRIMARY KEY  NOT NULL,"
                       "CURRENT_WORD   TEXT NOT NULL,"
@@ -226,15 +226,15 @@ TEST_F(DataManagerTest, Update) {
                       "AFTER_WORD     TEXT NOT NULL,"
                       "OCCURANCES     INT  NOT NULL);";
     datamanagement::Table data = {};
-    testManager.Create(sql, data);
+    dbdatasource.Create(sql, data);
     sql.clear();
     sql = "INSERT INTO WORDS VALUES (1, 'test', 'ah', 'ha', 10)";
     data.clear();
-    int rc = testManager.Update(sql, data);
+    int rc = dbdatasource.Update(sql, data);
     ASSERT_EQ(rc, 0);
 }
 
-TEST_F(DataManagerTest, Delete) {
+TEST_F(DBDataSourceTest, Delete) {
     std::string sql = "CREATE TABLE WORDS("
                       "ID INT PRIMARY KEY  NOT NULL,"
                       "CURRENT_WORD   TEXT NOT NULL,"
@@ -242,29 +242,29 @@ TEST_F(DataManagerTest, Delete) {
                       "AFTER_WORD     TEXT NOT NULL,"
                       "OCCURANCES     INT  NOT NULL);";
     datamanagement::Table data = {};
-    testManager.Create(sql, data);
+    dbdatasource.Create(sql, data);
     sql.clear();
     sql = "INSERT INTO WORDS VALUES (1, 'test', 'ah', 'ha', 10);";
     data.clear();
-    testManager.Update(sql, data);
+    dbdatasource.Update(sql, data);
     data.clear();
-    testManager.Delete("DELETE FROM WORDS WHERE ID = 1;", data);
+    dbdatasource.Delete("DELETE FROM WORDS WHERE ID = 1;", data);
     data.clear();
-    testManager.Select("SELECT * FROM WORDS;", data);
+    dbdatasource.Select("SELECT * FROM WORDS;", data);
     ASSERT_TRUE(data.empty());
 }
 
-TEST_F(DataManagerTest, LoadConfigAndGetFromConfig) {
-    testManager.LoadConfig(configFile);
+TEST_F(DBDataSourceTest, LoadConfigAndGetFromConfig) {
+    dbdatasource.LoadConfig(configFile);
     std::string data = "";
-    int rc = testManager.GetFromConfig("simulation.duration", data);
+    int rc = dbdatasource.GetFromConfig("simulation.duration", data);
     ASSERT_EQ(data, "52");
 }
 
-TEST_F(DataManagerTest, GetConfigSectionCategories) {
-    testManager.LoadConfig(configFile);
+TEST_F(DBDataSourceTest, GetConfigSectionCategories) {
+    dbdatasource.LoadConfig(configFile);
     std::vector<std::string> data = {};
-    int rc = testManager.GetConfigSectionCategories("simulation", data);
+    int rc = dbdatasource.GetConfigSectionCategories("simulation", data);
     std::vector<std::string> expected = {"duration",
                                          "aging_interval",
                                          "intervention_change_times",
