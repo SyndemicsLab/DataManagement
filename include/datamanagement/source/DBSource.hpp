@@ -1,17 +1,17 @@
 #ifndef DBDATASOURCE_HPP_
 #define DBDATASOURCE_HPP_
 
-#include <datamanagement/datasource/DataSource.hpp>
+#include <datamanagement/source/TableSource.hpp>
 #include <filesystem>
 #include <fstream>
 #include <sqlite3.h>
 #include <string>
 #include <vector>
 
-namespace datamanagement {
+namespace datamanagement::source {
     using Row = std::vector<std::string>;
     using Table = std::vector<Row>;
-    class DBDataSource : public virtual DataSource {
+    class DBSource : public virtual TableSource {
     private:
         /* data */
         sqlite3 *db;
@@ -106,8 +106,8 @@ namespace datamanagement {
         }
 
     public:
-        DBDataSource() {}
-        ~DBDataSource() { CloseConnection(); }
+        DBSource() {}
+        ~DBSource() { CloseConnection(); }
 
         void ConnectToDatabase(const std::string &path) {
             dbf = path;
@@ -179,11 +179,13 @@ namespace datamanagement {
             return rc;
         }
 
-        void AddData(const std::string &s) const override {}
-        Eigen::MatrixXd GetData(const std::string &query) const override {
+        Eigen::MatrixXd
+        GetData(const std::vector<std::string> &select_columns,
+                const std::unordered_map<std::string, std::string>
+                    &where_conditions) const override {
             return Eigen::MatrixXd();
         }
     };
-} // namespace datamanagement
+} // namespace datamanagement::source
 
 #endif

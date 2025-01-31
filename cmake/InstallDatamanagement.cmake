@@ -12,6 +12,7 @@ set(pkg_config "${CMAKE_BINARY_DIR}/${PROJECT_NAME}.pc")
 # ---------------------------------------------------------------------------------------
 install(DIRECTORY include/ DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
 install(TARGETS datamanagement EXPORT datamanagement)
+message(STATUS "Include Files Installed")
 
 # ---------------------------------------------------------------------------------------
 # Install pkg-config file
@@ -31,6 +32,7 @@ string(REPLACE ";" " -D" PKG_CONFIG_DEFINES "${PKG_CONFIG_DEFINES}")
 string(CONCAT PKG_CONFIG_DEFINES "-D" "${PKG_CONFIG_DEFINES}")
 configure_file("cmake/${PROJECT_NAME}.pc.in" "${pkg_config}" @ONLY)
 install(FILES "${pkg_config}" DESTINATION "${pkgconfig_install_dir}")
+message(STATUS "Package Config Files Installed")
 
 # ---------------------------------------------------------------------------------------
 # Install CMake config files
@@ -38,12 +40,14 @@ install(FILES "${pkg_config}" DESTINATION "${pkgconfig_install_dir}")
 export(TARGETS datamanagement NAMESPACE datamanagement::
     FILE "${CMAKE_CURRENT_BINARY_DIR}/${config_targets_file}")
 install(EXPORT datamanagement DESTINATION ${export_dest_dir} NAMESPACE datamanagement:: FILE ${config_targets_file})
+message(STATUS "CMake Config Target Files Installed")
 
 include(CMakePackageConfigHelpers)
 configure_package_config_file("${project_config_in}" "${project_config_out}" INSTALL_DESTINATION ${export_dest_dir})
 
 write_basic_package_version_file("${version_config_file}" COMPATIBILITY SameMajorVersion)
 install(FILES "${project_config_out}" "${version_config_file}" DESTINATION "${export_dest_dir}")
+message(STATUS "CMake Version Files Installed")
 
 # ---------------------------------------------------------------------------------------
 # Support creation of installable packages

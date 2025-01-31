@@ -11,15 +11,13 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/../bin)
-
 enable_testing()
 
 add_executable(${PROJECT_NAME} 
         src/TEST_Config.cpp
-        src/TEST_CSVDataSource.cpp
-        src/TEST_DataSource.cpp
-        src/TEST_DBDataSource.cpp
+        src/TEST_CSVSource.cpp
+        src/TEST_Source.cpp
+        src/TEST_DBSource.cpp
         src/TEST_ModelData.cpp
         src/TEST_Utils.cpp
 )

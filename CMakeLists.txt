@@ -83,7 +83,6 @@ include(LoadSqlite)
 include(LoadBoost)
 include(LoadEigen)
 include(LoadSpdlog)
-include(LoadGlaze)
 
 target_link_libraries(${PROJECT_NAME} 
     INTERFACE 
@@ -91,7 +90,6 @@ target_link_libraries(${PROJECT_NAME}
         Boost::boost
         spdlog::spdlog
         Eigen3::Eigen
-        glaze::glaze
 )
 
 set_target_properties(datamanagement PROPERTIES VERSION ${DATAMANAGEMENT_VERSION} SOVERSION ${DATAMANAGEMENT_VERSION_MAJOR}.${DATAMANAGEMENT_VERSION_MINOR})

@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-namespace datamanagement::configuration {
+namespace datamanagement::source {
     class Config {
     private:
         boost::property_tree::ptree ptree;
@@ -55,6 +55,6 @@ namespace datamanagement::configuration {
             return 0;
         }
     };
-} // namespace datamanagement::configuration
+} // namespace datamanagement::source
 
 #endif
