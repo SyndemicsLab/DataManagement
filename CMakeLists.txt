@@ -79,14 +79,11 @@ target_include_directories(${PROJECT_NAME}
 # ---------------------------------------------------------------------------------------
 # Link Dependencies
 # ---------------------------------------------------------------------------------------
-include(LoadSqlite)
-include(LoadBoost)
-include(LoadEigen)
-include(LoadSpdlog)
+include(MakeDependenciesAvaliable)
 
 target_link_libraries(${PROJECT_NAME} 
     INTERFACE 
-        SQLite::SQLite3
+        SQLiteCpp
         Boost::boost
         spdlog::spdlog
         Eigen3::Eigen

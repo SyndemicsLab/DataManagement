@@ -1,189 +1,85 @@
 #ifndef DBDATASOURCE_HPP_
 #define DBDATASOURCE_HPP_
 
-#include <datamanagement/source/TableSource.hpp>
+#include <SQLiteCpp/SQLiteCpp.h>
 #include <filesystem>
 #include <fstream>
-#include <sqlite3.h>
+#include <functional>
 #include <string>
+#include <variant>
 #include <vector>
 
 namespace datamanagement::source {
-    using Row = std::vector<std::string>;
-    using Table = std::vector<Row>;
-    class DBSource : public virtual TableSource {
+    using BindingVariant = std::variant<int, double, std::string>;
+    class DBSource {
     private:
-        /* data */
-        sqlite3 *db;
-        std::string dbf = "";
-        bool db_isopen = false;
-
-        // Generalized Callback function used to return a vector of string (each
-        // string is a column)
-        static int callback(void *storage, int count, char **data,
-                            char **columns) {
-            Table *vecPtr = (Table *)storage;
-            Row row;
-            for (int i = 0; i < count; ++i) {
-                row.push_back(std::string(data[i]));
-            }
-            vecPtr->push_back(row);
-            return 0;
-        }
-
-        // Be Very Careful! void* is expected to be a Table*
-        // because sqlite and C
-        int ExecuteQuery(std::string const query,
-                         int (*callback_func)(void *, int, char **, char **),
-                         void *data) const {
-            StartTransaction();
-            char *error_message;
-            int rc = sqlite3_exec(db, query.c_str(), callback_func, data,
-                                  &error_message);
-            EndTransaction();
-            Table *vecPtr = (Table *)data;
-            Row row;
-            // If there is an error, return the error message in the first index
-            // of the data vector
-            if (rc != SQLITE_OK) {
-                row.push_back(CleanErrorMessages(error_message));
-                vecPtr->push_back(row);
-                return rc;
-            }
-
-            if (data == nullptr) {
-                row.push_back("");
-                vecPtr->push_back(row);
-            }
-            return rc;
-        }
-
-        /// @brief Function to Build a Prepared Statement. NOTE: User must call
-        /// sqlite3_finalize later on to free the memory allocated here.
-        /// @param query String to add with the binding spaces marked
-        sqlite3_stmt *BuildTextPreparedStatement(std::string query) const {
-            sqlite3_stmt *stmt;
-            sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, NULL);
-            return stmt;
-        }
-
-        int
-        BindTextToPreparedStatement(sqlite3_stmt *stmt,
-                                    std::vector<std::string> bindings) const {
-            if (stmt == nullptr) {
-                return -1;
-            }
-            for (int i = 0; i < bindings.size(); ++i) {
-                sqlite3_bind_text(stmt, i + 1, bindings[i].c_str(), -1,
-                                  SQLITE_TRANSIENT);
-            }
-            return 0;
-        }
-
-        int StepAndResetStatement(sqlite3_stmt *stmt) const {
-            if (stmt == nullptr) {
-                return -1;
-            }
-            sqlite3_step(stmt);
-            sqlite3_clear_bindings(stmt);
-            return sqlite3_reset(stmt);
-        }
-
-        /// @brief THIS FUNTION MUST BE CALLED IF YOU CREATE A PREPARED
-        /// STATEMENT THROUGH BuildTextPreparedStatement
-        /// @param stmt
-        int FinalizePreparedStatement(sqlite3_stmt *stmt) const {
-            return sqlite3_finalize(stmt);
-        }
-
-        /// @brief I HATE SQLITE SOMETIMES
-        /// @param message The char * to free
-        /// @return The string copy of the error message that has scope
-        std::string CleanErrorMessages(char *message) const {
-            std::string usable_error = std::string(message);
-            sqlite3_free(message);
-            return usable_error;
-        }
+        SQLite::Database db;
 
     public:
-        DBSource() {}
-        ~DBSource() { CloseConnection(); }
+        DBSource(const std::string &path)
+            : db(path, SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE) {}
+        ~DBSource() = default;
 
-        void ConnectToDatabase(const std::string &path) {
-            dbf = path;
-            int rc = sqlite3_open(path.c_str(), &db);
-            db_isopen = (rc == SQLITE_OK) ? true : false;
-        }
-        int CloseConnection() {
-            int rc = 0;
-            if (db_isopen) {
-                rc = sqlite3_close(db);
-                db_isopen = (rc == SQLITE_OK) ? false : true;
+        void
+        Select(const std::string &query,
+               std::function<void(std::any &storage,
+                                  const SQLite::Statement &stmt)>
+                   callback,
+               std::any &storage,
+               const std::unordered_map<int, BindingVariant> &bindings = {}) {
+            try {
+                SQLite::Statement stmt(db, query);
+
+                for (const auto &[index, value] : bindings) {
+                    if (value.index() == 0) {
+                        stmt.bind(index, std::get<int>(value));
+                    } else if (value.index() == 1) {
+                        stmt.bind(index, std::get<double>(value));
+                    } else {
+                        stmt.bind(index, std::get<std::string>(value));
+                    }
+                }
+
+                SQLite::Transaction transaction(db);
+
+                while (stmt.executeStep()) {
+                    callback(storage, stmt);
+                }
+
+                transaction.commit();
+            } catch (const std::exception &e) {
+                throw std::runtime_error("Error executing query: " + query +
+                                         "\n" + e.what());
             }
-            return rc;
         }
 
-        int SaveDatabase(std::string const &outfile) {
-            if (db_isopen) {
-                CloseConnection();
+        void
+        BatchExecute(const std::string &query,
+                     const std::vector<std::unordered_map<int, BindingVariant>>
+                         &bindings_batch = {}) {
+            try {
+                SQLite::Transaction transaction(db);
+                SQLite::Statement stmt(db, query);
+
+                for (auto &bindings : bindings_batch) {
+                    for (const auto &[index, value] : bindings) {
+                        if (value.index() == 0) {
+                            stmt.bind(index, std::get<int>(value));
+                        } else if (value.index() == 1) {
+                            stmt.bind(index, std::get<double>(value));
+                        } else {
+                            stmt.bind(index, std::get<std::string>(value));
+                        }
+                    }
+                    stmt.exec();
+                    stmt.reset();
+                }
+                transaction.commit();
+
+            } catch (const std::exception &e) {
+                throw std::runtime_error("Error executing query: " + query +
+                                         "\n" + e.what());
             }
-            if (std::filesystem::exists(GetDBFileName())) {
-                std::ifstream src(GetDBFileName(), std::ios::binary);
-                std::ofstream dest(outfile, std::ios::binary);
-                dest << src.rdbuf();
-                src.close();
-                dest.close();
-                return 0;
-            } else {
-                return -1;
-            }
-        }
-
-        int StartTransaction() const {
-            char *error_message;
-            return sqlite3_exec(db, "BEGIN TRANSACTION", NULL, NULL,
-                                &error_message);
-        }
-
-        int EndTransaction() const {
-            char *error_message;
-            return sqlite3_exec(db, "END TRANSACTION", NULL, NULL,
-                                &error_message);
-        }
-        std::string GetDBFileName() const { return dbf; }
-
-        int Create(std::string const query, Table &data) const {
-            return ExecuteQuery(query, NULL, &data);
-        }
-        int Select(std::string const query, Table &data) const {
-            return ExecuteQuery(query, callback, &data);
-        }
-        int Update(std::string const query, Table &data) const {
-            return ExecuteQuery(query, callback, &data);
-        }
-        int Delete(std::string const query, Table &data) const {
-            return ExecuteQuery(query, callback, &data);
-        }
-        int SelectCustomCallback(std::string const query,
-                                 int (*callback_func)(void *, int, char **,
-                                                      char **),
-                                 void *data, std::string &error) const {
-            char *error_message;
-            StartTransaction();
-            int rc = sqlite3_exec(db, query.c_str(), callback_func, data,
-                                  &error_message);
-            EndTransaction();
-            if (rc != SQLITE_OK) {
-                error = CleanErrorMessages(error_message);
-            }
-            return rc;
-        }
-
-        Eigen::MatrixXd
-        GetData(const std::vector<std::string> &select_columns,
-                const std::unordered_map<std::string, std::string>
-                    &where_conditions) const override {
-            return Eigen::MatrixXd();
         }
     };
 } // namespace datamanagement::source

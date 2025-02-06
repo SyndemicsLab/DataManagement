@@ -3,277 +3,104 @@
 #include <gtest/gtest.h>
 #include <iostream>
 #include <memory>
-#include <string>
+#include <tuple>
 
 #include <datamanagement/source/DBSource.hpp>
 
 class DBSourceTest : public ::testing::Test {
 protected:
-    struct tablerow {
-        std::string intervention;
-        std::string age;
-        std::string sex;
-        std::string oud;
-        double value;
-    };
-    static int callback(void *storage, int count, char **data, char **columns) {
-        std::vector<struct tablerow> *vecPtr =
-            (std::vector<struct tablerow> *)storage;
-        struct tablerow row;
-        row.intervention = std::string(data[0]);
-        row.age = std::string(data[1]);
-        row.sex = std::string(data[2]);
-        row.oud = std::string(data[3]);
-        row.value = std::stod(std::string(data[4]));
-        vecPtr->push_back(row);
-        return 0;
-    };
-
-    std::filesystem::path tempPath;
-    std::filesystem::path absolute;
-    std::filesystem::path configFile;
-    std::ofstream tempStream;
-    std::ofstream configStream;
-    datamanagement::source::DBSource dbdatasource;
-    std::string testTableName;
     void SetUp() override {
-        dbdatasource.ConnectToDatabase("temp.db");
-        tempPath = std::tmpnam(nullptr) + std::string(".csv");
-        absolute = std::filesystem::temp_directory_path() / tempPath;
-        tempStream.open(absolute);
-        std::filesystem::path t = std::tmpnam(nullptr) + std::string(".csv");
-        std::filesystem::path a = std::filesystem::temp_directory_path() / t;
-        testTableName = a.filename().stem();
-        std::ofstream s;
-        s.open(a);
-        s << "block,agegrp,sex,oud,counts" << std::endl
-          << "No_Treatment,10_14,Male,Active_Noninjection,2917.55795376043"
-          << std::endl
-          << "No_Treatment,10_14,Male,Active_Injection,977.390032367151"
-          << std::endl
-          << "No_Treatment,10_14,Male,Nonactive_Noninjection,288.995723856067";
-        s.close();
-        // int rc = dbdatasource.AddCSVTable(a);
-
-        configFile = std::filesystem::temp_directory_path() /
-                     std::filesystem::path("sim.conf");
-        configStream.open(configFile);
-
-        configStream << "[simulation]" << std::endl
-                     << "duration = 52" << std::endl
-                     << "aging_interval = 260" << std::endl
-                     << "intervention_change_times = 52" << std::endl
-                     << "entering_sample_change_times = 52" << std::endl
-                     << "overdose_change_times = 52" << std::endl
-                     << "stratified_entering_cohort = false" << std::endl
-                     << std::endl
-                     << "[state]" << std::endl
-                     << "interventions = No_Treatment, Buprenorphine,"
-                        "Naltrexone, Methadone, Detox, Post-Buprenorphine,"
-                        "Post-Naltrexone, Post-Methadone, Post-Detox"
-                        ""
-                     << std::endl
-                     << "ouds = Active_Noninjection, Active_Injection,"
-                        "Nonactive_Noninjection, Nonactive_Injection"
-                     << std::endl
-                     << std::endl
-                     << "[demographic]" << std::endl
-                     << "age_groups = 10_14, 15_19, 20_24, 25_29, 30_34, "
-                        "35_39, 40_44, 45_49, 50_54, 55_59, 60_64, 65_69, "
-                        "70_74, 75_79, 80_84, 85_89, 90_94, 95_99 "
-                     << std::endl
-                     << "sex = Male, Female " << std::endl
-                     << std::endl
-                     << "[cost]" << std::endl
-                     << "cost_analysis = true" << std::endl
-                     << "cost_perspectives = healthcare" << std::endl
-                     << "discount_rate = 0.0025 " << std::endl
-                     << "reporting_interval = 1" << std::endl
-                     << "cost_utility_output_timesteps = 52 " << std::endl
-                     << "cost_category_outputs = false " << std::endl
-                     << std::endl
-                     << "[output] " << std::endl
-                     << "per_intervention_predictions = true " << std::endl
-                     << "general_outputs = false " << std::endl
-                     << "general_stats_output_timesteps = 52";
-        configStream.close();
+        SQLite::Database db("test.db",
+                            SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE);
+        db.exec("CREATE TABLE IF NOT EXISTS test (id INTEGER PRIMARY KEY, name "
+                "TEXT, age INTEGER);");
+        SQLite::Transaction transaction(db);
+        db.exec("INSERT INTO test (name, age) VALUES ('Alice', 30);");
+        db.exec("INSERT INTO test (name, age) VALUES ('Bob', 25);");
+        db.exec("INSERT INTO test (name, age) VALUES ('Charlie', 35);");
+        transaction.commit();
     }
-    void TearDown() override {
-        if (tempStream.is_open()) {
-            tempStream.close();
-        }
-        if (configStream.is_open()) {
-            configStream.close();
-        }
-        std::filesystem::remove("temp.db");
-    }
+    void TearDown() override { std::remove("test.db"); }
 };
 
-TEST_F(DBSourceTest, Constructor) {
-    datamanagement::source::DBSource datasource;
-    ASSERT_TRUE(true); // ensure we create the object
-}
-
-// TEST_F(DBSourceTest, AddCSVTable) {
-//     tempStream
-//         << "block,agegrp,sex,oud,counts" << std::endl
-//         << "No_Treatment,10_14,Male,Active_Noninjection,2917.55795376043"
-//         << std::endl
-//         << "No_Treatment,10_14,Male,Active_Injection,977.390032367151"
-//         << std::endl
-//         << "No_Treatment,10_14,Male,Nonactive_Noninjection,288.995723856067";
-//     tempStream.close();
-
-//     int rc = dbdatasource.AddCSVTable(absolute);
-//     datamanagement::Table data = {};
-//     rc = dbdatasource.Select(
-//         "select count(*) from sqlite_master as tables where type='table'",
-//         data);
-//     ASSERT_EQ(rc, 0);
-//     ASSERT_EQ(std::stoi(data[0][0]), 2);
-// }
-
-// TEST_F(DBSourceTest, WriteTableToCSV) {
-//     tempStream
-//         << "block,agegrp,sex,oud,counts" << std::endl
-//         << "No_Treatment,10_14,Male,Active_Noninjection,2917.55795376043"
-//         << std::endl
-//         << "No_Treatment,10_14,Male,Active_Injection,977.390032367151"
-//         << std::endl
-//         << "No_Treatment,10_14,Male,Nonactive_Noninjection,288.995723856067";
-//     tempStream.close();
-
-//     int rc = dbdatasource.AddCSVTable(absolute);
-
-//     std::filesystem::path tempResult;
-//     std::filesystem::path absoluteResult;
-//     tempResult = std::tmpnam(nullptr) + std::string(".csv");
-//     absoluteResult = std::filesystem::temp_directory_path() / tempResult;
-//     dbdatasource.WriteTableToCSV(absoluteResult, absolute.filename().stem(),
-//                                  "block,agegrp,sex,oud,counts");
-
-//     std::vector<std::string> expected = {
-//         "block,agegrp,sex,oud,counts",
-//         "No_Treatment,10_14,Male,Active_Noninjection,2917.55795376043",
-//         "No_Treatment,10_14,Male,Active_Injection,977.390032367151",
-//         "No_Treatment,10_14,Male,Nonactive_Noninjection,288.995723856067"};
-//     std::ifstream resultStream;
-//     resultStream.open(absolute, std::ios::in);
-//     std::string line;
-//     int i = 0;
-//     while (std::getline(resultStream, line)) {
-//         ASSERT_EQ(line, expected[i]);
-//         ++i;
-//     }
-// }
-
-TEST_F(DBSourceTest, Create) {
-    std::string sql = "CREATE TABLE WORDS("
-                      "ID INT PRIMARY KEY  NOT NULL,"
-                      "CURRENT_WORD   TEXT NOT NULL,"
-                      "BEFORE_WORD    TEXT NOT NULL,"
-                      "AFTER_WORD     TEXT NOT NULL,"
-                      "OCCURANCES     INT  NOT NULL);";
-    datamanagement::source::Table data = {};
-    dbdatasource.Create(sql, data);
-    // verify a correct value returns (SQLITE_OK == 0)
-    ASSERT_EQ(dbdatasource.Select("SELECT * from WORDS", data), 0);
-}
-
 TEST_F(DBSourceTest, Select) {
-    datamanagement::source::Table data = {};
-    std::string sql = "SELECT * FROM '" + testTableName + "';";
-    dbdatasource.Select(sql, data);
-    std::vector<std::string> expected = {"No_Treatment",
-                                         "10_14",
-                                         "Male",
-                                         "Active_Noninjection",
-                                         "2917.55795376043",
-                                         "No_Treatment",
-                                         "10_14",
-                                         "Male",
-                                         "Active_Injection",
-                                         "977.390032367151",
-                                         "No_Treatment",
-                                         "10_14",
-                                         "Male",
-                                         "Nonactive_Noninjection",
-                                         "288.995723856067"};
-    int i = 0;
-    for (datamanagement::source::Row row : data) {
-        for (std::string d : row) {
-            ASSERT_EQ(expected[i], d);
-            ++i;
-        }
+    datamanagement::source::DBSource db_source("test.db");
+
+    std::any storage = std::vector<std::tuple<int, std::string, int>>{};
+
+    db_source.Select(
+        "SELECT * FROM test;",
+        [](std::any &storage, const SQLite::Statement &stmt) {
+            std::vector<std::tuple<int, std::string, int>> *results =
+                std::any_cast<std::vector<std::tuple<int, std::string, int>>>(
+                    &storage);
+            results->emplace_back(stmt.getColumn(0).getInt(),
+                                  stmt.getColumn(1).getText(),
+                                  stmt.getColumn(2).getInt());
+        },
+        storage);
+
+    std::vector<std::tuple<int, std::string, int>> results =
+        std::any_cast<std::vector<std::tuple<int, std::string, int>>>(storage);
+
+    EXPECT_EQ(results.size(), 3);
+    EXPECT_EQ(std::get<1>(results[0]), "Alice");
+    EXPECT_EQ(std::get<1>(results[1]), "Bob");
+    EXPECT_EQ(std::get<1>(results[2]), "Charlie");
+}
+
+TEST_F(DBSourceTest, SelectWithBindings) {
+    datamanagement::source::DBSource db_source("test.db");
+    std::any storage = std::vector<std::tuple<int, std::string, int>>{};
+
+    std::unordered_map<int, datamanagement::source::BindingVariant> bindings;
+    bindings[1] = 1;
+    db_source.Select(
+        "SELECT * FROM test WHERE id = ?;",
+        [](std::any &storage, const SQLite::Statement &stmt) {
+            std::vector<std::tuple<int, std::string, int>> *results =
+                std::any_cast<std::vector<std::tuple<int, std::string, int>>>(
+                    &storage);
+            results->emplace_back(stmt.getColumn(0).getInt(),
+                                  stmt.getColumn(1).getText(),
+                                  stmt.getColumn(2).getInt());
+        },
+        storage, bindings);
+
+    std::vector<std::tuple<int, std::string, int>> results =
+        std::any_cast<std::vector<std::tuple<int, std::string, int>>>(storage);
+
+    EXPECT_EQ(results.size(), 1);
+    EXPECT_EQ(std::get<1>(results[0]), "Alice");
+}
+
+TEST_F(DBSourceTest, BatchExecute) {
+    datamanagement::source::DBSource db_source("test.db");
+    std::string query = "INSERT INTO test (name, age) VALUES (?, ?);";
+    std::vector<std::unordered_map<int, datamanagement::source::BindingVariant>>
+        batch_bindings;
+    for (int i = 0; i < 10; ++i) {
+        std::unordered_map<int, datamanagement::source::BindingVariant>
+            bindings;
+        bindings[1] = i;
+        bindings[2] = "Test" + std::to_string(i);
+        batch_bindings.emplace_back(bindings);
     }
+    db_source.BatchExecute(query, batch_bindings);
+
+    std::any storage = std::vector<std::tuple<int, std::string, int>>{};
+    db_source.Select(
+        "SELECT * FROM test;",
+        [](std::any &storage, const SQLite::Statement &stmt) {
+            std::vector<std::tuple<int, std::string, int>> *results =
+                std::any_cast<std::vector<std::tuple<int, std::string, int>>>(
+                    &storage);
+            results->emplace_back(stmt.getColumn(0).getInt(),
+                                  stmt.getColumn(1).getText(),
+                                  stmt.getColumn(2).getInt());
+        },
+        storage);
+    std::vector<std::tuple<int, std::string, int>> results =
+        std::any_cast<std::vector<std::tuple<int, std::string, int>>>(storage);
+    EXPECT_EQ(results.size(), 13);
 }
-
-TEST_F(DBSourceTest, SelectCustomCallback) {
-    std::string sql = "SELECT * FROM '" + testTableName + "';";
-    std::vector<struct tablerow> result = {};
-    std::string error = "";
-    int rc = dbdatasource.SelectCustomCallback(sql, callback, &result, error);
-    ASSERT_EQ(rc, 0);
-    ASSERT_EQ(result[0].intervention, "No_Treatment");
-    ASSERT_NEAR(result[2].value, 288.995723856067, 0.000001);
-}
-
-TEST_F(DBSourceTest, Update) {
-    std::string sql = "CREATE TABLE WORDS("
-                      "ID INT PRIMARY KEY  NOT NULL,"
-                      "CURRENT_WORD   TEXT NOT NULL,"
-                      "BEFORE_WORD    TEXT NOT NULL,"
-                      "AFTER_WORD     TEXT NOT NULL,"
-                      "OCCURANCES     INT  NOT NULL);";
-    datamanagement::source::Table data = {};
-    dbdatasource.Create(sql, data);
-    sql.clear();
-    sql = "INSERT INTO WORDS VALUES (1, 'test', 'ah', 'ha', 10)";
-    data.clear();
-    int rc = dbdatasource.Update(sql, data);
-    ASSERT_EQ(rc, 0);
-}
-
-TEST_F(DBSourceTest, Delete) {
-    std::string sql = "CREATE TABLE WORDS("
-                      "ID INT PRIMARY KEY  NOT NULL,"
-                      "CURRENT_WORD   TEXT NOT NULL,"
-                      "BEFORE_WORD    TEXT NOT NULL,"
-                      "AFTER_WORD     TEXT NOT NULL,"
-                      "OCCURANCES     INT  NOT NULL);";
-    datamanagement::source::Table data = {};
-    dbdatasource.Create(sql, data);
-    sql.clear();
-    sql = "INSERT INTO WORDS VALUES (1, 'test', 'ah', 'ha', 10);";
-    data.clear();
-    dbdatasource.Update(sql, data);
-    data.clear();
-    dbdatasource.Delete("DELETE FROM WORDS WHERE ID = 1;", data);
-    data.clear();
-    dbdatasource.Select("SELECT * FROM WORDS;", data);
-    ASSERT_TRUE(data.empty());
-}
-
-// TEST_F(DBSourceTest, LoadConfigAndGetFromConfig) {
-//     dbdatasource.LoadConfig(configFile);
-//     std::string data = "";
-//     int rc = dbdatasource.GetFromConfig("simulation.duration", data);
-//     ASSERT_EQ(data, "52");
-// }
-
-// TEST_F(DBSourceTest, GetConfigSectionCategories) {
-//     dbdatasource.LoadConfig(configFile);
-//     std::vector<std::string> data = {};
-//     int rc = dbdatasource.GetConfigSectionCategories("simulation", data);
-//     std::vector<std::string> expected = {"duration",
-//                                          "aging_interval",
-//                                          "intervention_change_times",
-//                                          "entering_sample_change_times",
-//                                          "overdose_change_times",
-//                                          "stratified_entering_cohort"};
-//     int i = 0;
-//     for (std::string d : data) {
-//         ASSERT_EQ(expected[i], d);
-//         ++i;
-//     }
-// }

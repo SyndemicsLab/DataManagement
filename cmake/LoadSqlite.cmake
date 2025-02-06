@@ -1,7 +1,0 @@
-message(CHECK_START "Searching for SQLite3...")
-find_package(SQLite3)
-if( NOT SQLite3_FOUND )
-    message(FATAL_ERROR "SQLite3 Not Found! Exiting...")
-else()
-    message(CHECK_PASS "SQLite3 Found")
-endif()

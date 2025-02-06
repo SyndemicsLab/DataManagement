@@ -8,5 +8,5 @@ Description: Syndemics Data Management
 URL: https://github.com/SyndemicsLab
 Version: @DATAMANAGEMENT_VERSION@
 CFlags: -I${includedir} @PKG_CONFIG_DEFINES@
-Libs: -L${libdir} -lspdlog -leigen -lboost -lsqlite3
+Libs: -L${libdir} -lspdlog -lboost
 Requires: @PKG_CONFIG_REQUIRES@

@@ -1,18 +1,15 @@
 #ifndef CSVDATASOURCE_HPP_
 #define CSVDATASOURCE_HPP_
 
-#include <any>
-#include <datamanagement/source/TableSource.hpp>
 #include <datamanagement/utils/csv.hpp>
+#include <eigen3/Eigen/Core>
 #include <eigen3/Eigen/Dense>
 #include <string>
 #include <vector>
 
 namespace datamanagement::source {
-    class CSVSource : public virtual TableSource {
+    class CSVSource {
     private:
-        const static Eigen::IOFormat CSVFormat(Eigen::FullPrecision,
-                                               Eigen::DontAlignCols, ",", "\n");
         std::string filepath;
 
         bool
@@ -37,7 +34,7 @@ namespace datamanagement::source {
         Eigen::MatrixXd
         GetData(const std::vector<std::string> &select_columns,
                 const std::unordered_map<std::string, std::string>
-                    &where_conditions) const override {
+                    &where_conditions) const {
             std::vector<std::vector<double>> temp_data;
             csv::CSVReader reader(filepath);
             for (csv::CSVRow &row : reader) {
@@ -57,9 +54,22 @@ namespace datamanagement::source {
             return data;
         }
 
-        virtual void WriteCSV(std::string const &filepath) const {
+        virtual void WriteCSV(std::string const &filepath,
+                              const std::vector<std::string> &columns) const {
             std::ofstream file(filepath.c_str());
-            file << GetData({}, {}).format(CSVFormat);
+            for (const std::string &col : columns) {
+                file << col;
+                if (&col != &columns.back()) {
+                    file << ",";
+                } else {
+                    file << "\n";
+                }
+            }
+            file << GetData(columns, {})
+                        .format(Eigen::IOFormat(Eigen::StreamPrecision,
+                                                Eigen::DontAlignCols, ",",
+                                                "\n"));
+            file.close();
         }
     };
 } // namespace datamanagement::source
