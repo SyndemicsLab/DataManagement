@@ -16,10 +16,8 @@ enable_testing()
 add_executable(${PROJECT_NAME} 
         src/TEST_Config.cpp
         src/TEST_CSVSource.cpp
-        src/TEST_Source.cpp
         src/TEST_DBSource.cpp
         src/TEST_ModelData.cpp
-        src/TEST_Utils.cpp
 )
 
 target_link_libraries(dataTests PRIVATE datamanagement)
@@ -28,6 +26,5 @@ target_link_libraries(dataTests PRIVATE GTest::gtest_main)
 
 target_include_directories(dataTests 
     PRIVATE 
-        "mocks/"
         ${PROJECT_SOURCE_DIR}/../include/
 )

@@ -4,6 +4,7 @@
 #include <datamanagement/utils/csv.hpp>
 #include <eigen3/Eigen/Core>
 #include <eigen3/Eigen/Dense>
+#include <filesystem>
 #include <string>
 #include <vector>
 
@@ -30,6 +31,11 @@ namespace datamanagement::source {
 
     public:
         CSVSource(const std::string &s) { filepath = s; }
+
+        std::string GetName() const {
+            std::filesystem::path p = filepath;
+            return p.filename().string();
+        }
 
         Eigen::MatrixXd
         GetData(const std::vector<std::string> &select_columns,

@@ -2,6 +2,7 @@
 #define DBDATASOURCE_HPP_
 
 #include <SQLiteCpp/SQLiteCpp.h>
+#include <any>
 #include <filesystem>
 #include <fstream>
 #include <functional>
@@ -14,11 +15,20 @@ namespace datamanagement::source {
     class DBSource {
     private:
         SQLite::Database db;
+        std::string name = "";
 
     public:
         DBSource(const std::string &path)
-            : db(path, SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE) {}
+            : db(path, SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE) {
+            std::filesystem::path p = path;
+            name = p.filename().string();
+        }
         ~DBSource() = default;
+
+        // Move Constructor
+        DBSource(DBSource &&old) : db(std::move(old.db)), name(old.name) {}
+
+        std::string GetName() const { return name; }
 
         void
         Select(const std::string &query,
