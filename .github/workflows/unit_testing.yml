@@ -34,7 +34,7 @@ jobs:
 
     - name: Configure CMake
       working-directory: ${{github.workspace}}/build
-      run: cmake .. -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DBUILD_TESTS=ON -DBUILD_SHARED_LIBS=OFF
+      run: cmake .. -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DBUILD_TESTS=ON -DBUILD_SHARED_LIBS=OFF -DDATAMANAGEMENT_INSTALL=OFF
       env:
         BOOST_ROOT: ${{ steps.install-boost.outputs.BOOST_ROOT }}
 
@@ -43,5 +43,5 @@ jobs:
       run: cmake --build .
 
     - name: Run Tests
-      working-directory: ${{github.workspace}}
-      run: bin/dataTests
+      working-directory: ${{github.workspace}}/build
+      run: tests/dataTests
