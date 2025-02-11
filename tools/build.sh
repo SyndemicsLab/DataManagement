@@ -34,15 +34,13 @@ err () {
 }
 
 # set default build type
-BUILDTYPE="Debug"
-BUILD_TESTS=""
-BUILD_BENCHMARK=""
-BUILD_SHARED_LIBS="OFF"
+BUILDTYPE="Release"
+BUILD_TESTS="OFF"
 INSTALL_PATH="${CMAKE_SOURCE_DIR}/install"
 INSTALL=""
 
 # process optional command line flags
-while getopts ":lhnpti:" option; do
+while getopts ":hpti:" option; do
     case $option in
         h)
             showhelp
@@ -61,12 +59,6 @@ while getopts ":lhnpti:" option; do
             ;;
         p)
             BUILD_TESTS="ON"
-            ;;
-        l)
-            BUILD_SHARED_LIBS="ON"
-            ;;
-        n)
-            BUILD_BENCHMARK="ON"
             ;;
         i)
             INSTALL_PATH="$OPTARG"
@@ -96,15 +88,8 @@ done
         CMAKE_COMMAND="cmake .. -DCMAKE_BUILD_TYPE=$BUILDTYPE"
         if [[ -n "$BUILD_TESTS" ]]; then
             CMAKE_COMMAND="$CMAKE_COMMAND -DBUILD_TESTS=$BUILD_TESTS"
-            rm -rf ../bin/dataTests
+            rm -rf tests/dataTests
         fi
-        # build benchmarking executable
-        if [[ -n "$BUILD_BENCHMARK" ]]; then
-            CMAKE_COMMAND="$CMAKE_COMMAND -DBUILD_BENCHMARK=$BUILD_BENCHMARK"
-        fi
-        # build static library if BUILD_STATIC_LIBRARY is on, otherwise build
-        # shared library
-        CMAKE_COMMAND="$CMAKE_COMMAND -DBUILD_SHARED_LIBS=$BUILD_SHARED_LIBS"
 
         err "[EXECUTE] $CMAKE_COMMAND"
             # run the full build command as specified
@@ -116,11 +101,16 @@ done
             exit "$ERROR_CODE"
 	    fi
         (
-            # determine the number of processing units available
-            CORES="$(nproc --all)"
+            # use all but 2 processing cores
+            CORES="$(nproc --ignore=2)"
             # if CORES > 1 compile in parallel where possible
             ([[ -n "$CORES" ]] && cmake --build . -j"$CORES") || cmake --build .
         )
+
+        # run tests, if they built properly
+        if [[ (-n "$BUILD_TESTS") && (-f "tests/dataTests") ]]; then
+            tests/dataTests
+        fi
     
         # Install project
         if [[ (-n "$INSTALL") ]]; then
@@ -129,9 +119,4 @@ done
             cmake --install . --prefix=$INSTALL_PATH
         fi
     )
-
-    # run tests, if they built properly
-    if [[ (-n "$BUILD_TESTS") && (-f "bin/dataTests") ]]; then
-        bin/dataTests
-    fi
 )
