@@ -1,9 +1,9 @@
 #ifndef CSVDATASOURCE_HPP_
 #define CSVDATASOURCE_HPP_
 
+#include <Eigen/Core>
+#include <Eigen/Dense>
 #include <datamanagement/utils/csv.hpp>
-#include <eigen3/Eigen/Core>
-#include <eigen3/Eigen/Dense>
 #include <filesystem>
 #include <string>
 #include <vector>
