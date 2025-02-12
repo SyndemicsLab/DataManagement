@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['config_0',['Config',['../classdatamanagement_1_1DataManager_1_1Config.html',1,'datamanagement::DataManager']]]
+  ['and_20build_20via_20cmake_0',['Clone and Build via CMake',['../index.html#autotoc_md3',1,'']]]
 ];

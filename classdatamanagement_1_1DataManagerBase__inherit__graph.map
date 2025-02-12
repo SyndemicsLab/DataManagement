@@ -1,4 +1,5 @@
 <map id="datamanagement::DataManagerBase" name="datamanagement::DataManagerBase">
-<area shape="rect" id="node1" title=" " alt="" coords="5,5,272,32"/>
-<area shape="rect" id="node2" href="$classdatamanagement_1_1DataManager.html" title=" " alt="" coords="21,80,256,107"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,272,31"/>
+<area shape="rect" id="Node000002" href="$classdatamanagement_1_1DataManager.html" title=" " alt="" coords="21,79,256,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="141,44,141,79,136,79,136,44"/>
 </map>
