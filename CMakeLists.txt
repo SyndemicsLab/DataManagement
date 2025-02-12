@@ -1,123 +1,108 @@
-cmake_minimum_required(VERSION 3.19)
-set(CMAKE_CXX_STANDARD 17)
+cmake_minimum_required(VERSION 3.20)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
+include(utils)
+datamanagement_extract_version()
 
 project(
-  DataManagement
-  VERSION 1.0.0
+  datamanagement
+  VERSION ${DATAMANAGEMENT_VERSION}
   DESCRIPTION "A Data Management Library Used By Syndemics Lab Simulation Models"
+  LANGUAGES CXX
 )
 
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
-set(CMAKE_INCLUDE_CURRENT_DIR_IN_INTERFACE ON)
+message(STATUS "Build data management: ${DATAMANAGEMENT_VERSION}")
 
-SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+include(GNUInstallDirs)
 
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../lib)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../lib)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../bin)
+# ---------------------------------------------------------------------------------------
+# Set default build to release
+# ---------------------------------------------------------------------------------------
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+    set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose Release or Debug" FORCE)
+endif()
 
-find_package(SQLite3 REQUIRED)
-find_package(Boost REQUIRED)
+# ---------------------------------------------------------------------------------------
+# Compiler config
+# ---------------------------------------------------------------------------------------
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-option(BUILD_TESTS "enable DataManagement unit tests" OFF)
+# ---------------------------------------------------------------------------------------
+# Windows CXX Extensions
+# ---------------------------------------------------------------------------------------
+set(CMAKE_CXX_EXTENSIONS OFF)
+if(CMAKE_SYSTEM_NAME MATCHES "CYGWIN" OR CMAKE_SYSTEM_NAME MATCHES "MSYS" OR CMAKE_SYSTEM_NAME MATCHES "MINGW")
+    set(CMAKE_CXX_EXTENSIONS ON)
+endif()
+
+# ---------------------------------------------------------------------------------------
+# Set  DATAMANAGEMENT_MASTER_PROJECT to ON if we are building synmodels directly
+# ---------------------------------------------------------------------------------------
+if(NOT DEFINED  DATAMANAGEMENT_MASTER_PROJECT)
+    if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+        set( DATAMANAGEMENT_MASTER_PROJECT ON)
+    else()
+        set( DATAMANAGEMENT_MASTER_PROJECT OFF)
+    endif()
+endif()
+
+# ---------------------------------------------------------------------------------------
+# Set all default options
+# ---------------------------------------------------------------------------------------
+include(options)
+
+# ---------------------------------------------------------------------------------------
+# Set position independent code
+# ---------------------------------------------------------------------------------------
+if(DATAMANAGEMENT_BUILD_PIC)
+    set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+endif()
+
+# ---------------------------------------------------------------------------------------
+# Build the library
+# ---------------------------------------------------------------------------------------
+add_library(datamanagement INTERFACE)
+add_library(datamanagement::datamanagement ALIAS datamanagement)
+
+option(BUILD_TESTS "enable datamanagement unit tests" OFF)
 if (NOT BUILD_TESTS STREQUAL OFF)
   add_subdirectory(tests)
 endif()
 
-option(BUILD_SHARED_LIBS "Build Using Shared Libraries" ON)
-
-if(BUILD_SHARED_LIBS)
-  add_library(${PROJECT_NAME} SHARED)
-else()
-  add_library(${PROJECT_NAME} STATIC)
-endif()
-
-target_sources(${PROJECT_NAME}
-    PRIVATE
-        ${PROJECT_SOURCE_DIR}/src/DataManager.cpp
-)
-
 target_include_directories(${PROJECT_NAME}
-    PUBLIC
+    INTERFACE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-    PRIVATE
-        ${Boost_INCLUDE_DIRS}
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/include>
 )
+
+# ---------------------------------------------------------------------------------------
+# Link Dependencies
+# ---------------------------------------------------------------------------------------
+include(MakeDependenciesAvailable)
 
 target_link_libraries(${PROJECT_NAME} 
-    PRIVATE 
-        ${SQLite3_LIBRARIES}
-        ${Boost_LIBRARY_DIRS}
-        ${Boost_LIBRARIES}
+    INTERFACE 
+        SQLiteCpp
+        Boost::boost
+        spdlog::spdlog
+        Eigen3::Eigen
 )
 
-# note that it is not CMAKE_INSTALL_PREFIX we are checking here
-if(DEFINED CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-    message(
-        STATUS
-        "CMAKE_INSTALL_PREFIX is not set\n"
-        "Default value: ${CMAKE_INSTALL_PREFIX}\n"
-        "Will set it to ${CMAKE_SOURCE_DIR}/install"
-    )
-    set(CMAKE_INSTALL_PREFIX
-        "${CMAKE_SOURCE_DIR}/install"
-        CACHE PATH "Where the library will be installed to" FORCE
-    )
-else()
-    message(
-        STATUS
-        "CMAKE_INSTALL_PREFIX was already set\n"
-        "Current value: ${CMAKE_INSTALL_PREFIX}"
-    )
+set_target_properties(datamanagement PROPERTIES VERSION ${DATAMANAGEMENT_VERSION} SOVERSION ${DATAMANAGEMENT_VERSION_MAJOR}.${DATAMANAGEMENT_VERSION_MINOR})
+
+# ---------------------------------------------------------------------------------------
+# Build Tests
+# ---------------------------------------------------------------------------------------
+if(DATAMANAGEMENT_BUILD_TESTS)
+    message(STATUS "Generating tests")
+    enable_testing()
+    add_subdirectory(tests)
 endif()
 
-SET(public_headers
-    include/DataManager.hpp
-    include/DataManagerBase.hpp
-)
-
-set_target_properties(${PROJECT_NAME} PROPERTIES PUBLIC_HEADER "${public_headers}")
-
-set_target_properties(${PROJECT_NAME} PROPERTIES DEBUG_POSTFIX "d")
-
-include(GNUInstallDirs)
-
-# install the target and create export-set
-install(TARGETS ${PROJECT_NAME}
-    EXPORT "${PROJECT_NAME}Targets"
-    # these get default values from GNUInstallDirs, no need to set them
-    #RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} # bin
-    #LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} # lib
-    #ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} # lib
-    # except for public headers, as we want them to be inside a library folder
-    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME} # include/SomeLibrary
-    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} # include
-)
-
-# generate and install export file
-install(EXPORT "${PROJECT_NAME}Targets"
-    FILE "${PROJECT_NAME}Targets.cmake"
-    NAMESPACE DataManagement::
-    DESTINATION cmake
-)
-
-include(CMakePackageConfigHelpers)
-
-# generate the version file for the config file
-write_basic_package_version_file(
-    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
-    VERSION "${version}"
-    COMPATIBILITY AnyNewerVersion
-)
-# create config file
-configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
-    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
-    INSTALL_DESTINATION cmake
-)
-# install config files
-install(FILES
-    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
-    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
-    DESTINATION cmake
-)
+# ---------------------------------------------------------------------------------------
+# Install
+# ---------------------------------------------------------------------------------------
+if(DATAMANAGEMENT_INSTALL)
+    include(InstallDatamanagement)
+endif()

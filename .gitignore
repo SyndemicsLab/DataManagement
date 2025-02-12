@@ -10,7 +10,7 @@ compile_commands.json
 CTestTestfile.cmake
 _deps
 
-docs/
+docs/doxygen/
 .vscode/
 build/*
 !build/.gitkeep
@@ -18,4 +18,3 @@ _install/
 
 !.gitkeep
 lib/*
-bin/*
