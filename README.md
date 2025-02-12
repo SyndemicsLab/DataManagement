@@ -8,8 +8,11 @@ This repository contains the primary interface for managing all data sources for
 
 ### License
 
-Copyright 2024-2025, Syndemics Lab, All rights reserved. Any questions, please reach out to [Jocelyn Vititow](jocelyn.vititow@bmc.org) or [Caroline Savitzky](caroline.savitzky@bmc.org).
+Copyright 2024-2025, Syndemics Lab, All rights reserved.
+
 Distributed under the AGPLv3 license.
+
+Any questions, please reach out to [Jocelyn Vititow](jocelyn.vititow@bmc.org) or [Caroline Savitzky](caroline.savitzky@bmc.org).
 
 #### Note On Redistribution
 
@@ -48,7 +51,7 @@ To use this tool, we recommend installing the project locally and then incorpora
 
 Example Installation for Linux:
 
-```bat
+```bash
 git clone git@github.com:SyndemicsLab/DataManagement.git
 cd DataManagement
 mkdir build && cd $_
@@ -70,7 +73,7 @@ target_link_libraries(my_target PRIVATE datamanagement::datamanagement)
 
 To run the tests, simply compile with the CMake `BUILD_TESTS` flag enabled and ensure you include `googletest` from the dependency list.
 
-```bat
+```bash
 git clone git@github.com:SyndemicsLab/DataManagement.git
 cd DataManagement
 mkdir build && cd $_

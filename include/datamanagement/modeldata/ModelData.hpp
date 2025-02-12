@@ -14,8 +14,10 @@ namespace datamanagement {
     class ModelData {
     private:
         datamanagement::source::Config config;
-        std::vector<datamanagement::source::CSVSource> csvSources = {};
-        std::vector<datamanagement::source::DBSource> dbSources = {};
+        std::unordered_map<std::string, datamanagement::source::CSVSource>
+            csvSources = {};
+        std::unordered_map<std::string, datamanagement::source::DBSource>
+            dbSources = {};
 
     public:
         ModelData(const std::string &cfgfile) : config(cfgfile) {}
@@ -25,9 +27,13 @@ namespace datamanagement {
         void AddSource(const std::string &path) {
             std::filesystem::path p = path;
             if (p.extension() == ".csv") {
-                csvSources.emplace_back(path);
+                datamanagement::source::CSVSource s;
+                csvSources[p.stem()] = std::move(s);
+                csvSources[p.stem()].ConnectToFile(path);
             } else if (p.extension() == ".db") {
-                dbSources.emplace_back(path);
+                datamanagement::source::DBSource s;
+                dbSources[p.stem()] = std::move(s);
+                dbSources[p.stem()].ConnectToDatabase(path);
             } else {
                 // Not a valid source file
             }
@@ -35,17 +41,26 @@ namespace datamanagement {
 
         std::vector<std::string> GetCSVSourceNames() const {
             std::vector<std::string> names = {};
-            for (const datamanagement::source::CSVSource &src : csvSources) {
-                names.push_back(src.GetName());
+            for (const auto &[k, v] : csvSources) {
+                names.push_back(k);
             }
             return names;
         }
         std::vector<std::string> GetDBSourceNames() const {
             std::vector<std::string> names = {};
-            for (const datamanagement::source::DBSource &src : dbSources) {
-                names.push_back(src.GetName());
+            for (const auto &[k, v] : dbSources) {
+                names.push_back(k);
             }
             return names;
+        }
+
+        datamanagement::source::CSVSource &
+        GetCSVSource(const std::string &name) {
+            return csvSources[name];
+        }
+
+        datamanagement::source::DBSource &GetDBSource(const std::string &name) {
+            return dbSources[name];
         }
     };
 } // namespace datamanagement

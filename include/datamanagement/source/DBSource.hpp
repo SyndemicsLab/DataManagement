@@ -14,21 +14,27 @@ namespace datamanagement::source {
     using BindingVariant = std::variant<int, double, std::string>;
     class DBSource {
     private:
-        SQLite::Database db;
-        std::string name = "";
+        std::unique_ptr<SQLite::Database> db = nullptr;
+        std::string path = "";
 
     public:
-        DBSource(const std::string &path)
-            : db(path, SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE) {
-            std::filesystem::path p = path;
-            name = p.filename().string();
-        }
+        DBSource() {}
         ~DBSource() = default;
 
         // Move Constructor
-        DBSource(DBSource &&old) : db(std::move(old.db)), name(old.name) {}
+        DBSource(DBSource &&old) = default;
+        DBSource &operator=(DBSource &&) = default;
 
-        std::string GetName() const { return name; }
+        void ConnectToDatabase(const std::string &p) {
+            path = p;
+            db = std::make_unique<SQLite::Database>(p, SQLite::OPEN_READWRITE |
+                                                           SQLite::OPEN_CREATE);
+        }
+
+        std::string GetName() const {
+            std::filesystem::path p = path;
+            return p.stem();
+        }
 
         void
         Select(const std::string &query,
@@ -38,7 +44,7 @@ namespace datamanagement::source {
                std::any &storage,
                const std::unordered_map<int, BindingVariant> &bindings = {}) {
             try {
-                SQLite::Statement stmt(db, query);
+                SQLite::Statement stmt(*db, query);
 
                 for (const auto &[index, value] : bindings) {
                     if (value.index() == 0) {
@@ -50,7 +56,7 @@ namespace datamanagement::source {
                     }
                 }
 
-                SQLite::Transaction transaction(db);
+                SQLite::Transaction transaction(*db);
 
                 while (stmt.executeStep()) {
                     callback(storage, stmt);
@@ -68,8 +74,8 @@ namespace datamanagement::source {
                      const std::vector<std::unordered_map<int, BindingVariant>>
                          &bindings_batch = {}) {
             try {
-                SQLite::Transaction transaction(db);
-                SQLite::Statement stmt(db, query);
+                SQLite::Transaction transaction(*db);
+                SQLite::Statement stmt(*db, query);
 
                 for (auto &bindings : bindings_batch) {
                     for (const auto &[index, value] : bindings) {

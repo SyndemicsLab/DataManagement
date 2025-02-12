@@ -30,7 +30,10 @@ namespace datamanagement::source {
         }
 
     public:
-        CSVSource(const std::string &s) { filepath = s; }
+        CSVSource() {}
+        ~CSVSource() = default;
+
+        void ConnectToFile(const std::string &s) { filepath = s; }
 
         std::string GetName() const {
             std::filesystem::path p = filepath;

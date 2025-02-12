@@ -24,7 +24,8 @@ protected:
 };
 
 TEST_F(DBSourceTest, Select) {
-    datamanagement::source::DBSource db_source("test.db");
+    datamanagement::source::DBSource db_source;
+    db_source.ConnectToDatabase("test.db");
 
     std::any storage = std::vector<std::tuple<int, std::string, int>>{};
 
@@ -50,7 +51,8 @@ TEST_F(DBSourceTest, Select) {
 }
 
 TEST_F(DBSourceTest, SelectWithBindings) {
-    datamanagement::source::DBSource db_source("test.db");
+    datamanagement::source::DBSource db_source;
+    db_source.ConnectToDatabase("test.db");
     std::any storage = std::vector<std::tuple<int, std::string, int>>{};
 
     std::unordered_map<int, datamanagement::source::BindingVariant> bindings;
@@ -75,15 +77,16 @@ TEST_F(DBSourceTest, SelectWithBindings) {
 }
 
 TEST_F(DBSourceTest, BatchExecute) {
-    datamanagement::source::DBSource db_source("test.db");
+    datamanagement::source::DBSource db_source;
+    db_source.ConnectToDatabase("test.db");
     std::string query = "INSERT INTO test (name, age) VALUES (?, ?);";
     std::vector<std::unordered_map<int, datamanagement::source::BindingVariant>>
         batch_bindings;
     for (int i = 0; i < 10; ++i) {
         std::unordered_map<int, datamanagement::source::BindingVariant>
             bindings;
-        bindings[1] = i;
-        bindings[2] = "Test" + std::to_string(i);
+        bindings[1] = "Test" + std::to_string(i);
+        bindings[2] = i;
         batch_bindings.emplace_back(bindings);
     }
     db_source.BatchExecute(query, batch_bindings);
@@ -103,4 +106,5 @@ TEST_F(DBSourceTest, BatchExecute) {
     std::vector<std::tuple<int, std::string, int>> results =
         std::any_cast<std::vector<std::tuple<int, std::string, int>>>(storage);
     EXPECT_EQ(results.size(), 13);
+    EXPECT_EQ(std::get<1>(results[3]), "Test0");
 }

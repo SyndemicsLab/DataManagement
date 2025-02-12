@@ -19,7 +19,8 @@ class CSVSourceTest : public ::testing::Test {
 };
 
 TEST_F(CSVSourceTest, GetData) {
-    datamanagement::source::CSVSource csv_source("test.csv");
+    datamanagement::source::CSVSource csv_source;
+    csv_source.ConnectToFile("test.csv");
 
     // Test without where conditions
     Eigen::MatrixXd data = csv_source.GetData({"id", "age"}, {});
@@ -34,10 +35,12 @@ TEST_F(CSVSourceTest, GetData) {
 }
 
 TEST_F(CSVSourceTest, WriteCSV) {
-    datamanagement::source::CSVSource csv_source1("test.csv");
+    datamanagement::source::CSVSource csv_source1;
+    csv_source1.ConnectToFile("test.csv");
 
     csv_source1.WriteCSV("output.csv", {"id", "age"});
-    datamanagement::source::CSVSource csv_source2("output.csv");
+    datamanagement::source::CSVSource csv_source2;
+    csv_source2.ConnectToFile("output.csv");
 
     // Test without where conditions
     Eigen::MatrixXd data1 = csv_source1.GetData({"id", "age"}, {});

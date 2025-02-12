@@ -79,7 +79,7 @@ target_include_directories(${PROJECT_NAME}
 # ---------------------------------------------------------------------------------------
 # Link Dependencies
 # ---------------------------------------------------------------------------------------
-include(MakeDependenciesAvaliable)
+include(MakeDependenciesAvailable)
 
 target_link_libraries(${PROJECT_NAME} 
     INTERFACE 
