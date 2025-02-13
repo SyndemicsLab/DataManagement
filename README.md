@@ -1,4 +1,4 @@
-<img src="docs/images/DSMLogo.png" alt="Data Source Management at the Syndemics Lab" width=50% style="display: block; margin-left: auto; margin-right: auto;"/>
+<img src="./docs/images/DSMLogo.png" alt="Data Source Management at the Syndemics Lab" width=50% style="display: block; margin-left: auto; margin-right: auto;"/>
 
 # DataManagement
 
