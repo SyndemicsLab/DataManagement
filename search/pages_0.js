@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['data_20management_0',['Data Management',['../index.html',1,'']]]
+  ['datamanagement_0',['datamanagement',['../index.html',1,'']]]
 ];

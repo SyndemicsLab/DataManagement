@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['via_20cmake_0',['Clone and Build via CMake',['../index.html#autotoc_md3',1,'']]]
+  ['get_5fshared_5fptr_0',['get_shared_ptr',['../classmio_1_1basic__shared__mmap.html#a6f8e8ceb33dcd068474d32f9ce4fb7c1',1,'mio::basic_shared_mmap']]],
+  ['getting_20started_1',['Getting Started',['../index.html#autotoc_md7',1,'']]]
 ];
