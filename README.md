@@ -1,8 +1,8 @@
-<img src="docs/images/DSMLogoCropped.png" alt="Data Source Management at the Syndemics Lab" height="400" style="display: block; margin-left: auto; margin-right: auto;"/>
+# DataManagement
 
-# DataManagement for the Syndemics Lab at Boston Medical Center
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0) ![GitHub Release](https://img.shields.io/github/v/release/SyndemicsLab/DataManagement) ![Unit Tests](https://img.shields.io/github/actions/workflow/status/SyndemicsLab/DataManagement/unit_testing.yml?label=Tests) ![Document Generation](https://img.shields.io/github/actions/workflow/status/SyndemicsLab/DataManagement/deploy-docs.yml?label=Docs)
 
-[![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0) ![GitHub Release](https://img.shields.io/github/v/release/SyndemicsLab/DataManagement) ![Unit Tests](https://img.shields.io/github/actions/workflow/status/SyndemicsLab/DataManagement/unit_testing.yml)
+<img src="docs/images/DSMLogoCropped.png" alt="Data Source Management at the Syndemics Lab" width=50% style="display: block; margin-left: auto; margin-right: auto;"/>
 
 ## About DataManagement
 
