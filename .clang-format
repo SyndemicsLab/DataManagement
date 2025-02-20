@@ -134,7 +134,7 @@ PenaltyIndentedWhitespace: 0
 PointerAlignment: Right
 PPIndentWidth: -1
 ReferenceAlignment: Pointer
-ReflowComments: false
+ReflowComments: Always
 RemoveBracesLLVM: false
 # RequiresClausePosition: 			OwnLine
 SeparateDefinitionBlocks: Leave
