@@ -1,4 +1,20 @@
-#include <datamanagement/modeldata/ModelData.hpp>
+////////////////////////////////////////////////////////////////////////////////
+// File: test_model_data.cpp                                                  //
+// Project: src                                                               //
+// Created Date: Th Feb 2025                                                  //
+// Author: Matthew Carroll                                                    //
+// -----                                                                      //
+// Last Modified: Thu Feb 20 2025                                             //
+// Modified By: Matthew Carroll                                               //
+// -----                                                                      //
+// Copyright (c) 2025 Syndemics Lab at Boston Medical Center                  //
+// -----                                                                      //
+// HISTORY:                                                                   //
+// Date      	By	Comments                                                  //
+// ----------	---	--------------------------------------------------------- //
+////////////////////////////////////////////////////////////////////////////////
+
+#include <datamanagement/modeldata/model_data.hpp>
 #include <gtest/gtest.h>
 
 class ModelDataTest : public ::testing::Test {
@@ -55,11 +71,11 @@ TEST_F(ModelDataTest, GetSourceNames) {
     md.AddSource("test.db");
     md.AddSource("test.csv");
 
-    std::vector<std::string> csvNames = md.GetCSVSourceNames();
-    ASSERT_EQ(csvNames[0], "test");
+    std::vector<std::string> csv_names = md.GetCSVSourceNames();
+    ASSERT_EQ(csv_names[0], "test");
 
-    std::vector<std::string> dbNames = md.GetDBSourceNames();
-    ASSERT_EQ(dbNames[0], "test");
+    std::vector<std::string> db_names = md.GetDBSourceNames();
+    ASSERT_EQ(db_names[0], "test");
 }
 
 TEST_F(ModelDataTest, Select) {
