@@ -11,9 +11,12 @@ jobs:
     strategy:
       matrix:
         path:
-          - 'src'
-          - 'include'
-          - 'tests'
+          - check: 'src'
+            exclude: ''
+          - check: 'include'
+            exclude: '(csv.hpp)'
+          - check: 'tests'
+            exclude: ''
     steps:
     - uses: actions/checkout@v4
     - name: Run clang-format style check for C/C++/Protobuf programs.
@@ -21,4 +24,5 @@ jobs:
       with:
         clang-format-version: '19'
         check-path: ${{ matrix.path }}
+        exclude-regex: ${{ matrix.path['exclude'] }}
         fallback-style: 'Mozilla' # optional
