@@ -1,5 +1,9 @@
 name: clang-format Check
-on: [push, pull_request]
+on: 
+    push: 
+        branches: '*'
+    pull_request:
+        branches: [ "main" ]
 jobs:
   formatting-check:
     name: Formatting Check
@@ -15,6 +19,6 @@ jobs:
     - name: Run clang-format style check for C/C++/Protobuf programs.
       uses: jidicula/clang-format-action@v4.14.0
       with:
-        clang-format-version: '13'
+        clang-format-version: '19'
         check-path: ${{ matrix.path }}
         fallback-style: 'Mozilla' # optional
