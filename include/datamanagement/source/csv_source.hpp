@@ -4,7 +4,7 @@
 // Created Date: Th Feb 2025                                                  //
 // Author: Matthew Carroll                                                    //
 // -----                                                                      //
-// Last Modified: Thu Feb 20 2025                                             //
+// Last Modified: Fri Feb 21 2025                                             //
 // Modified By: Matthew Carroll                                               //
 // -----                                                                      //
 // Copyright (c) 2025 Syndemics Lab at Boston Medical Center                  //
@@ -14,8 +14,8 @@
 // ----------	---	--------------------------------------------------------- //
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef CSVDATASOURCE_HPP_
-#define CSVDATASOURCE_HPP_
+#ifndef DATAMANAGEMENT_SOURCE_CSVSOURCE_HPP_
+#define DATAMANAGEMENT_SOURCE_CSVSOURCE_HPP_
 
 #include <Eigen/Core>
 #include <Eigen/Dense>
@@ -95,4 +95,4 @@ public:
 };
 } // namespace datamanagement::source
 
-#endif
+#endif // DATAMANAGEMENT_SOURCE_CSVSOURCE_HPP_
