@@ -1,5 +1,21 @@
-#ifndef VERSION_HPP_
-#define VERSION_HPP_
+////////////////////////////////////////////////////////////////////////////////
+// File: version.hpp                                                          //
+// Project: datamanagement                                                    //
+// Created Date: Th Feb 2025                                                  //
+// Author: Matthew Carroll                                                    //
+// -----                                                                      //
+// Last Modified: Thu Feb 20 2025                                             //
+// Modified By: Matthew Carroll                                               //
+// -----                                                                      //
+// Copyright (c) 2025 Syndemics Lab at Boston Medical Center                  //
+// -----                                                                      //
+// HISTORY:                                                                   //
+// Date      	By	Comments                                                  //
+// ----------	---	--------------------------------------------------------- //
+////////////////////////////////////////////////////////////////////////////////
+
+#ifndef DATAMANAGEMENT_VERSION_HPP_
+#define DATAMANAGEMENT_VERSION_HPP_
 
 #define DATAMANAGEMENT_VER_MAJOR 1
 #define DATAMANAGEMENT_VER_MINOR 15
@@ -12,4 +28,4 @@
                               DATAMANAGEMENT_VER_MINOR,                        \
                               DATAMANAGEMENT_VER_PATCH)
 
-#endif
+#endif // DATAMANAGEMENT_VERSION_HPP_

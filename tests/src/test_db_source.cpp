@@ -1,3 +1,19 @@
+////////////////////////////////////////////////////////////////////////////////
+// File: test_db_source.cpp                                                    //
+// Project: src                                                               //
+// Created Date: Th Feb 2025                                                  //
+// Author: Matthew Carroll                                                    //
+// -----                                                                      //
+// Last Modified: Thu Feb 20 2025                                             //
+// Modified By: Matthew Carroll                                               //
+// -----                                                                      //
+// Copyright (c) 2025 Syndemics Lab at Boston Medical Center                  //
+// -----                                                                      //
+// HISTORY:                                                                   //
+// Date      	By	Comments                                                  //
+// ----------	---	--------------------------------------------------------- //
+////////////////////////////////////////////////////////////////////////////////
+
 #include <filesystem>
 #include <fstream>
 #include <gtest/gtest.h>
@@ -5,7 +21,7 @@
 #include <memory>
 #include <tuple>
 
-#include <datamanagement/source/DBSource.hpp>
+#include <datamanagement/source/db_source.hpp>
 
 class DBSourceTest : public ::testing::Test {
 protected:

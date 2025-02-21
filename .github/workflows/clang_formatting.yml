@@ -1,0 +1,26 @@
+name: clang-format Check
+on: 
+    push: 
+        branches: '*'
+    pull_request:
+        branches: [ "main" ]
+jobs:
+  formatting-check:
+    name: Formatting Check
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        path:
+          - check: 'include'
+            exclude: '(csv.hpp)'
+          - check: 'tests'
+            exclude: ''
+    steps:
+    - uses: actions/checkout@v4
+    - name: Run clang-format style check for C/C++/Protobuf programs.
+      uses: jidicula/clang-format-action@v4.14.0
+      with:
+        clang-format-version: '19'
+        check-path: ${{ matrix.path['check'] }}
+        exclude-regex: ${{ matrix.path['exclude'] }}
+        fallback-style: 'Mozilla' # optional

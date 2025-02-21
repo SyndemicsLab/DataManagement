@@ -14,10 +14,10 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 
 add_executable(${PROJECT_NAME} 
-        src/TEST_Config.cpp
-        src/TEST_CSVSource.cpp
-        src/TEST_DBSource.cpp
-        src/TEST_ModelData.cpp
+        src/test_config.cpp
+        src/test_csv_source.cpp
+        src/test_db_source.cpp
+        src/test_model_data.cpp
 )
 
 target_link_libraries(dataTests PRIVATE datamanagement)
