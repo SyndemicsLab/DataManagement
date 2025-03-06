@@ -1,7 +1,19 @@
+////////////////////////////////////////////////////////////////////////////////
+// File: Reader.hpp                                                           //
+// Project: DataManagement                                                    //
+// Created Date: 2025-03-06                                                   //
+// Author: Matthew Carroll                                                    //
+// -----                                                                      //
+// Last Modified: 2025-03-06                                                  //
+// Modified By: Matthew Carroll                                               //
+// -----                                                                      //
+// Copyright (c) 2025 Syndemics Lab at Boston Medical Center                  //
+////////////////////////////////////////////////////////////////////////////////
+
 #ifndef READER_HPP_
 #define READER_HPP_
 
-#include "DataTable.hpp"
+#include <datamanagement/DataTable.hpp>
 #include <filesystem>
 #include <string>
 #include <vector>

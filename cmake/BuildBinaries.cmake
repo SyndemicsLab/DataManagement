@@ -1,0 +1,5 @@
+if(DATAMANAGEMENT_BUILD_TESTS OR DATAMANAGEMENT_BUILD_ALL)
+    message(STATUS "Generating tests")
+    enable_testing()
+    add_subdirectory(tests)
+endif()

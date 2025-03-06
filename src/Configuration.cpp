@@ -1,6 +1,18 @@
-#include "Configuration.hpp"
+////////////////////////////////////////////////////////////////////////////////
+// File: Configuration.cpp                                                    //
+// Project: DataManagement                                                    //
+// Created Date: 2025-03-06                                                   //
+// Author: Matthew Carroll                                                    //
+// -----                                                                      //
+// Last Modified: 2025-03-06                                                  //
+// Modified By: Matthew Carroll                                               //
+// -----                                                                      //
+// Copyright (c) 2025 Syndemics Lab at Boston Medical Center                  //
+////////////////////////////////////////////////////////////////////////////////
+
 #include <boost/property_tree/ini_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
+#include <datamanagement/Configuration.hpp>
 
 #include <cassert>
 #include <limits>
@@ -23,7 +35,7 @@ namespace Data {
         read_ini(configFile, this->dmTree->ptree);
     }
 
-    Config::~Config(){};
+    Config::~Config() {};
 
     ReturnType Config::get(std::string str, ReturnType default_value) {
         if (std::holds_alternative<int>(default_value)) {
