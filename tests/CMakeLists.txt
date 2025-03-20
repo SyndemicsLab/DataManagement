@@ -9,7 +9,7 @@ enable_testing()
 
 add_executable(${PROJECT_NAME} main.cpp DataTableTest.cpp ConfigurationTest.cpp)
 
-target_link_libraries(dataTests PUBLIC DataManagement)
+target_link_libraries(dataTests PUBLIC datamanagement)
 target_link_libraries(dataTests PUBLIC GTest::gtest)
 target_link_libraries(dataTests PUBLIC GTest::gtest_main)
 

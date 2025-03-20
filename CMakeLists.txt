@@ -1,32 +1,8 @@
 cmake_minimum_required(VERSION 3.20)
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
+# list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-# include(utils)
-# datamanagement_extract_version()
-
-file(READ "${CMAKE_CURRENT_LIST_DIR}/include/datamanagement/version.hpp" file_contents)
-string(REGEX MATCH "DATAMANAGEMENT_VER_MAJOR ([0-9]+)" _ "${file_contents}")
-if(NOT CMAKE_MATCH_COUNT EQUAL 1)
-    message(FATAL_ERROR "Could not extract major version number from version.h")
-endif()
-set(ver_major ${CMAKE_MATCH_1})
-
-string(REGEX MATCH "DATAMANAGEMENT_VER_MINOR ([0-9]+)" _ "${file_contents}")
-if(NOT CMAKE_MATCH_COUNT EQUAL 1)
-    message(FATAL_ERROR "Could not extract minor version number from version.hpp")
-endif()
-
-set(ver_minor ${CMAKE_MATCH_1})
-string(REGEX MATCH "DATAMANAGEMENT_VER_PATCH ([0-9]+)" _ "${file_contents}")
-if(NOT CMAKE_MATCH_COUNT EQUAL 1)
-    message(FATAL_ERROR "Could not extract patch version number from version.hpp")
-endif()
-set(ver_patch ${CMAKE_MATCH_1})
-
-set(DATAMANAGEMENT_VERSION_MAJOR ${ver_major} )
-set(DATAMANAGEMENT_VERSION_MINOR ${ver_minor} )
-set(DATAMANAGEMENT_VERSION_PATCH ${ver_patch} )
-set(DATAMANAGEMENT_VERSION "${ver_major}.${ver_minor}.${ver_patch}" )
+include(cmake/utils.cmake)
+datamanagement_extract_version()
 
 project(datamanagement VERSION ${DATAMANAGEMENT_VERSION} LANGUAGES CXX)
 
@@ -69,7 +45,7 @@ endif()
 # ---------------------------------------------------------------------------------------
 # Set all default options
 # ---------------------------------------------------------------------------------------
-include(options)
+include(cmake/options.cmake)
 
 # ---------------------------------------------------------------------------------------
 # Set position independent code
@@ -88,7 +64,7 @@ set(DATAMANAGEMENT_SRCS
 
 if(BUILD_SHARED_LIBS)
     if(WIN32)
-        configure_file(${CMAKE_CURRENT_LIST_DIR}/cmake/version.rc.in ${CMAKE_CURRENT_BINARY_DIR}/version.rc @ONLY)
+        configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/version.rc.in ${CMAKE_CURRENT_BINARY_DIR}/version.rc @ONLY)
         list(APPEND DATAMANAGEMENT_SRCS ${CMAKE_CURRENT_BINARY_DIR}/version.rc)
     endif()
     add_library(datamanagement SHARED ${DATAMANAGEMENT_SRCS} ${DATAMANAGEMENT_ALL_HEADERS})
@@ -116,7 +92,7 @@ target_include_directories(datamanagement ${DATAMANAGEMENT_INCLUDES_LEVEL} PUBLI
                                                                   "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
                                                                   PRIVATE "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/src>")
 
-include(MakeDependenciesAvailable)
+include(cmake/MakeDependenciesAvailable.cmake)
                                                                   
 target_link_libraries(datamanagement
     PRIVATE
@@ -125,11 +101,11 @@ target_link_libraries(datamanagement
 
 set_target_properties(datamanagement PROPERTIES VERSION ${DATAMANAGEMENT_VERSION} SOVERSION ${DATAMANAGEMENT_VERSION_MAJOR}.${DATAMANAGEMENT_VERSION_MINOR})
 
-include(BuildBinaries)
+include(cmake/BuildBinaries.cmake)
 
 # ---------------------------------------------------------------------------------------
 # Install
 # ---------------------------------------------------------------------------------------
 if(DATAMANAGEMENT_INSTALL)
-    include(InstallDatamanagement)
+    include(cmake/InstallDatamanagement.cmake)
 endif()
