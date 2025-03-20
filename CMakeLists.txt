@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
 include(utils)
 datamanagement_extract_version()
@@ -64,7 +64,7 @@ set(DATAMANAGEMENT_SRCS
 
 if(BUILD_SHARED_LIBS)
     if(WIN32)
-        configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/version.rc.in ${CMAKE_CURRENT_BINARY_DIR}/version.rc @ONLY)
+        configure_file(${CMAKE_CURRENT_LIST_DIR}/cmake/version.rc.in ${CMAKE_CURRENT_BINARY_DIR}/version.rc @ONLY)
         list(APPEND DATAMANAGEMENT_SRCS ${CMAKE_CURRENT_BINARY_DIR}/version.rc)
     endif()
     add_library(datamanagement SHARED ${DATAMANAGEMENT_SRCS} ${DATAMANAGEMENT_ALL_HEADERS})
