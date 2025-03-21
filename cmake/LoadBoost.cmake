@@ -3,8 +3,9 @@ list(APPEND CMAKE_MESSAGE_INDENT "  ")
 
 FetchContent_Declare(
     Boost
-    GIT_REPOSITORY https://github.com/boostorg/boost.git
-    GIT_TAG c89e6267665516192015a9e40955e154466f4f68 # v1.87.0
+    GIT_REPOSITORY https://github.com/boostorg/boost/releases/download/boost-1.87.0/boost-1.87.0-cmake.tar.gz
+    USES_TERMINAL_DOWNLOAD TRUE
+    DOWNLOAD_NO_EXTRACT FALSE
 )
 list(POP_BACK CMAKE_MESSAGE_INDENT)
 message(CHECK_PASS "Boost Fetched")
