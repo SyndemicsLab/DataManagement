@@ -3,7 +3,7 @@ list(APPEND CMAKE_MESSAGE_INDENT "  ")
 
 FetchContent_Declare(
     Boost
-    GIT_REPOSITORY https://github.com/boostorg/boost/releases/download/boost-1.87.0/boost-1.87.0-cmake.tar.gz
+    URL https://github.com/boostorg/boost/releases/download/boost-1.87.0/boost-1.87.0-cmake.tar.gz
     USES_TERMINAL_DOWNLOAD TRUE
     DOWNLOAD_NO_EXTRACT FALSE
 )
