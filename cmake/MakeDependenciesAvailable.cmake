@@ -4,4 +4,6 @@ include(FetchContent)
 
 include(cmake/LoadBoost.cmake)
 
+set(BUILD_TESTING OFF)
 FetchContent_MakeAvailable(Boost)
+unset(BUILD_TESTING)

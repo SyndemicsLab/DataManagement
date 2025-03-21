@@ -4,7 +4,7 @@ list(APPEND CMAKE_MESSAGE_INDENT "  ")
 FetchContent_Declare(
     Boost
     GIT_REPOSITORY https://github.com/boostorg/boost.git
-    GIT_TAG 1.87.0
+    GIT_TAG c89e6267665516192015a9e40955e154466f4f68
     FIND_PACKAGE_ARGS
 )
 list(POP_BACK CMAKE_MESSAGE_INDENT)
