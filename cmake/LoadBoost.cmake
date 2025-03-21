@@ -4,7 +4,6 @@ list(APPEND CMAKE_MESSAGE_INDENT "  ")
 FetchContent_Declare(
     Boost
     URL https://github.com/boostorg/boost/releases/download/boost-1.87.0/boost-1.87.0-cmake.tar.gz
-    URL_MD5 d41d8cd98f00b204e9800998ecf8427e
     FIND_PACKAGE_ARGS
     DOWNLOAD_EXTRACT_TIMESTAMP 1
 )
