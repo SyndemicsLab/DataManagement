@@ -1,3 +1,15 @@
+////////////////////////////////////////////////////////////////////////////////
+// File: Configuration.hpp                                                    //
+// Project: DataManagement                                                    //
+// Created Date: 2025-03-20                                                   //
+// Author: Matthew Carroll                                                    //
+// -----                                                                      //
+// Last Modified: 2025-03-21                                                  //
+// Modified By: Matthew Carroll                                               //
+// -----                                                                      //
+// Copyright (c) 2025 Syndemics Lab at Boston Medical Center                  //
+////////////////////////////////////////////////////////////////////////////////
+
 //===-- Configuration.hpp ----------------------------------------*- C++-*-===//
 //
 // Part of the Syndemics Lab DataManagement Code Repository, under
@@ -50,16 +62,9 @@ namespace Data {
                                                          ReturnType) = 0;
         virtual std::vector<ReturnType> getVector(std::string) = 0;
 
-        [[deprecated("This function is not intended to be permanent. getVector "
-                     "will recieve future focus.")]] virtual std::vector<int>
-            getIntVector(std::string) = 0;
-        [[deprecated("This function is not intended to be permanent. getVector "
-                     "will recieve future focus.")]] virtual std::vector<double>
-            getDoubleVector(std::string) = 0;
-        [[deprecated(
-            "This function is not intended to be permanent. getVector will "
-            "recieve future focus.")]] virtual std::vector<std::string>
-            getStringVector(std::string) = 0;
+        virtual std::vector<int> getIntVector(std::string) = 0;
+        virtual std::vector<double> getDoubleVector(std::string) = 0;
+        virtual std::vector<std::string> getStringVector(std::string) = 0;
     };
 
     class IParseable {
