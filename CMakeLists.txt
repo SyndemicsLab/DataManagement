@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-include(utils)
+include(cmake/utils.cmake)
 datamanagement_extract_version()
 
 project(
@@ -50,7 +49,7 @@ endif()
 # ---------------------------------------------------------------------------------------
 # Set all default options
 # ---------------------------------------------------------------------------------------
-include(options)
+include(cmake/options.cmake)
 
 # ---------------------------------------------------------------------------------------
 # Set position independent code
@@ -79,7 +78,7 @@ target_include_directories(${PROJECT_NAME}
 # ---------------------------------------------------------------------------------------
 # Link Dependencies
 # ---------------------------------------------------------------------------------------
-include(MakeDependenciesAvailable)
+include(cmake/MakeDependenciesAvailable.cmake)
 
 target_link_libraries(${PROJECT_NAME} 
     INTERFACE 
@@ -104,5 +103,5 @@ endif()
 # Install
 # ---------------------------------------------------------------------------------------
 if(DATAMANAGEMENT_INSTALL)
-    include(InstallDatamanagement)
+    include(cmake/InstallDatamanagement.cmake)
 endif()
