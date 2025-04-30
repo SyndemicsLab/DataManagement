@@ -1,0 +1,116 @@
+{
+    "version": 7,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 27,
+        "patch": 0
+    },
+    "include": [],
+    "configurePresets": [
+        {
+            "name": "linux-ninja",
+            "hidden": true,
+            "displayName": "Linux Config",
+            "description": "Linux Config build using Ninja generator",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build",
+            "cacheVariables": {
+                "DATAMANAGEMENT_BUILD_PIC": {
+                    "type": "BOOL",
+                    "value": "ON"
+                }
+            },
+            "environment": {}
+        },
+        {
+            "name": "linux-ninja-debug",
+            "inherits": "linux-ninja",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": {
+                    "type": "STRING",
+                    "value": "Debug"
+                }
+            }
+        },
+        {
+            "name": "linux-ninja-release",
+            "inherits": "linux-ninja",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": {
+                    "type": "STRING",
+                    "value": "Release"
+                }
+            }
+        },
+        {
+            "name": "linux-ninja-debug-tests",
+            "inherits": "linux-ninja-debug",
+            "cacheVariables": {
+                "DATAMANAGEMENT_BUILD_TESTS": {
+                    "type": "BOOL",
+                    "value": "ON"
+                },
+                "DATAMANAGEMENT_CALCULATE_COVERAGE": {
+                    "type": "BOOL",
+                    "value": "ON"
+                }
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "default-library",
+            "configurePreset": "linux-ninja-release",
+            "jobs": 4
+        }
+    ],
+    "testPresets": [
+        {
+            "name": "default-test",
+            "configurePreset": "linux-ninja-debug-tests",
+            "configuration": "Debug",
+            "output": {
+                "verbosity": "verbose",
+                "outputOnFailure": true
+            },
+            "execution": {
+                "noTestsAction": "error",
+                "stopOnFailure": true
+            }
+        }
+    ],
+    "packagePresets": [
+        {
+            "name": "default-package",
+            "configurePreset": "linux-ninja-release",
+            "generators": [
+                "TGZ"
+            ]
+        }
+    ],
+    "workflowPresets": [
+        {
+            "name": "default",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "linux-ninja-release"
+                },
+                {
+                    "type": "build",
+                    "name": "default-library"
+                },
+                {
+                    "type": "test",
+                    "name": "default-test"
+                },
+                {
+                    "type": "package",
+                    "name": "default-package"
+                }
+            ]
+        }
+    ]
+}

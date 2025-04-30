@@ -4,7 +4,7 @@
 // Created Date: Th Feb 2025                                                  //
 // Author: Matthew Carroll                                                    //
 // -----                                                                      //
-// Last Modified: Thu Feb 20 2025                                             //
+// Last Modified: 2025-04-30                                                  //
 // Modified By: Matthew Carroll                                               //
 // -----                                                                      //
 // Copyright (c) 2025 Syndemics Lab at Boston Medical Center                  //
@@ -49,7 +49,7 @@ public:
         } else if (p.extension() == ".db") {
             datamanagement::source::DBSource s;
             _db_sources[p.stem()] = std::move(s);
-            _db_sources[p.stem()].ConnectToDatabase(path);
+            _db_sources[p.stem()].SetDatabasePath(path);
         } else {
             // Not a valid source file
         }

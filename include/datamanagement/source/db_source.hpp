@@ -4,7 +4,7 @@
 // Created Date: Th Feb 2025                                                  //
 // Author: Matthew Carroll                                                    //
 // -----                                                                      //
-// Last Modified: Thu Feb 20 2025                                             //
+// Last Modified: 2025-04-30                                                  //
 // Modified By: Matthew Carroll                                               //
 // -----                                                                      //
 // Copyright (c) 2025 Syndemics Lab at Boston Medical Center                  //
@@ -29,10 +29,6 @@
 namespace datamanagement::source {
 using BindingVariant = std::variant<int, double, std::string>;
 class DBSource {
-private:
-    std::unique_ptr<SQLite::Database> db = nullptr;
-    std::string path = "";
-
 public:
     DBSource() {}
     ~DBSource() = default;
@@ -41,14 +37,10 @@ public:
     DBSource(DBSource &&old) = default;
     DBSource &operator=(DBSource &&) = default;
 
-    void ConnectToDatabase(const std::string &p) {
-        path = p;
-        db = std::make_unique<SQLite::Database>(p, SQLite::OPEN_READWRITE |
-                                                       SQLite::OPEN_CREATE);
-    }
+    void SetDatabasePath(const std::string &p) { _path = p; }
 
-    std::string GetName() const {
-        std::filesystem::path p = path;
+    std::string GetDatabaseFileName() const {
+        std::filesystem::path p = _path;
         return p.stem();
     }
 
@@ -59,7 +51,9 @@ public:
            std::any &storage,
            const std::unordered_map<int, BindingVariant> &bindings = {}) {
         try {
-            SQLite::Statement stmt(*db, query);
+            SQLite::Database db(_path,
+                                SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE);
+            SQLite::Statement stmt(db, query);
 
             for (const auto &[index, value] : bindings) {
                 if (value.index() == 0) {
@@ -71,7 +65,7 @@ public:
                 }
             }
 
-            SQLite::Transaction transaction(*db);
+            SQLite::Transaction transaction(db);
 
             while (stmt.executeStep()) {
                 callback(storage, stmt);
@@ -88,8 +82,10 @@ public:
                       const std::vector<std::unordered_map<int, BindingVariant>>
                           &bindings_batch = {}) {
         try {
-            SQLite::Transaction transaction(*db);
-            SQLite::Statement stmt(*db, query);
+            SQLite::Database db(_path,
+                                SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE);
+            SQLite::Transaction transaction(db);
+            SQLite::Statement stmt(db, query);
 
             for (auto &bindings : bindings_batch) {
                 for (const auto &[index, value] : bindings) {
@@ -111,6 +107,9 @@ public:
                                      e.what());
         }
     }
+
+private:
+    std::string _path = "";
 };
 } // namespace datamanagement::source
 
