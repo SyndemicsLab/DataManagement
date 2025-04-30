@@ -4,7 +4,7 @@
 // Created Date: Th Feb 2025                                                  //
 // Author: Matthew Carroll                                                    //
 // -----                                                                      //
-// Last Modified: Thu Feb 20 2025                                             //
+// Last Modified: 2025-04-30                                                  //
 // Modified By: Matthew Carroll                                               //
 // -----                                                                      //
 // Copyright (c) 2025 Syndemics Lab at Boston Medical Center                  //
@@ -41,7 +41,7 @@ protected:
 
 TEST_F(DBSourceTest, Select) {
     datamanagement::source::DBSource db_source;
-    db_source.ConnectToDatabase("test.db");
+    db_source.SetDatabasePath("test.db");
 
     std::any storage = std::vector<std::tuple<int, std::string, int>>{};
 
@@ -68,7 +68,7 @@ TEST_F(DBSourceTest, Select) {
 
 TEST_F(DBSourceTest, SelectWithBindings) {
     datamanagement::source::DBSource db_source;
-    db_source.ConnectToDatabase("test.db");
+    db_source.SetDatabasePath("test.db");
     std::any storage = std::vector<std::tuple<int, std::string, int>>{};
 
     std::unordered_map<int, datamanagement::source::BindingVariant> bindings;
@@ -94,7 +94,7 @@ TEST_F(DBSourceTest, SelectWithBindings) {
 
 TEST_F(DBSourceTest, BatchExecute) {
     datamanagement::source::DBSource db_source;
-    db_source.ConnectToDatabase("test.db");
+    db_source.SetDatabasePath("test.db");
     std::string query = "INSERT INTO test (name, age) VALUES (?, ?);";
     std::vector<std::unordered_map<int, datamanagement::source::BindingVariant>>
         batch_bindings;
