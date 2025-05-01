@@ -1,4 +1,4 @@
-name: clang-format Check
+name: Code Formatting
 on: 
     push: 
         branches: '*'
