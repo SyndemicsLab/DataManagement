@@ -1,4 +1,4 @@
-name: Code Coverage Results
+name: Code Coverage
 
 on:
     push:
@@ -51,3 +51,8 @@ jobs:
                 html-details: true
                 html-title: TESPOND Test Coverage Report
                 html-theme: github.green
+            - name: Upload Code Coverage Results
+              uses: actions/upload-artifact@v4
+              with:
+                name: coverage
+                path: ${{github.workspace}}/coverage.html

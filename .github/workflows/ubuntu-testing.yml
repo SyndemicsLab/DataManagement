@@ -25,12 +25,22 @@ jobs:
         boost_version: 1.84.0
         platform_version: 22.04
         toolset: 'gcc'
+    
+    - name: Install Eigen3
+      uses: kupns-aka-kupa/setup-eigen3@master
+      id: install-eigen3
+      with:
+        version: 3.4.0
+      env:
+        CMAKE_GENERATOR: Ninja
 
     - name: Install GTest Ubuntu
       run: sudo apt-get install libgtest-dev
 
     - name: Configure CMake
-      working-directory: ${{github.workspace}}/build
+      working-directory: ${{github.workspace}}
       run: cmake --workflow --preset gcc-debug
       env:
         BOOST_ROOT: ${{ steps.install-boost.outputs.BOOST_ROOT }}
+        EIGEN3_INCLUDE_DIR: ${{ steps.install-eigen3.outputs.EIGEN3_INCLUDE_DIR }}
+        EIGEN3_DIR: ${{ steps.install-eigen3.outputs.EIGEN3_DIR}}
