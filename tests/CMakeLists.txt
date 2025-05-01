@@ -9,7 +9,6 @@ endif()
 enable_testing()
 
 add_executable(${PROJECT_NAME} 
-        src/test_config.cpp
         src/test_csv_source.cpp
         src/test_db_source.cpp
         src/test_model_data.cpp

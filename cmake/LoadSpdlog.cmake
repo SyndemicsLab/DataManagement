@@ -6,5 +6,6 @@ FetchContent_Declare(
         GIT_TAG         v1.x
         GIT_PROGRESS    TRUE
 )
+set(SPDLOG_INSTALL ON)
 list(POP_BACK CMAKE_MESSAGE_INDENT)
 message(CHECK_PASS "spdlog Fetched")
