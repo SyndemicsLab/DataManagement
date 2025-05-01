@@ -1,7 +1,7 @@
 var searchData=
 [
   ['col_5fnames_0',['col_names',['../group__csv__internal.html#ga89f11de1213ea2b3202129970322e688',1,'csv::CSVReader']]],
-  ['config_1',['config',['../classdatamanagement_1_1source_1_1Config.html',1,'datamanagement::source::Config'],['../index.html#autotoc_md14',1,'Config']]],
+  ['config_1',['Config',['../index.html#autotoc_md14',1,'']]],
   ['configuration_20data_2',['Configuration Data',['../index.html#autotoc_md12',1,'']]],
   ['constexpr_3',['CONSTEXPR',['../csv_8hpp.html#a1b390eeec914c993220d6ad281e0a099',1,'csv.hpp']]],
   ['constexpr_5fvalue_4',['CONSTEXPR_VALUE',['../csv_8hpp.html#a88ec8638f55d8b2c24f709cdf9e3430b',1,'csv.hpp']]],
