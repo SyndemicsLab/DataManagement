@@ -93,11 +93,7 @@ set_target_properties(datamanagement PROPERTIES VERSION ${DATAMANAGEMENT_VERSION
 # ---------------------------------------------------------------------------------------
 # Build Tests
 # ---------------------------------------------------------------------------------------
-if(DATAMANAGEMENT_BUILD_TESTS)
-    message(STATUS "Generating tests")
-    enable_testing()
-    add_subdirectory(tests)
-endif()
+include(cmake/BuildBinaries.cmake)
 
 # ---------------------------------------------------------------------------------------
 # Install

@@ -4,7 +4,7 @@
 // Created Date: Th Feb 2025                                                  //
 // Author: Matthew Carroll                                                    //
 // -----                                                                      //
-// Last Modified: Thu Feb 20 2025                                             //
+// Last Modified: 2025-05-01                                                  //
 // Modified By: Matthew Carroll                                               //
 // -----                                                                      //
 // Copyright (c) 2025 Syndemics Lab at Boston Medical Center                  //
@@ -18,7 +18,7 @@
 #define DATAMANAGEMENT_VERSION_HPP_
 
 #define DATAMANAGEMENT_VER_MAJOR 1
-#define DATAMANAGEMENT_VER_MINOR 15
+#define DATAMANAGEMENT_VER_MINOR 1
 #define DATAMANAGEMENT_VER_PATCH 0
 
 #define DATAMANAGEMENT_TO_VERSION(major, minor, patch)                         \
