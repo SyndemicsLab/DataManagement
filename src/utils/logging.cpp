@@ -23,8 +23,8 @@ CreationStatus CreateFileLogger(const std::string &logger_name,
     try {
         spdlog::cfg::load_env_levels();
         spdlog::set_pattern("[%H:%M:%S %z] [%n] [%^---%L---%$] [thread %t] %v");
-        spdlog::flush_every(std::chrono::seconds(3));
         spdlog::basic_logger_mt(logger_name, filepath);
+        spdlog::flush_every(std::chrono::seconds(3));
     } catch (const spdlog::spdlog_ex &ex) {
         std::cout << "Log init failed: " << ex.what() << std::endl;
         return CreationStatus::kError;

@@ -125,6 +125,7 @@ if (DATAMANAGEMENT_CALCULATE_COVERAGE)
         PRIVATE
             spdlog::spdlog
             Boost::boost
+            gcov
     )
 else()
     target_link_libraries(datamanagement
@@ -134,7 +135,6 @@ else()
         PRIVATE
             spdlog::spdlog
             Boost::boost
-            gcov
         )
 endif()
 

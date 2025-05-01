@@ -14,8 +14,14 @@
 // ----------	---	--------------------------------------------------------- //
 ////////////////////////////////////////////////////////////////////////////////
 
+// File Under Test
 #include <datamanagement/modeldata/model_data.hpp>
+
+// 3rd Party Libraries
 #include <gtest/gtest.h>
+
+// Include Libraries
+#include <datamanagement/utils/logging.hpp>
 
 class ModelDataTest : public ::testing::Test {
     void SetUp() override {
@@ -60,6 +66,25 @@ class ModelDataTest : public ::testing::Test {
 TEST_F(ModelDataTest, GetFromConfig) {
     auto model_data = datamanagement::ModelData::Create("test.conf");
     ASSERT_EQ(model_data->GetFromConfig("simulation.duration"), "52");
+}
+
+TEST_F(ModelDataTest, GetFromConfigError) {
+    const std::string LOG_NAME = "GetFromConfigError";
+    const std::string LOG_FILE = "test.log";
+    datamanagement::utils::CreateFileLogger(LOG_NAME, LOG_FILE);
+    auto model_data = datamanagement::ModelData::Create("test.conf", LOG_NAME);
+    ASSERT_EQ(model_data->GetFromConfig("find_an_error"), "");
+
+    std::string expected =
+        "Error in attempting to extract find_an_error from config file...";
+    std::string line;
+
+    std::ifstream f(LOG_FILE);
+    std::getline(f, line);
+    f.close();
+
+    ASSERT_TRUE(line.find(expected) != std::string::npos);
+    std::filesystem::remove(LOG_FILE);
 }
 
 TEST_F(ModelDataTest, GetConfigSectionCategories) {

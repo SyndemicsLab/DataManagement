@@ -46,6 +46,7 @@ jobs:
                     gtest/*
                     googletest/*
                     build/*
+                    tests/*
                 fail-under-line: 80
                 html-out: coverage.html
                 html-details: true

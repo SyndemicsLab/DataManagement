@@ -12,6 +12,7 @@ add_executable(${PROJECT_NAME}
         src/test_csv_source.cpp
         src/test_db_source.cpp
         src/test_model_data.cpp
+        src/test_logging.cpp
 )
 
 target_link_libraries(datamanagement_tests 

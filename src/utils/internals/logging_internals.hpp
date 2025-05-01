@@ -48,6 +48,7 @@ void log(const std::string &logger_name, const std::string &message,
             logger->error(message);
             break;
         case LogType::kDebug:
+            logger->set_level(spdlog::level::debug);
             logger->debug(message);
             break;
         default:

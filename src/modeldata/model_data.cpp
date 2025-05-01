@@ -61,7 +61,6 @@ std::string ModelDataImpl::GetFromConfig(const std::string &key) const {
     try {
         result = _ptree.get<std::string>(key);
     } catch (const std::exception &e) {
-        // log bad cast
         datamanagement::utils::LogError(_log_name,
                                         "Error in attempting to extract " +
                                             key + " from config file...");
