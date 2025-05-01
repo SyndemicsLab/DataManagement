@@ -4,7 +4,7 @@
 // Created Date: Th Feb 2025                                                  //
 // Author: Matthew Carroll                                                    //
 // -----                                                                      //
-// Last Modified: Thu Feb 20 2025                                             //
+// Last Modified: 2025-05-01                                                  //
 // Modified By: Matthew Carroll                                               //
 // -----                                                                      //
 // Copyright (c) 2025 Syndemics Lab at Boston Medical Center                  //
@@ -14,8 +14,14 @@
 // ----------	---	--------------------------------------------------------- //
 ////////////////////////////////////////////////////////////////////////////////
 
+// File Under Test
 #include <datamanagement/modeldata/model_data.hpp>
+
+// 3rd Party Libraries
 #include <gtest/gtest.h>
+
+// Include Libraries
+#include <datamanagement/utils/logging.hpp>
 
 class ModelDataTest : public ::testing::Test {
     void SetUp() override {
@@ -57,34 +63,61 @@ class ModelDataTest : public ::testing::Test {
     }
 };
 
-TEST_F(ModelDataTest, ConfigTesting) {
-    datamanagement::ModelData md("test.conf");
-    datamanagement::source::Config cf = md.GetConfig();
+TEST_F(ModelDataTest, GetFromConfig) {
+    auto model_data = datamanagement::ModelData::Create("test.conf");
+    ASSERT_EQ(model_data->GetFromConfig("simulation.duration"), "52");
+}
 
-    std::string data = "";
-    cf.GetFromConfig("simulation.duration", data);
-    ASSERT_EQ(data, "52");
+TEST_F(ModelDataTest, GetFromConfigError) {
+    const std::string LOG_NAME = "GetFromConfigError";
+    const std::string LOG_FILE = "test.log";
+    datamanagement::utils::CreateFileLogger(LOG_NAME, LOG_FILE);
+    auto model_data = datamanagement::ModelData::Create("test.conf", LOG_NAME);
+    ASSERT_EQ(model_data->GetFromConfig("find_an_error"), "");
+
+    std::string expected =
+        "Error in attempting to extract find_an_error from config file...";
+    std::string line;
+
+    std::ifstream f(LOG_FILE);
+    std::getline(f, line);
+    f.close();
+
+    ASSERT_TRUE(line.find(expected) != std::string::npos);
+    std::filesystem::remove(LOG_FILE);
+}
+
+TEST_F(ModelDataTest, GetConfigSectionCategories) {
+    auto model_data = datamanagement::ModelData::Create("test.conf");
+    std::vector<std::string> data =
+        model_data->GetConfigSectionCategories("simulation");
+    std::vector<std::string> expected = {"duration", "aging_interval"};
+    int i = 0;
+    for (std::string d : data) {
+        ASSERT_EQ(expected[i], d);
+        ++i;
+    }
 }
 
 TEST_F(ModelDataTest, GetSourceNames) {
-    datamanagement::ModelData md("test.conf");
-    md.AddSource("test.db");
-    md.AddSource("test.csv");
+    auto model_data = datamanagement::ModelData::Create("test.conf");
+    model_data->AddSource("test.db");
+    model_data->AddSource("test.csv");
 
-    std::vector<std::string> csv_names = md.GetCSVSourceNames();
+    std::vector<std::string> csv_names = model_data->GetCSVSourceNames();
     ASSERT_EQ(csv_names[0], "test");
 
-    std::vector<std::string> db_names = md.GetDBSourceNames();
+    std::vector<std::string> db_names = model_data->GetDBSourceNames();
     ASSERT_EQ(db_names[0], "test");
 }
 
 TEST_F(ModelDataTest, Select) {
-    datamanagement::ModelData md("test.conf");
-    md.AddSource("test.db");
+    auto model_data = datamanagement::ModelData::Create("test.conf");
+    model_data->AddSource("test.db");
 
     std::any storage = std::vector<std::tuple<int, std::string, int>>{};
 
-    md.GetDBSource("test").Select(
+    model_data->GetDBSource("test").Select(
         "SELECT * FROM test;",
         [](std::any &storage, const SQLite::Statement &stmt) {
             std::vector<std::tuple<int, std::string, int>> *results =
@@ -106,8 +139,8 @@ TEST_F(ModelDataTest, Select) {
 }
 
 TEST_F(ModelDataTest, BatchExecute) {
-    datamanagement::ModelData md("test.conf");
-    md.AddSource("test.db");
+    auto model_data = datamanagement::ModelData::Create("test.conf");
+    model_data->AddSource("test.db");
 
     std::string query = "INSERT INTO test (name, age) VALUES (?, ?);";
     std::vector<std::unordered_map<int, datamanagement::source::BindingVariant>>
@@ -119,10 +152,10 @@ TEST_F(ModelDataTest, BatchExecute) {
         bindings[2] = i;
         batch_bindings.emplace_back(bindings);
     }
-    md.GetDBSource("test").BatchExecute(query, batch_bindings);
+    model_data->GetDBSource("test").BatchExecute(query, batch_bindings);
 
     std::any storage = std::vector<std::tuple<int, std::string, int>>{};
-    md.GetDBSource("test").Select(
+    model_data->GetDBSource("test").Select(
         "SELECT * FROM test;",
         [](std::any &storage, const SQLite::Statement &stmt) {
             std::vector<std::tuple<int, std::string, int>> *results =
@@ -140,31 +173,33 @@ TEST_F(ModelDataTest, BatchExecute) {
 }
 
 TEST_F(ModelDataTest, GetData) {
-    datamanagement::ModelData md("test.conf");
-    md.AddSource("test.csv");
+    auto model_data = datamanagement::ModelData::Create("test.conf");
+    model_data->AddSource("test.csv");
 
     // Test without where conditions
-    Eigen::MatrixXd data = md.GetCSVSource("test").GetData({"id", "age"}, {});
+    Eigen::MatrixXd data =
+        model_data->GetCSVSource("test").GetData({"id", "age"}, {});
     EXPECT_EQ(data.rows(), 3);
     EXPECT_EQ(data.cols(), 2);
 
     // Test with where conditions
-    Eigen::MatrixXd filtered_data =
-        md.GetCSVSource("test").GetData({"id", "age"}, {{"name", "Alice"}});
+    Eigen::MatrixXd filtered_data = model_data->GetCSVSource("test").GetData(
+        {"id", "age"}, {{"name", "Alice"}});
     EXPECT_EQ(filtered_data.rows(), 1);
     EXPECT_EQ(filtered_data.cols(), 2);
 }
 
 TEST_F(ModelDataTest, WriteCSV) {
-    datamanagement::ModelData md("test.conf");
-    md.AddSource("test.csv");
+    auto model_data = datamanagement::ModelData::Create("test.conf");
+    model_data->AddSource("test.csv");
 
-    md.GetCSVSource("test").WriteCSV("output.csv", {"id", "age"});
+    model_data->GetCSVSource("test").WriteCSV("output.csv", {"id", "age"});
     datamanagement::source::CSVSource csv_source2;
     csv_source2.ConnectToFile("output.csv");
 
     // Test without where conditions
-    Eigen::MatrixXd data1 = md.GetCSVSource("test").GetData({"id", "age"}, {});
+    Eigen::MatrixXd data1 =
+        model_data->GetCSVSource("test").GetData({"id", "age"}, {});
     Eigen::MatrixXd data2 = csv_source2.GetData({"id", "age"}, {});
     ASSERT_TRUE(data2.isApprox(data1));
     std::remove("output.csv");

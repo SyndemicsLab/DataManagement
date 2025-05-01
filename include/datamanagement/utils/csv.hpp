@@ -1,4 +1,6 @@
 #pragma once
+// GCOVR_EXCL_START
+// clang-format off
 /*
 CSV for C++, version 2.3.0
 https://github.com/vincentlaucsb/csv-parser
@@ -8828,4 +8830,6 @@ namespace csv {
     }
 } // namespace csv
 
+// clang-format on
+// GCOVR_EXCL_STOP
 #endif
