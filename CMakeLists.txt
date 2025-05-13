@@ -116,13 +116,14 @@ target_include_directories(datamanagement ${DATAMANAGEMENT_INCLUDES_LEVEL}
 # Link Dependencies
 # ---------------------------------------------------------------------------------------
 include(cmake/MakeDependenciesAvailable.cmake)
+find_package(SQLiteCpp REQUIRED)
 
 if (DATAMANAGEMENT_CALCULATE_COVERAGE)
     target_link_libraries(datamanagement
         PUBLIC 
+            SQLiteCpp
             Eigen3::Eigen
         PRIVATE
-            SQLiteCpp
             spdlog::spdlog
             Boost::boost
             gcov
@@ -130,9 +131,9 @@ if (DATAMANAGEMENT_CALCULATE_COVERAGE)
 else()
     target_link_libraries(datamanagement
         PUBLIC 
+            SQLiteCpp
             Eigen3::Eigen
         PRIVATE
-            SQLiteCpp
             spdlog::spdlog
             Boost::boost
         )
