@@ -14,3 +14,6 @@ elseif(DATAMANAGEMENT_BUILD_TESTS STREQUAL "ON")
     FetchContent_MakeAvailable(Eigen3 SQLiteCpp Boost spdlog googletest)
     include(GoogleTest)
 endif()
+
+# Thanks SQLiteCpp for being annoying and moving things into the cmake folder
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_INSTALL_LIBDIR}/cmake)
